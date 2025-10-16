@@ -1,0 +1,22 @@
+{
+  "login": "Login",
+  "register": "Register",
+  "username": "Username",
+  "password": "Password",
+  "language": "Language",
+
+
+  "welcomeMessage": "Welcome to React and react-i18next",
+  "countSheepMessage_one": "There is <1>{{count}}</1> sheep",
+  "countSheepMessage_other": "There are <1>{{count}}</1> sheeps",
+  "home": "Home",
+  "recruitmentReq": "Recruitment Requests",
+  "jobPosition": "Job Positions",
+  "candidate": "Candidates",
+  "calendar": "Calendar",
+  "email":"Email",
+
+  "profile": "Profile",
+  "settings": "Settings",
+  "logout": "Logout"
+}

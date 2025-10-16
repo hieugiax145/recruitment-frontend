@@ -1,0 +1,20 @@
+{
+  "login": "Đăng nhập",
+  "register": "Đăng ký",
+  "username": "Tên đăng nhập",
+  "password": "Mật khẩu",
+  "language": "Ngôn ngữ",
+
+  "welcomeMessage": "Chào mừng bạn đến với React và react-i18next",
+  "countSheepMessage_one": "Có <1>{{count}}</1> con cừu",
+  "countSheepMessage_other": "Có <1>{{count}}</1> con cừu",
+  "home":"Trang chủ",
+  "recruitmentReq":"Yêu cầu tuyển dụng",
+  "jobPosition":"Vị trí tuyển dụng",
+  "candidate":"Ứng viên",
+  "calendar":"Lịch",
+
+  "profile": "Hồ sơ",
+  "settings": "Cài đặt",
+  "logout": "Đăng xuất"
+}
