@@ -5,16 +5,17 @@ import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import PeopleOutlineIcon from "@mui/icons-material/PeopleOutline";
 import MenuIcon from "@mui/icons-material/Menu";
 import MenuItem from "./MenuItem";
+import { Briefcase, CalendarDays, ClipboardList, House, Mail, UsersRound } from "lucide-react";
 
 const Sidebar = ({ isVisible, toggleSidebar , sidebarWidth }) => {
   const { t } = useTranslation();
   const menuItems = [
-    { text: t("home"), link: "/", icon: <HomeRoundedIcon /> },
-    { text: t("recruitmentReq"), link: "/recruitment-requests", icon: <WorkIcon /> },
-    { text: t("jobPosition"), link: "/job-positions", icon: <WorkIcon /> },
-    { text: t("candidate"), link: "/candidate", icon: <PeopleOutlineIcon /> },
-    { text: t("calendar"), link: "/calendar", icon: <CalendarTodayIcon /> },
-    { text: t("email"), link: "/email", icon: <PeopleOutlineIcon /> },
+    { text: t("home"), link: "/", icon: <House /> },
+    { text: t("recruitmentReq"), link: "/recruitment-requests", icon: <ClipboardList /> },
+    { text: t("jobPosition"), link: "/job-positions", icon: <Briefcase /> },
+    { text: t("candidate"), link: "/candidate", icon: <UsersRound /> },
+    { text: t("calendar"), link: "/calendar", icon: <CalendarDays /> },
+    { text: t("email"), link: "/email", icon: <Mail /> },
   ];
 
   return (

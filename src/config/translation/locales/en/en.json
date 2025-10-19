@@ -18,5 +18,8 @@
 
   "profile": "Profile",
   "settings": "Settings",
-  "logout": "Logout"
+  "logout": "Logout",
+
+  "listRequest":"List of recruitment requirements",
+  "staffCreated":""
 }

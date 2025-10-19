@@ -5,6 +5,8 @@ const MenuItem = ({ link, text, icon, isCollapsed }) => {
     <li>
     <NavLink
       to={link}
+      replace
+      state={{fom:"menu"}}
       className={({ isActive }) =>`
       relative flex items-center rounded-md px-2 py-2 my-2
       justify-center

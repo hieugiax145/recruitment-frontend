@@ -56,7 +56,9 @@ const Layout = () => {
           minHeight: `calc(100vh - ${APPBAR_HEIGHT + 16}px)`,
         }}
       >
-        <div className="min-h-full p-4 bg-white rounded-xl shadow">
+        <div className="h-full 
+        
+        ">
           <Outlet />
         </div>
       </main>

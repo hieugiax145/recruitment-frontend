@@ -16,5 +16,7 @@
 
   "profile": "Hồ sơ",
   "settings": "Cài đặt",
-  "logout": "Đăng xuất"
+  "logout": "Đăng xuất",
+
+  "listRequest":"Danh sách yêu cầu tuyển dụng"
 }

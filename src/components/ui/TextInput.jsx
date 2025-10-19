@@ -1,18 +1,40 @@
-const TextInput = ({ label, type, value, onChange, required=false }) => {
+import { cn } from "../../utils/utils";
+
+const TextInput = ({
+  label,
+  name,
+  placeholder,
+  type,
+  readOnly = false,
+  value,
+  onChange,
+  required = false,
+  isRow = false,
+  className,
+}) => {
   return (
-    <div className="flex flex-col ">
-      <label className="block mb-2 text-gray-700" htmlFor={label}>
+    <div className={`flex ${isRow ? "items-center gap-4" : "flex-col gap-2"}`}>
+      <label className="block text-gray-700" htmlFor={label}>
         {label}
+        {required && <span className="text-red-500"> *</span>}
       </label>
       <input
-        className="border border-gray-300 p-2 rounded-md text-gray-700
-        focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        className={cn(
+          `border border-gray-300 p-2 rounded-md text-gray-700
+        focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+        disabled:opacity-50 disabled:cursor-not-allowed
+        flex-1`,
+          className
+        )}
         type={type}
         id={label}
-        name={label}
+        name={name}
+        placeholder={placeholder}
         value={value}
         onChange={onChange}
         required={required}
+        disabled={readOnly}
+        min={type === "number" ? 0 : undefined}
       />
     </div>
   );

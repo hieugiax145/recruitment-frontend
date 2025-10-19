@@ -3,31 +3,36 @@ import { useNavigate } from "react-router-dom";
 import Card from "../../components/ui/Card";
 import TextInput from "../../components/ui/TextInput";
 import Button from "../../components/ui/Button";
-import { useTranslation } from "react-i18next"; 
+import { useTranslation } from "react-i18next";
+import { toast } from "react-toastify";
+import { useAuth } from "../../context/AuthContext";
 
 const Login = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const [formData, setFormData] = useState({
-    username: "",
-    password: "",
-  });
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
+  const { login } = useAuth();
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
+
     try {
+      await login(username, password);
+
+      toast.success(t("loginSuccess"));
       navigate("/");
+
     } catch (error) {
+      const errorMessage = error.response?.data?.message || t("loginFailed");
       console.error(error);
+      toast.error(errorMessage);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -35,24 +40,30 @@ const Login = () => {
     <div className="min-h-screen flex items-center justify-center">
       <div
         className="flex flex-col space-y-4 w-full max-w-md
-       bg-white rounded-xl shadow-md p-8 border border-[#f3f3f3]"
+        bg-white rounded-xl shadow-md p-8 border border-[#f3f3f3]"
       >
         <h2 className="text-2xl font-bold mb-6 text-center">{t("login")}</h2>
         <form onSubmit={handleLogin} className="space-y-2">
           <TextInput
             label={t("username")}
             name="username"
-            onChange={handleChange}
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
             required
+            disabled={isSubmitting}
           />
           <TextInput
             label={t("password")}
             name="password"
+            value={password}
             type="password"
-            onChange={handleChange}
+            onChange={(e) => setPassword(e.target.value)}
             required
+            disabled={isSubmitting}
           />
-          <Button  type="submit" onClick={handleLogin} children={t("login")} />
+          <Button type="submit" onClick={handleLogin} disabled={isSubmitting}>
+            {isSubmitting ? t("loading") : t("login")}
+          </Button>
         </form>
       </div>
     </div>

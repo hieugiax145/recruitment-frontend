@@ -4,10 +4,10 @@ import { AutoTextSize } from "auto-text-size";
 import UserDropdown from "./UserDropdown";
 import UserIcon from "@mui/icons-material/Person";
 import ProfileIcon from "@mui/icons-material/AccountCircle";
-import SettingsIcon from "@mui/icons-material/Settings";
-
-const Navbar = ({ isSidebarVisible, title , sidebarWidth }) => {
+import { useNavigate } from "react-router-dom";
+const Navbar = ({ isSidebarVisible, title, sidebarWidth }) => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { t } = useTranslation();
 
   const getTitle = () => {
@@ -36,6 +36,11 @@ const Navbar = ({ isSidebarVisible, title , sidebarWidth }) => {
     }
   };
 
+  const cameFromMenu = location.state && location.state.from === "menu";
+  const canGoBack =
+    (!cameFromMenu && Boolean(location.state && location.state.from)) ||
+    (typeof window !== "undefined" && window.history.length > 1);
+
   return (
     <div
       className="flex justify-between fixed
@@ -47,15 +52,19 @@ const Navbar = ({ isSidebarVisible, title , sidebarWidth }) => {
         left: sidebarWidth,
       }}
     >
-      <div className="flex items-center h-[60px] w-full justify-between bg-white
-      rounded-xl shadow-lg border border-[#f3f3f3] px-4 py-2">
-        <div className="flex-1 text-2xl font-bold">
-          <AutoTextSize minFontSizePx={20} maxFontSizePx={30}>{title ?? getTitle()}</AutoTextSize>
+      <div
+        className="flex items-center h-[60px] w-full justify-between bg-white
+      rounded-xl shadow-lg border border-[#f3f3f3] px-4 py-2"
+      >
+        <div className="flex items-center flex-1">
+          <div className="text-2xl font-bold">
+            <AutoTextSize minFontSizePx={20} maxFontSizePx={30}>
+              {title ?? getTitle()}
+            </AutoTextSize>
+          </div>
+        </div>
+        <UserDropdown />
       </div>
-      <UserDropdown
-      /> 
-      </div>
-      
     </div>
   );
 };
