@@ -10,8 +10,6 @@ const APPBAR_HEIGHT = 60;
 const Layout = () => {
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
 
- 
-
   const sidebarWidth = useMemo(
     () => (isSidebarVisible ? EXPANDED : COLLAPSED),
     [isSidebarVisible]
@@ -34,10 +32,7 @@ const Layout = () => {
 
   return (
     <div className="flex">
-      <Navbar
-        sidebarWidth={sidebarWidth}
-        isSidebarVisible={isSidebarVisible}
-      />
+      <Navbar sidebarWidth={sidebarWidth} isSidebarVisible={isSidebarVisible} />
       <Sidebar
         sidebarWidth={sidebarWidth}
         isVisible={isSidebarVisible}
@@ -56,9 +51,7 @@ const Layout = () => {
           minHeight: `calc(100vh - ${APPBAR_HEIGHT + 16}px)`,
         }}
       >
-        <div className="h-full 
-        
-        ">
+        <div className="h-full max-w-[1600px] mx-auto">
           <Outlet />
         </div>
       </main>
