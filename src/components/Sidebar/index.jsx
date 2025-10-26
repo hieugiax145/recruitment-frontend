@@ -1,17 +1,24 @@
 import { useTranslation } from "react-i18next";
-import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
-import WorkIcon from "@mui/icons-material/Work";
-import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
-import PeopleOutlineIcon from "@mui/icons-material/PeopleOutline";
-import MenuIcon from "@mui/icons-material/Menu";
+import { Menu } from "lucide-react";
 import MenuItem from "./MenuItem";
-import { Briefcase, CalendarDays, ClipboardList, House, Mail, UsersRound } from "lucide-react";
+import {
+  Briefcase,
+  CalendarDays,
+  ClipboardList,
+  House,
+  Mail,
+  UsersRound,
+} from "lucide-react";
 
-const Sidebar = ({ isVisible, toggleSidebar , sidebarWidth }) => {
+const Sidebar = ({ isVisible, toggleSidebar, sidebarWidth }) => {
   const { t } = useTranslation();
   const menuItems = [
     { text: t("home"), link: "/", icon: <House /> },
-    { text: t("recruitmentReq"), link: "/recruitment-requests", icon: <ClipboardList /> },
+    {
+      text: t("recruitmentReq"),
+      link: "/recruitment-requests",
+      icon: <ClipboardList />,
+    },
     { text: t("jobPosition"), link: "/job-positions", icon: <Briefcase /> },
     { text: t("candidate"), link: "/candidate", icon: <UsersRound /> },
     { text: t("calendar"), link: "/calendar", icon: <CalendarDays /> },
@@ -28,13 +35,15 @@ const Sidebar = ({ isVisible, toggleSidebar , sidebarWidth }) => {
         transition: "width 0.3s ease-in-out",
       }}
     >
-      <nav className="
+      <nav
+        className="
       h-full flex flex-col truncate bg-white rounded-xl shadow-lg
-      border border-[#f3f3f3] ">
+      border border-[#f3f3f3] "
+      >
         <div className="flex items-center justify-between p-4">
           <span
             className={`overflow-hidden transition-all duration-300
-      
+
           `}
           >
             Title
@@ -43,11 +52,13 @@ const Sidebar = ({ isVisible, toggleSidebar , sidebarWidth }) => {
             onClick={toggleSidebar}
             className="p-1 bg-white hover:bg-gray-100 rounded-lg cursor-pointer"
           >
-            <MenuIcon />
+            <Menu />
           </div>
         </div>
-        <ul className="flex-1 p-2 overflow-y-auto truncate
-        [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <ul
+          className="flex-1 p-2 overflow-y-auto truncate
+        [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        >
           {menuItems.map((item) => (
             <MenuItem
               key={item.text}

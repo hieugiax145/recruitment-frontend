@@ -1,5 +1,4 @@
 import { createBrowserRouter } from "react-router-dom";
-import Home from "../../pages/Home";
 import Login from "../../features/auth/Login";
 import Layout from "../../components/Layout";
 import RecruitmentRequests from "../../features/recruitment-requests/RecruitmentRequests";
@@ -12,6 +11,7 @@ import RedirectIfAuth from "../../components/RedirectIfAuth";
 import ProtectedRoute from "../../components/ProtectedRoute";
 import JobPositionsAdd from "../../features/job-positions/JobPositionAdd";
 import JobPositionCandidates from "../../features/job-positions/JobPositionCandidates";
+import Home from "../../features/dashboard/Home";
 
 export const router = createBrowserRouter([
   {

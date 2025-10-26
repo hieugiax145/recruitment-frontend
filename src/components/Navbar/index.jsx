@@ -2,8 +2,6 @@ import { useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { AutoTextSize } from "auto-text-size";
 import UserDropdown from "./UserDropdown";
-import UserIcon from "@mui/icons-material/Person";
-import ProfileIcon from "@mui/icons-material/AccountCircle";
 import { useNavigate } from "react-router-dom";
 const Navbar = ({ isSidebarVisible, title, sidebarWidth }) => {
   const location = useLocation();

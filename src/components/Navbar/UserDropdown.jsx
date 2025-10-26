@@ -1,13 +1,12 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import UserIcon from "@mui/icons-material/Person";
 import LanguageSwitcher from "./LanguageSwitcher";
 import { useAuth } from "../../context/AuthContext";
 import { CircleUserRound } from "lucide-react";
 
 const UserDropdown = () => {
   const { t } = useTranslation();
-  const {user, logout } = useAuth();
+  const { user, logout } = useAuth();
   return (
     <div className="relative group">
       <div

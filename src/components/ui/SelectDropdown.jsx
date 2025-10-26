@@ -5,19 +5,19 @@ import { cn } from "../../utils/utils";
 export default function SelectDropdown({
   label,
   options = [],
-  id,
+  value,
   isRow,
   onChange = () => {},
   placeholder,
   className,
-  required
+  required,
+  disabled,
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
-  const [selectedValue, setSelectedValue] = useState("");
-  const selectedOption = options.find((option) => option.id === id);
+  const selectedOption = options.find((option) => option.id === value);
 
-  const displayLabel = selectedOption ? selectedOption.name: placeholder;
+  const displayLabel = selectedOption ? selectedOption.name : placeholder;
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -31,10 +31,11 @@ export default function SelectDropdown({
     };
   }, [dropdownRef]);
 
-  const handleOptionClick = (optionValue) => {
-    // onChange(optionValue);
-    setSelectedValue(optionValue.name);
-    setIsOpen(false);
+  const handleOptionClick = (option) => {
+    if (!disabled) {
+      onChange(option.id);
+      setIsOpen(false);
+    }
   };
 
   return (
@@ -45,18 +46,18 @@ export default function SelectDropdown({
       </label>
       <div className={cn("relative w-full", className)} ref={dropdownRef}>
         <div
-          tabIndex="0"
+          tabIndex={disabled ? -1 : 0}
           className={cn(
             `border border-gray-300 p-2 rounded-md text-gray-700
-        focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
-        disabled:opacity-50 disabled:cursor-not-allowed
-        flex items-center justify-between`,
+        focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent
+        flex items-center justify-between cursor-pointer`,
+            disabled && "opacity-50 cursor-not-allowed bg-gray-100",
             className
           )}
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={() => !disabled && setIsOpen(!isOpen)}
         >
-          <span className={cn(!selectedOption && "text-gray-500")}>
-            {selectedValue || displayLabel}
+          <span className={cn(!selectedOption && "text-gray-400")}>
+            {displayLabel}
           </span>
           <ChevronDown
             className={cn(
@@ -66,7 +67,7 @@ export default function SelectDropdown({
           />
         </div>
 
-        {isOpen && (
+        {isOpen && !disabled && (
           <ul
             className="absolute z-10 mt-1 w-full
                      max-h-60 overflow-y-auto
@@ -80,11 +81,11 @@ export default function SelectDropdown({
                 className={cn(
                   "relative cursor-pointer select-none px-3 py-2 text-sm",
                   "text-gray-900 hover:bg-gray-100",
-                  option.id === id && "font-semibold bg-gray-100"
+                  option.id === value && "font-semibold bg-gray-100"
                 )}
                 onClick={() => handleOptionClick(option)}
                 role="option"
-                aria-selected={option.name === name}
+                aria-selected={option.id === value}
               >
                 {option.name}
               </li>

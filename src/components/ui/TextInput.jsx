@@ -6,6 +6,7 @@ const TextInput = ({
   placeholder,
   type,
   readOnly = false,
+  disabled = false,
   value,
   onChange,
   required = false,
@@ -21,7 +22,7 @@ const TextInput = ({
       <input
         className={cn(
           `border border-gray-300 p-2 rounded-md text-gray-700
-        focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+        focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent
         disabled:opacity-50 disabled:cursor-not-allowed
         flex-1`,
           className
@@ -33,7 +34,7 @@ const TextInput = ({
         value={value}
         onChange={onChange}
         required={required}
-        disabled={readOnly}
+        disabled={readOnly || disabled}
         min={type === "number" ? 0 : undefined}
       />
     </div>
