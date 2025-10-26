@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
 import Card from "../../components/ui/Card";
 import TextInput from "../../components/ui/TextInput";
 import Button from "../../components/ui/Button";
@@ -12,28 +13,28 @@ const Login = () => {
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { login } = useAuth();
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-
-    try {
-      await login(username, password);
-
+  // Using useMutation for login
+  const loginMutation = useMutation({
+    mutationFn: async (credentials) => {
+      return await login(credentials.username, credentials.password);
+    },
+    onSuccess: () => {
       toast.success(t("loginSuccess"));
       navigate("/");
-
-    } catch (error) {
+    },
+    onError: (error) => {
       const errorMessage = error.response?.data?.message || t("loginFailed");
       console.error(error);
       toast.error(errorMessage);
-    } finally {
-      setIsSubmitting(false);
-    }
+    },
+  });
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    loginMutation.mutate({ username, password });
   };
 
   return (
@@ -50,7 +51,7 @@ const Login = () => {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
-            disabled={isSubmitting}
+            disabled={loginMutation.isPending}
           />
           <TextInput
             label={t("password")}
@@ -59,10 +60,14 @@ const Login = () => {
             type="password"
             onChange={(e) => setPassword(e.target.value)}
             required
-            disabled={isSubmitting}
+            disabled={loginMutation.isPending}
           />
-          <Button type="submit" onClick={handleLogin} disabled={isSubmitting}>
-            {isSubmitting ? t("loading") : t("login")}
+          <Button
+            type="submit"
+            onClick={handleLogin}
+            disabled={loginMutation.isPending}
+          >
+            {loginMutation.isPending ? t("loading") : t("login")}
           </Button>
         </form>
       </div>

@@ -18,11 +18,12 @@ api.interceptors.response.use(
     if (response.status === 200 || response.status === 201) {
       response.success = true;
     }
-    return response.data;
+    return response;
   },
   (error) => {
     if (error.response && error.response.status === 401) {
-      toast.error("Session expired. Please log in again.");
+      console.error("Session expired. Please log in again.");
+      localStorage.removeItem("token");
       window.location.href = "/login";
     }
     return Promise.reject(error);
