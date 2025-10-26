@@ -1,22 +1,22 @@
 import api from "../../../config/axios";
 
 export const reqServices = {
-    getRequests: async () => {
-        return api.get("/api/v1/recruitment-requests");
-    },
+  getRequests: async (params = {}) => {
+    return api.get("/job-service/recruitment-requests", { params });
+  },
 
-    getRequestsByDepartment: async (departmentId) => {
-        return api.get(`/api/v1/recruitment-requests/department/${departmentId}`);
-    },
+  getRequestById: async (id) => {
+    return api.get(`/job-service/recruitment-requests/${id}`);
+  },
 
-    createRequest: async (data) => {
-        return api.post("/api/v1/recruitment-requests", data);
-    },  
-    updateRequest: async (id, data) => {
-        return api.put(`/api/v1/recruitment-requests/${id}`, data);
-    },
+  createRequest: async (data) => {
+    return api.post("/job-service/recruitment-requests", data);
+  },
+  updateRequest: async (id, data) => {
+    return api.put(`/job-service/recruitment-requests/${id}`, data);
+  },
 
-    deleteRequest: async (id) => {
-        return api.delete(`/api/v1/recruitment-requests/${id}`);
-    }
+  deleteRequest: async (id) => {
+    return api.delete(`/job-service/recruitment-requests/${id}`);
+  },
 };

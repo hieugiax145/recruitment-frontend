@@ -1,112 +1,47 @@
 import { Plus } from "lucide-react";
 import Button from "../../components/ui/Button";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Pagination from "../../components/ui/Pagination";
 import RequestCard from "./components/RequestCard";
 import RequestStatus from "./components/RequestStatus";
 import { Navigate, useNavigate } from "react-router-dom";
 import ContentHeader from "../../components/ui/ContentHeader";
 import Can from "../../components/Can";
-import { reqServices } from "./services/reqServices";
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
+import { useAuth } from "../../context/AuthContext";
+import {
+  useRecruitmentRequests,
+  useDeleteRecruitmentRequest,
+} from "./hooks/useRecruitmentRequests";
 
 export default function RecruitmentRequests() {
-  const {t}=useTranslation();
+  const { t } = useTranslation();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedRequests, setSelectedRequests] = useState([]);
-  const itemsPerPage = 5;
+  const itemsPerPage = 10;
 
-  useEffect(() => {
-    const fetchRequests = async () => {
-      try {
-        const res = await reqServices.getRequests();
-        if(res.status===200){
-          setRequests(res.data.data)
-        }
-      } catch (e) {
-        toast.error(e);
-      }
-    };
+  // Check if user is MANAGER
+  const isManager = user?.role?.name === "MANAGER";
 
-    // fetchRequests();
-  }, []);
+  // Build query params based on role
+  const queryParams =
+    isManager && user?.department?.id
+      ? { departmentId: user.department.id }
+      : {};
 
-  const [requests, setRequests] = useState([
-    {
-      id: "1",
-      position: "Senior Backend Developer",
-      department: "Engineering",
-      requestedBy: "Nguyễn Văn A",
-      dateRequested: "2025-10-10",
-      status: "approved",
-      priority: "high",
-    },
-    {
-      id: "2",
-      position: "UI/UX Designer",
-      department: "Design",
-      requestedBy: "Trần Thị B",
-      dateRequested: "2025-10-08",
-      status: "pending",
-      priority: "medium",
-    },
-    {
-      id: "3",
-      position: "Product Manager",
-      department: "Product",
-      requestedBy: "Lê Văn C",
-      dateRequested: "2025-10-05",
-      status: "approved",
-      priority: "high",
-    },
-    {
-      id: "4",
-      position: "DevOps Engineer",
-      department: "DevOps",
-      requestedBy: "Phạm Thị D",
-      dateRequested: "2025-10-03",
-      status: "rejected",
-      priority: "low",
-    },
-    {
-      id: "5",
-      position: "Senior Backend Developer",
-      department: "Engineering",
-      requestedBy: "Nguyễn Văn A",
-      dateRequested: "2025-10-10",
-      status: "approved",
-      priority: "high",
-    },
-    {
-      id: "6",
-      position: "UI/UX Designer",
-      department: "Design",
-      requestedBy: "Trần Thị B",
-      dateRequested: "2025-10-08",
-      status: "pending",
-      priority: "medium",
-    },
-    {
-      id: "7",
-      position: "Product Manager",
-      department: "Product",
-      requestedBy: "Lê Văn C",
-      dateRequested: "2025-10-05",
-      status: "approved",
-      priority: "high",
-    },
-    {
-      id: "8",
-      position: "DevOps Engineer",
-      department: "DevOps",
-      requestedBy: "Phạm Thị D",
-      dateRequested: "2025-10-03",
-      status: "rejected",
-      priority: "low",
-    },
-  ]);
+  // Fetch requests with appropriate filters
+  const { data, isLoading, isError, error, refetch } =
+    useRecruitmentRequests(queryParams);
+
+  // Using useMutation for delete
+  const deleteMutation = useDeleteRecruitmentRequest();
+
+  // Get requests from the query data or use fallback
+  // Ensure requests is always an array
+  const requests = Array.isArray(data?.data?.result) ? data.data.result : [];
 
   const handleCheckboxChange = (requestId) => {
     setSelectedRequests((prevSelected) => {
@@ -128,19 +63,45 @@ export default function RecruitmentRequests() {
     }
   };
 
+  const handleDelete = (id) => {
+    if (window.confirm("Are you sure you want to delete this request?")) {
+      deleteMutation.mutate(id);
+    }
+  };
+
   const tableHeaders = (header) => {
     return (
       <>
-        <th className="p-4 text-left text-sm font-medium text-gray-600">
+        <th className="p-4 text-left text-sm font-medium text-gray-600 whitespace-nowrap">
           {header}
         </th>
       </>
     );
   };
+
+  if (isError) {
+    return (
+      <div className="flex flex-col justify-center items-center h-full gap-4">
+        <div className="text-red-500 text-lg font-medium">
+          {error?.response?.data?.message || "Error loading requests"}
+        </div>
+        <Button onClick={() => refetch()}>Retry</Button>
+      </div>
+    );
+  }
+
+  if (!data && !isLoading) {
+    return (
+      <div className="flex justify-center items-center h-full">
+        <div className="text-gray-500">No data available</div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col h-full">
       <ContentHeader
-        title={t('listRequest')}
+        title={t("listRequest")}
         actions={
           <Can allowedRoles={["MANAGER"]}>
             <Button
@@ -158,15 +119,11 @@ export default function RecruitmentRequests() {
         className="flex-1 flex flex-col mt-4 overflow-y-auto
         p-6 bg-white rounded-xl shadow"
       >
-        <div
-          className="
-        flex-1
-        "
-        >
+        <div className="flex-1 overflow-x-auto">
           <table className="w-full min-w-[800px]">
             <thead>
               <tr className="bg-red-50">
-                <th className="w-12 p-4 sticky ">
+                <th className="w-12 p-4 whitespace-nowrap">
                   <input
                     type="checkbox"
                     className="rounded border-gray-300"
@@ -191,53 +148,73 @@ export default function RecruitmentRequests() {
               </tr>
             </thead>
             <tbody>
-              {currentRequests.map((request, index) => (
-                <tr
-                  key={request.id}
-                  className="border-b last:border-b-0 border-gray-200 hover:bg-gray-50 cursor-pointer"
-                  onClick={() =>
-                    navigate(`/recruitment-requests/${request.id}`)
-                  }
-                >
-                  <td className="p-4" onClick={(e) => e.stopPropagation()}>
-                    <input
-                      type="checkbox"
-                      className="rounded border-gray-300 bg-white"
-                      checked={selectedRequests.includes(request.id)}
-                      onChange={() => handleCheckboxChange(request.id)}
-                    />
-                  </td>
-                  <td
-                    className="p-4 text-sm"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    {startIndex + index + 1}
-                  </td>
-                  <td className="p-4 text-sm">
-                    {request.createdBy?.fullName ||
-                      request.creator?.fullName ||
-                      "N/A"}
-                  </td>
-                  <td className="p-4 text-sm">
-                    {request.userId?.fullName ||
-                      request.requester?.fullName ||
-                      "N/A"}
-                  </td>
-                  <td className="p-4 text-sm">{request.position}</td>
-                  <td className="p-4 text-sm">{request.quantity}</td>
-                  <td className="p-4 text-sm">{request.department}</td>
-                  <td className="p-4 text-sm">
-                    {request.createdAt ? "" : "N/A"}
-                  </td>
-                  <td className="p-4">
-                    <RequestStatus status={request.status} />
+              {currentRequests.length === 0 ? (
+                <tr>
+                  <td colSpan="9" className="p-8 text-center text-gray-500">
+                    No recruitment requests found
                   </td>
                 </tr>
-              ))}
+              ) : (
+                currentRequests.map((request, index) => (
+                  <tr
+                    key={request.id}
+                    className="border-b last:border-b-0 border-gray-200 hover:bg-gray-50 cursor-pointer"
+                    onClick={() =>
+                      navigate(`/recruitment-requests/${request.id}`)
+                    }
+                  >
+                    <td
+                      className="p-4 whitespace-nowrap"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <input
+                        type="checkbox"
+                        className="rounded border-gray-300 bg-white"
+                        checked={selectedRequests.includes(request.id)}
+                        onChange={() => handleCheckboxChange(request.id)}
+                      />
+                    </td>
+                    <td
+                      className="p-4 text-sm whitespace-nowrap"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {startIndex + index + 1}
+                    </td>
+                    <td className="p-4 text-sm whitespace-nowrap max-w-[150px] truncate">
+                      {request.requester?.name || "N/A"}
+                    </td>
+                    <td className="p-4 text-sm whitespace-nowrap max-w-[150px] truncate">
+                      {request.approver?.name || "N/A"}
+                    </td>
+                    <td
+                      className="p-4 text-sm whitespace-nowrap max-w-[200px] truncate"
+                      title={request.title}
+                    >
+                      {request.title || "N/A"}
+                    </td>
+                    <td className="p-4 text-sm whitespace-nowrap text-center">
+                      {request.numberOfPositions || 0}
+                    </td>
+                    <td className="p-4 text-sm whitespace-nowrap max-w-[150px] truncate">
+                      {request.department?.name || "N/A"}
+                    </td>
+                    <td className="p-4 text-sm whitespace-nowrap">
+                      {request.createdAt
+                        ? new Date(request.createdAt).toLocaleDateString(
+                            "vi-VN"
+                          )
+                        : "N/A"}
+                    </td>
+                    <td className="p-4 whitespace-nowrap">
+                      <RequestStatus status={request.status} />
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
-        <div className="flex justify-end items-center">
+        <div className="flex justify-end items-center w-full mt-4">
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
