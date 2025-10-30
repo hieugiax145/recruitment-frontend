@@ -5,12 +5,11 @@ import {
   ChevronRight,
   Calendar as CalendarIcon,
 } from "lucide-react";
-import ContentHeader from "../../components/ui/ContentHeader";
 import Button from "../../components/ui/Button";
 
 export default function Calendar() {
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [viewMode, setViewMode] = useState("month"); // day, month, year
+  const [viewMode, setViewMode] = useState("month"); // day, week, month
   const [selectedDate, setSelectedDate] = useState(null);
 
   // Helper functions
@@ -73,6 +72,18 @@ export default function Calendar() {
     newDate.setDate(currentDate.getDate() + 1);
     setCurrentDate(newDate);
     setSelectedDate(newDate);
+  };
+
+  const handlePrevWeek = () => {
+    const newDate = new Date(currentDate);
+    newDate.setDate(currentDate.getDate() - 7);
+    setCurrentDate(newDate);
+  };
+
+  const handleNextWeek = () => {
+    const newDate = new Date(currentDate);
+    newDate.setDate(currentDate.getDate() + 7);
+    setCurrentDate(newDate);
   };
 
   const handleDateClick = (day, month = currentDate.getMonth()) => {
@@ -183,21 +194,60 @@ export default function Calendar() {
     return days;
   };
 
+  const renderWeekView = () => {
+    const startOfWeek = new Date(currentDate);
+    const day = startOfWeek.getDay();
+    const diff = startOfWeek.getDate() - day;
+    startOfWeek.setDate(diff);
+
+    const weekDays = [];
+    for (let i = 0; i < 7; i++) {
+      const date = new Date(startOfWeek);
+      date.setDate(startOfWeek.getDate() + i);
+      const dayNum = date.getDate();
+      const isCurrentDay = isToday(dayNum);
+      const isSelected = selectedDate && 
+        date.getDate() === selectedDate.getDate() &&
+        date.getMonth() === selectedDate.getMonth() &&
+        date.getFullYear() === selectedDate.getFullYear();
+
+      weekDays.push(
+        <div
+          key={i}
+          onClick={() => handleDateClick(date.getDate(), date.getMonth())}
+          className={`
+            flex-1 border border-gray-100 p-4 cursor-pointer
+            transition-all hover:bg-gray-50
+            ${isCurrentDay ? "bg-red-50 border-red-300" : ""}
+            ${isSelected ? "bg-red-100 border-red-500" : ""}
+          `}
+        >
+          <div className="text-center mb-2">
+            <div className="text-xs text-gray-500 mb-1">
+              {["CN", "T2", "T3", "T4", "T5", "T6", "T7"][i]}
+            </div>
+            <div
+              className={`
+                text-lg font-semibold
+                ${isCurrentDay ? "text-red-600" : "text-gray-700"}
+                ${isSelected ? "text-red-700" : ""}
+              `}
+            >
+              {dayNum}
+            </div>
+          </div>
+          {/* TODO: Add events here */}
+        </div>
+      );
+    }
+
+    return weekDays;
+  };
+
   return (
     <div className="flex flex-col h-full">
-      {/* Header */}
-      <ContentHeader
-        title="Lịch"
-        actions={
-          <Button onClick={handleCreateEvent}>
-            <Plus className="h-4 w-4 mr-2" />
-            Tạo lịch
-          </Button>
-        }
-      />
-
       {/* Main Content */}
-      <div className="flex-1 flex gap-4 mt-4 min-h-0">
+      <div className="flex-1 flex gap-4 min-h-0">
         {/* Left Side - Calendar */}
         <div className="flex-1 flex flex-col bg-white rounded-xl shadow overflow-hidden">
           {/* Calendar Header */}
@@ -211,59 +261,73 @@ export default function Calendar() {
                 </span>
               </div>
 
-              {/* View Mode Toggle */}
-              <div className="flex gap-1 bg-gray-100 rounded-lg p-1">
-                <div
-                  onClick={() => {
-                    setViewMode("day");
-                    if (!selectedDate) {
-                      setSelectedDate(currentDate);
-                    }
-                  }}
-                  className={`
-                    px-3 py-1.5 rounded-md text-sm font-medium transition-colors cursor-pointer
-                    ${
-                      viewMode === "day"
-                        ? "bg-white text-red-600 shadow-sm"
-                        : "text-gray-600 hover:text-gray-900"
-                    }
-                  `}
-                >
-                  Ngày
+              {/* View Mode Toggle and Create Button */}
+              <div className="flex items-center gap-3">
+                <div className="flex gap-1 bg-gray-100 rounded-lg p-1">
+                  <div
+                    onClick={() => {
+                      setViewMode("day");
+                      if (!selectedDate) {
+                        setSelectedDate(currentDate);
+                      }
+                    }}
+                    className={`
+                      px-3 py-1.5 rounded-md text-sm font-medium transition-colors cursor-pointer
+                      ${
+                        viewMode === "day"
+                          ? "bg-white text-red-600 shadow-sm"
+                          : "text-gray-600 hover:text-gray-900"
+                      }
+                    `}
+                  >
+                    Ngày
+                  </div>
+                  <div
+                    onClick={() => setViewMode("week")}
+                    className={`
+                      px-3 py-1.5 rounded-md text-sm font-medium transition-colors cursor-pointer
+                      ${
+                        viewMode === "week"
+                          ? "bg-white text-red-600 shadow-sm"
+                          : "text-gray-600 hover:text-gray-900"
+                      }
+                    `}
+                  >
+                    Tuần
+                  </div>
+                  <div
+                    onClick={() => setViewMode("month")}
+                    className={`
+                      px-3 py-1.5 rounded-md text-sm font-medium transition-colors cursor-pointer
+                      ${
+                        viewMode === "month"
+                          ? "bg-white text-red-600 shadow-sm"
+                          : "text-gray-600 hover:text-gray-900"
+                      }
+                    `}
+                  >
+                    Tháng
+                  </div>
                 </div>
-                <div
-                  onClick={() => setViewMode("month")}
-                  className={`
-                    px-3 py-1.5 rounded-md text-sm font-medium transition-colors cursor-pointer
-                    ${
-                      viewMode === "month"
-                        ? "bg-white text-red-600 shadow-sm"
-                        : "text-gray-600 hover:text-gray-900"
-                    }
-                  `}
-                >
-                  Tháng
-                </div>
-                <div
-                  onClick={() => setViewMode("year")}
-                  className={`
-                    px-3 py-1.5 rounded-md text-sm font-medium transition-colors cursor-pointer
-                    ${
-                      viewMode === "year"
-                        ? "bg-white text-red-600 shadow-sm"
-                        : "text-gray-600 hover:text-gray-900"
-                    }
-                  `}
-                >
-                  Năm
-                </div>
+
+                {/* Create Button */}
+                <Button onClick={handleCreateEvent} className="text-sm">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Tạo lịch
+                </Button>
               </div>
             </div>
 
-            {/* Month/Day Navigation */}
+            {/* Month/Day/Week Navigation */}
             <div className="flex items-center justify-between">
               <div
-                onClick={viewMode === "day" ? handlePrevDay : handlePrevMonth}
+                onClick={
+                  viewMode === "day"
+                    ? handlePrevDay
+                    : viewMode === "week"
+                    ? handlePrevWeek
+                    : handlePrevMonth
+                }
                 className="p-2 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
               >
                 <ChevronLeft className="h-5 w-5 text-gray-600" />
@@ -277,7 +341,13 @@ export default function Calendar() {
               </h2>
 
               <div
-                onClick={viewMode === "day" ? handleNextDay : handleNextMonth}
+                onClick={
+                  viewMode === "day"
+                    ? handleNextDay
+                    : viewMode === "week"
+                    ? handleNextWeek
+                    : handleNextMonth
+                }
                 className="p-2 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
               >
                 <ChevronRight className="h-5 w-5 text-gray-600" />
@@ -308,17 +378,18 @@ export default function Calendar() {
               </div>
             )}
 
+            {viewMode === "week" && (
+              <div className="h-full">
+                <div className="flex h-full gap-0">
+                  {renderWeekView()}
+                </div>
+              </div>
+            )}
+
             {viewMode === "day" && (
               <div className="text-center text-gray-500 py-20">
                 <CalendarIcon className="h-16 w-16 mx-auto mb-4 text-gray-300" />
                 <p>Chế độ xem ngày - Đang phát triển</p>
-              </div>
-            )}
-
-            {viewMode === "year" && (
-              <div className="text-center text-gray-500 py-20">
-                <CalendarIcon className="h-16 w-16 mx-auto mb-4 text-gray-300" />
-                <p>Chế độ xem năm - Đang phát triển</p>
               </div>
             )}
           </div>
@@ -344,12 +415,12 @@ export default function Calendar() {
               </div>
             </div>
 
-            <div
+            <Button
               onClick={handleCreateEvent}
-              className="mt-4 w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium text-center cursor-pointer"
+              className="mt-4 w-full text-sm"
             >
               Thêm sự kiện
-            </div>
+            </Button>
           </div>
         )}
       </div>
