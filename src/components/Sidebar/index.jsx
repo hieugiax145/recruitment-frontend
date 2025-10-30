@@ -20,7 +20,7 @@ const Sidebar = ({ isVisible, toggleSidebar, sidebarWidth }) => {
       icon: <ClipboardList />,
     },
     { text: t("jobPosition"), link: "/job-positions", icon: <Briefcase /> },
-    { text: t("candidate"), link: "/candidate", icon: <UsersRound /> },
+    { text: t("candidate"), link: "/candidates", icon: <UsersRound /> },
     { text: t("calendar"), link: "/calendar", icon: <CalendarDays /> },
     { text: t("email"), link: "/email", icon: <Mail /> },
   ];

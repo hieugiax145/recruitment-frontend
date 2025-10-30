@@ -1,7 +1,9 @@
 import { useState, useEffect, useMemo } from "react";
 import { Outlet } from "react-router-dom";
+import { useIsFetching, useIsMutating } from "@tanstack/react-query";
 import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
+import LoadingContent from "./ui/LoadingContent";
 
 const EXPANDED = 260;
 const COLLAPSED = 100;
@@ -9,6 +11,9 @@ const APPBAR_HEIGHT = 60;
 
 const Layout = () => {
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
+  const isFetching = useIsFetching();
+  const isMutating = useIsMutating();
+  const isLoading = isFetching > 0 || isMutating > 0;
 
   const sidebarWidth = useMemo(
     () => (isSidebarVisible ? EXPANDED : COLLAPSED),
@@ -52,7 +57,7 @@ const Layout = () => {
         }}
       >
         <div className="h-full max-w-[1600px] mx-auto">
-          <Outlet />
+          {isLoading ? <LoadingContent /> : <Outlet />}
         </div>
       </main>
     </div>
