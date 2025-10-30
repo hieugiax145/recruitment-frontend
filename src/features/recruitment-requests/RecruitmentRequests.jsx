@@ -1,6 +1,6 @@
 import { Plus } from "lucide-react";
 import Button from "../../components/ui/Button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Pagination from "../../components/ui/Pagination";
 import RequestCard from "./components/RequestCard";
 import RequestStatus from "./components/RequestStatus";
@@ -43,6 +43,15 @@ export default function RecruitmentRequests() {
   // Ensure requests is always an array
   const requests = Array.isArray(data?.data?.result) ? data.data.result : [];
 
+  // Show toast notification when there's an error
+  useEffect(() => {
+    if (isError) {
+      const errorMessage =
+        error?.response?.data?.message || t("errorLoadingRequests");
+      toast.error(errorMessage);
+    }
+  }, [isError, error, t]);
+
   const handleCheckboxChange = (requestId) => {
     setSelectedRequests((prevSelected) => {
       if (prevSelected.includes(requestId)) {
@@ -79,25 +88,6 @@ export default function RecruitmentRequests() {
     );
   };
 
-  if (isError) {
-    return (
-      <div className="flex flex-col justify-center items-center h-full gap-4">
-        <div className="text-red-500 text-lg font-medium">
-          {error?.response?.data?.message || "Error loading requests"}
-        </div>
-        <Button onClick={() => refetch()}>Retry</Button>
-      </div>
-    );
-  }
-
-  if (!data && !isLoading) {
-    return (
-      <div className="flex justify-center items-center h-full">
-        <div className="text-gray-500">No data available</div>
-      </div>
-    );
-  }
-
   return (
     <div className="flex flex-col h-full">
       <ContentHeader
@@ -110,116 +100,123 @@ export default function RecruitmentRequests() {
               }}
             >
               <Plus className="h-4 w-4 mr-2" />
-              Tạo yêu cầu mới
+              {t("createNewRequest")}
             </Button>
           </Can>
         }
       />
-      <div
-        className="flex-1 flex flex-col mt-4 overflow-y-auto
-        p-6 bg-white rounded-xl shadow"
-      >
-        <div className="flex-1 overflow-x-auto">
-          <table className="w-full min-w-[800px]">
-            <thead>
-              <tr className="bg-red-50">
-                <th className="w-12 p-4 whitespace-nowrap">
-                  <input
-                    type="checkbox"
-                    className="rounded border-gray-300"
-                    checked={selectedRequests.length === currentRequests.length}
-                    onChange={() => {
-                      if (selectedRequests.length === currentRequests.length) {
-                        setSelectedRequests([]);
-                      } else {
-                        setSelectedRequests(currentRequests.map((r) => r.id));
-                      }
-                    }}
-                  />
-                </th>
-                {tableHeaders("ID")}
-                {tableHeaders("Nhân sự lập phiếu")}
-                {tableHeaders("Nhân sự phụ trách")}
-                {tableHeaders("Vị trí")}
-                {tableHeaders("Số lượng")}
-                {tableHeaders("Phòng")}
-                {tableHeaders("Ngày tạo")}
-                {tableHeaders("Trạng thái")}
-              </tr>
-            </thead>
-            <tbody>
-              {currentRequests.length === 0 ? (
+      <div className="flex-1 flex flex-col mt-4 min-h-0">
+        <div className="flex-1 flex flex-col bg-white rounded-xl shadow overflow-hidden">
+          <div className="flex-1 overflow-auto">
+            <table className="w-full min-w-[800px]">
+              <thead className="bg-red-50 sticky top-0 z-10">
                 <tr>
-                  <td colSpan="9" className="p-8 text-center text-gray-500">
-                    No recruitment requests found
-                  </td>
+                  <th className="w-12 p-4 whitespace-nowrap">
+                    <input
+                      type="checkbox"
+                      className="rounded border-gray-300"
+                      checked={
+                        selectedRequests.length === currentRequests.length
+                      }
+                      onChange={() => {
+                        if (
+                          selectedRequests.length === currentRequests.length
+                        ) {
+                          setSelectedRequests([]);
+                        } else {
+                          setSelectedRequests(currentRequests.map((r) => r.id));
+                        }
+                      }}
+                    />
+                  </th>
+                  {tableHeaders(t("id"))}
+                  {tableHeaders(t("staffCreated"))}
+                  {tableHeaders(t("staffInCharge"))}
+                  {tableHeaders(t("position"))}
+                  {tableHeaders(t("quantity"))}
+                  {tableHeaders(t("department"))}
+                  {tableHeaders(t("createdDate"))}
+                  {tableHeaders(t("status"))}
                 </tr>
-              ) : (
-                currentRequests.map((request, index) => (
-                  <tr
-                    key={request.id}
-                    className="border-b last:border-b-0 border-gray-200 hover:bg-gray-50 cursor-pointer"
-                    onClick={() =>
-                      navigate(`/recruitment-requests/${request.id}`)
-                    }
-                  >
-                    <td
-                      className="p-4 whitespace-nowrap"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <input
-                        type="checkbox"
-                        className="rounded border-gray-300 bg-white"
-                        checked={selectedRequests.includes(request.id)}
-                        onChange={() => handleCheckboxChange(request.id)}
-                      />
-                    </td>
-                    <td
-                      className="p-4 text-sm whitespace-nowrap"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      {startIndex + index + 1}
-                    </td>
-                    <td className="p-4 text-sm whitespace-nowrap max-w-[150px] truncate">
-                      {request.requester?.name || "N/A"}
-                    </td>
-                    <td className="p-4 text-sm whitespace-nowrap max-w-[150px] truncate">
-                      {request.approver?.name || "N/A"}
-                    </td>
-                    <td
-                      className="p-4 text-sm whitespace-nowrap max-w-[200px] truncate"
-                      title={request.title}
-                    >
-                      {request.title || "N/A"}
-                    </td>
-                    <td className="p-4 text-sm whitespace-nowrap text-center">
-                      {request.numberOfPositions || 0}
-                    </td>
-                    <td className="p-4 text-sm whitespace-nowrap max-w-[150px] truncate">
-                      {request.department?.name || "N/A"}
-                    </td>
-                    <td className="p-4 text-sm whitespace-nowrap">
-                      {request.createdAt
-                        ? new Date(request.createdAt).toLocaleDateString(
-                            "vi-VN"
-                          )
-                        : "N/A"}
-                    </td>
-                    <td className="p-4 whitespace-nowrap">
-                      <RequestStatus status={request.status} />
+              </thead>
+              <tbody>
+                {currentRequests.length === 0 ? (
+                  <tr>
+                    <td colSpan="9" className="p-8 text-center text-gray-500">
+                      {t("noRequestsFound")}
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-        <div className="flex justify-end items-center w-full mt-4">
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={goToPage}
-          />
+                ) : (
+                  currentRequests.map((request, index) => (
+                    <tr
+                      key={request.id}
+                      className="border-b last:border-b-0 border-gray-200 hover:bg-gray-50 cursor-pointer"
+                      onClick={() =>
+                        navigate(`/recruitment-requests/${request.id}`)
+                      }
+                    >
+                      <td
+                        className="p-4 whitespace-nowrap"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <input
+                          type="checkbox"
+                          className="rounded border-gray-300 bg-white"
+                          checked={selectedRequests.includes(request.id)}
+                          onChange={() => handleCheckboxChange(request.id)}
+                        />
+                      </td>
+                      <td
+                        className="p-4 text-sm whitespace-nowrap"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        {startIndex + index + 1}
+                      </td>
+                      <td className="p-4 text-sm whitespace-nowrap max-w-[150px] truncate">
+                        {request.requester?.name || "N/A"}
+                      </td>
+                      <td className="p-4 text-sm whitespace-nowrap max-w-[150px] truncate">
+                        {request.approver?.name || "N/A"}
+                      </td>
+                      <td
+                        className="p-4 text-sm whitespace-nowrap max-w-[200px] truncate"
+                        title={request.title}
+                      >
+                        {request.title || "N/A"}
+                      </td>
+                      <td className="p-4 text-sm whitespace-nowrap text-center">
+                        {request.numberOfPositions || 0}
+                      </td>
+                      <td className="p-4 text-sm whitespace-nowrap max-w-[150px] truncate">
+                        {request.department?.name || "N/A"}
+                      </td>
+                      <td className="p-4 text-sm whitespace-nowrap">
+                        {request.createdAt
+                          ? new Date(request.createdAt).toLocaleDateString(
+                              "vi-VN"
+                            )
+                          : "N/A"}
+                      </td>
+                      <td className="p-4 whitespace-nowrap">
+                        <RequestStatus status={request.status} />
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Pagination */}
+          {requests.length > 0 && (
+            <div className="flex-shrink-0 flex justify-end items-center p-4 border-t border-gray-200 bg-white">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={goToPage}
+              />
+            </div>
+          )}
         </div>
       </div>
     </div>

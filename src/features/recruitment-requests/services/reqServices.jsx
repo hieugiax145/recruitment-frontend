@@ -19,4 +19,12 @@ export const reqServices = {
   deleteRequest: async (id) => {
     return api.delete(`/job-service/recruitment-requests/${id}`);
   },
+
+  approveRequest: async (id, data) => {
+    return api.post(`/job-service/recruitment-requests/${id}/approve`, data);
+  },
+
+  rejectRequest: async (id, data) => {
+    return api.post(`/job-service/recruitment-requests/${id}/reject`, data);
+  },
 };

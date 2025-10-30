@@ -89,3 +89,43 @@ export const useDeleteRecruitmentRequest = () => {
     },
   });
 };
+
+export const useApproveRecruitmentRequest = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, data }) => {
+      const response = await reqServices.approveRequest(id, data);
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: recruitmentRequestKeys.all });
+      toast.success("Yêu cầu đã được phê duyệt thành công");
+    },
+    onError: (error) => {
+      const errorMessage =
+        error.response?.data?.message || "Không thể phê duyệt yêu cầu";
+      toast.error(errorMessage);
+    },
+  });
+};
+
+export const useRejectRecruitmentRequest = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, data }) => {
+      const response = await reqServices.rejectRequest(id, data);
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: recruitmentRequestKeys.all });
+      toast.success("Yêu cầu đã bị từ chối");
+    },
+    onError: (error) => {
+      const errorMessage =
+        error.response?.data?.message || "Không thể từ chối yêu cầu";
+      toast.error(errorMessage);
+    },
+  });
+};

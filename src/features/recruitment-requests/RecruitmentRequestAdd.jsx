@@ -14,6 +14,8 @@ import {
   useCreateRecruitmentRequest,
   useUpdateRecruitmentRequest,
   useRecruitmentRequest,
+  useApproveRecruitmentRequest,
+  useRejectRecruitmentRequest,
 } from "./hooks/useRecruitmentRequests";
 
 export default function RecruitmentRequestAdd() {
@@ -28,17 +30,15 @@ export default function RecruitmentRequestAdd() {
     title: "",
     numberOfPositions: 1,
     priorityLevel: "HIGH",
-    requestReason: "",
-    jobDescription: "",
+    reason: "",
+    description: "",
     requirements: "",
-    preferredQualifications: "",
-    salaryRangeMin: 0,
-    salaryRangeMax: 0,
+    benefits: "",
+    isExceedBudget: false,
+    salaryMin: null,
+    salaryMax: null,
     currency: "VND",
-    employmentType: "FULL_TIME",
-    workLocation: "",
-    expectedStartDate: "2024-02-01",
-    deadline: "2024-01-15",
+    location: "",
     jobCategoryId: 1,
     requesterId: user?.id || null,
     departmentId: user?.department?.id || null,
@@ -60,15 +60,15 @@ export default function RecruitmentRequestAdd() {
 
   useEffect(() => {
     if (departmentsError) {
-      toast.error("Không thể tải danh sách phòng ban");
+      toast.error(t("errorLoadDepartments"));
     }
-  }, [departmentsError]);
+  }, [departmentsError, t]);
 
   useEffect(() => {
     if (requestError) {
-      toast.error("Không thể tải thông tin yêu cầu tuyển dụng");
+      toast.error(t("errorLoadRequest"));
     }
-  }, [requestError]);
+  }, [requestError, t]);
 
   useEffect(() => {
     if (existingRequest && isViewMode) {
@@ -82,24 +82,22 @@ export default function RecruitmentRequestAdd() {
         title: existingRequest.title || "",
         numberOfPositions: existingRequest.numberOfPositions || 1,
         priorityLevel: existingRequest.priorityLevel || "HIGH",
-        requestReason: existingRequest.requestReason || "",
-        jobDescription: existingRequest.jobDescription || "",
+        reason: existingRequest.reason || "",
+        description: existingRequest.description || "",
         requirements: existingRequest.requirements || "",
-        preferredQualifications: existingRequest.preferredQualifications || "",
-        salaryRangeMin: existingRequest.salaryRangeMin || 0,
-        salaryRangeMax: existingRequest.salaryRangeMax || 0,
+        benefits: existingRequest.benefits || "",
+        isExceedBudget: existingRequest.isExceedBudget || false,
+        salaryMin: existingRequest.salaryMin || null,
+        salaryMax: existingRequest.salaryMax || null,
         currency: existingRequest.currency || "VND",
-        employmentType: existingRequest.employmentType || "FULL_TIME",
-        workLocation: existingRequest.workLocation || "",
-        expectedStartDate: existingRequest.expectedStartDate || "",
-        deadline: existingRequest.deadline || "",
+        location: existingRequest.location || "",
         jobCategoryId: existingRequest.jobCategoryId || 1,
         requesterId: existingRequest.requesterId || user?.id || null,
         departmentId: existingRequest.departmentId || null,
       });
 
-      if (existingRequest.workLocation) {
-        const locationNames = existingRequest.workLocation.split(", ");
+      if (existingRequest.location) {
+        const locationNames = existingRequest.location.split(", ");
         const selectedIds = locations
           .filter((loc) => locationNames.includes(loc.name))
           .map((loc) => loc.id);
@@ -110,6 +108,8 @@ export default function RecruitmentRequestAdd() {
 
   const createMutation = useCreateRecruitmentRequest();
   const updateMutation = useUpdateRecruitmentRequest();
+  const approveMutation = useApproveRecruitmentRequest();
+  const rejectMutation = useRejectRecruitmentRequest();
 
   const locations = [
     {
@@ -140,7 +140,7 @@ export default function RecruitmentRequestAdd() {
         ? prev.filter((v) => v !== value)
         : [...prev, value];
 
-      // Update formData.workLocation with selected location names
+      // Update formData.location with selected location names
       const selectedNames = locations
         .filter((loc) => newValues.includes(loc.id))
         .map((loc) => loc.name)
@@ -148,7 +148,7 @@ export default function RecruitmentRequestAdd() {
 
       setFormData((prevData) => ({
         ...prevData,
-        workLocation: selectedNames,
+        location: selectedNames,
       }));
 
       return newValues;
@@ -157,44 +157,40 @@ export default function RecruitmentRequestAdd() {
 
   const onSubmit = () => {
     if (!formData.title) {
-      toast.error("Vui lòng nhập vị trí tuyển dụng");
+      toast.error(t("errorPositionRequired"));
       return;
     }
     if (!formData.departmentId) {
-      toast.error("Vui lòng chọn phòng ban");
+      toast.error(t("errorDepartmentRequired"));
       return;
     }
     if (!formData.numberOfPositions || formData.numberOfPositions < 1) {
-      toast.error("Số lượng cần tuyển phải lớn hơn 0");
+      toast.error(t("errorPositionCountInvalid"));
       return;
     }
-    if (!formData.requestReason) {
-      toast.error("Vui lòng nhập lý do tuyển dụng");
+    if (!formData.reason) {
+      toast.error(t("errorReasonRequired"));
       return;
     }
-    if (!formData.salaryRangeMin || formData.salaryRangeMin < 0) {
-      toast.error("Vui lòng nhập mức lương tối thiểu");
-      return;
-    }
-    if (!formData.salaryRangeMax || formData.salaryRangeMax < 0) {
-      toast.error("Vui lòng nhập mức lương tối đa");
-      return;
-    }
-    if (
-      formData.salaryRangeMin &&
-      formData.salaryRangeMax &&
-      formData.salaryRangeMin > formData.salaryRangeMax
-    ) {
-      toast.error("Lương tối đa phải lớn hơn lương tối thiểu");
-      return;
-    }
-    if (!formData.expectedStartDate) {
-      toast.error("Vui lòng chọn ngày bắt đầu dự kiến");
-      return;
-    }
-    if (!formData.deadline) {
-      toast.error("Vui lòng chọn deadline");
-      return;
+
+    // Only validate salary if exceedBudget is checked
+    if (formData.isExceedBudget) {
+      if (!formData.salaryMin || formData.salaryMin < 0) {
+        toast.error(t("errorMinSalaryRequired"));
+        return;
+      }
+      if (!formData.salaryMax || formData.salaryMax < 0) {
+        toast.error(t("errorMaxSalaryRequired"));
+        return;
+      }
+      if (
+        formData.salaryMin &&
+        formData.salaryMax &&
+        formData.salaryMin > formData.salaryMax
+      ) {
+        toast.error(t("errorSalaryInvalid"));
+        return;
+      }
     }
 
     if (isViewMode && isEditing) {
@@ -203,13 +199,12 @@ export default function RecruitmentRequestAdd() {
         {
           onSuccess: () => {
             setIsEditing(false);
-            toast.success("Cập nhật thành công");
+            toast.success(t("updateSuccess"));
           },
           onError: (error) => {
             console.error("Error updating request:", error);
             const errorMessage =
-              error.response?.data?.message ||
-              "Có lỗi xảy ra khi cập nhật yêu cầu";
+              error.response?.data?.message || t("errorUpdateRequest");
             toast.error(errorMessage);
           },
         }
@@ -222,17 +217,69 @@ export default function RecruitmentRequestAdd() {
         onError: (error) => {
           console.error("Error creating request:", error);
           const errorMessage =
-            error.response?.data?.message || "Có lỗi xảy ra khi tạo yêu cầu";
+            error.response?.data?.message || t("errorCreateRequest");
           toast.error(errorMessage);
         },
       });
     }
   };
 
-  const isPending = createMutation.isPending || updateMutation.isPending;
+  const handleApprove = () => {
+    if (!id) return;
 
+    const approvalData = {
+      approvalNotes: "Đã duyệt bởi CEO",
+    };
+
+    approveMutation.mutate(
+      { id, data: approvalData },
+      {
+        onSuccess: () => {
+          toast.success(t("approveSuccess") || "Yêu cầu đã được phê duyệt");
+          // Refetch để cập nhật UI
+        },
+      }
+    );
+  };
+
+  const handleReject = () => {
+    if (!id) return;
+
+    // Prompt user for rejection reason
+    const reason = window.prompt("Vui lòng nhập lý do từ chối:");
+
+    if (!reason || !reason.trim()) {
+      toast.error("Vui lòng nhập lý do từ chối");
+      return;
+    }
+
+    const rejectData = {
+      reason: reason.trim(),
+    };
+
+    rejectMutation.mutate(
+      { id, data: rejectData },
+      {
+        onSuccess: () => {
+          toast.success(t("rejectSuccess") || "Yêu cầu đã bị từ chối");
+          // Refetch để cập nhật UI
+        },
+      }
+    );
+  };
+
+  const isPending =
+    createMutation.isPending ||
+    updateMutation.isPending ||
+    approveMutation.isPending ||
+    rejectMutation.isPending;
+
+  const isCEO = user?.role?.name === "CEO";
   const isApproved = existingRequest?.status === "APPROVED";
-  const canEdit = isViewMode && !isApproved;
+  const isRejected = existingRequest?.status === "REJECTED";
+  const isPendingApproval = existingRequest?.status === "PENDING";
+  const canEdit = isViewMode && !isApproved && !isCEO;
+  const canApprove = isViewMode && isCEO && isPendingApproval;
 
   const getCurrentStatus = () => {
     if (!isViewMode) return "DRAFT";
@@ -242,10 +289,10 @@ export default function RecruitmentRequestAdd() {
   const currentStatus = getCurrentStatus();
 
   const progressSteps = [
-    { key: "DRAFT", label: "Chờ nộp" },
-    { key: "PENDING", label: "Đang xử lý" },
-    { key: "APPROVED", label: "Đã được duyệt" },
-    { key: "REJECTED", label: "Từ chối" },
+    { key: "DRAFT", label: t("waitingSubmit") },
+    { key: "PENDING", label: t("processing") },
+    { key: "APPROVED", label: t("approved") },
+    { key: "REJECTED", label: t("rejected") },
   ];
 
   const getStepStyle = (stepKey) => {
@@ -258,24 +305,48 @@ export default function RecruitmentRequestAdd() {
   return (
     <div className="flex flex-col h-full">
       <ContentHeader
-        title={
-          isViewMode ? "Chi tiết yêu cầu tuyển dụng" : "Thêm yêu cầu tuyển dụng"
-        }
+        title={isViewMode ? t("requestDetail") : t("addRecruitmentRequest")}
         actions={
           <>
+            {/* CEO Actions - Approve/Reject */}
+            {canApprove && (
+              <>
+                <Button onClick={handleApprove} disabled={isPending}>
+                  {approveMutation.isPending
+                    ? t("approving") || "Đang phê duyệt..."
+                    : t("approve") || "Phê duyệt"}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={handleReject}
+                  disabled={isPending}
+                  className="border-red-600 text-red-600 hover:bg-red-50"
+                >
+                  {rejectMutation.isPending
+                    ? t("rejecting") || "Đang từ chối..."
+                    : t("reject") || "Từ chối"}
+                </Button>
+              </>
+            )}
+
+            {/* Non-CEO Actions - Edit */}
             {isViewMode && !isEditing && canEdit && (
-              <Button onClick={() => setIsEditing(true)}>Sửa</Button>
+              <Button onClick={() => setIsEditing(true)}>{t("edit")}</Button>
             )}
             {isViewMode && isEditing && (
               <Button onClick={() => onSubmit()} disabled={isPending}>
-                {isPending ? "Đang cập nhật..." : "Cập nhật"}
+                {isPending ? t("updating") : t("update")}
               </Button>
             )}
+
+            {/* Create Mode */}
             {!isViewMode && (
               <Button onClick={() => onSubmit()} disabled={isPending}>
-                {isPending ? "Đang lưu..." : "Lưu Yêu Cầu"}
+                {isPending ? t("saving") : t("saveRequest")}
               </Button>
             )}
+
+            {/* Close/Cancel Button */}
             <Button
               variant="outline"
               onClick={() => {
@@ -287,7 +358,7 @@ export default function RecruitmentRequestAdd() {
               }}
               disabled={isPending}
             >
-              {isEditing ? "Hủy" : isViewMode ? "Đóng" : "Hủy"}
+              {isEditing ? t("cancel") : isViewMode ? t("close") : t("cancel")}
             </Button>
           </>
         }
@@ -313,16 +384,16 @@ export default function RecruitmentRequestAdd() {
         <div className="flex flex-col gap-4">
           {/* general info */}
           <div className="rounded-md border border-gray-300 p-4 gap-4 flex flex-col">
-            <h2>Thông tin chung</h2>
+            <h2>{t("generalInfo")}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
               <TextInput
-                label="Nhân sự lập phiếu"
-                placeholder={user.name || "Nhập nhân sự lập phiếu"}
+                label={t("requester")}
+                placeholder={user.name || t("requesterPlaceholder")}
                 readOnly={true}
               />
 
               <SelectDropdown
-                label="Phòng"
+                label={t("department")}
                 placeholder={t("department")}
                 options={departmentsData || []}
                 value={formData.departmentId}
@@ -336,8 +407,8 @@ export default function RecruitmentRequestAdd() {
               />
 
               <TextInput
-                label="Vị trí tuyển dụng"
-                placeholder="Nhập vị trí tuyển dụng"
+                label={t("positionLabel")}
+                placeholder={t("positionPlaceholder")}
                 type="text"
                 name="title"
                 value={formData.title}
@@ -347,12 +418,12 @@ export default function RecruitmentRequestAdd() {
               />
 
               <SelectDropdown
-                label="Mức độ ưu tiên"
-                placeholder="Chọn mức độ ưu tiên"
+                label={t("priorityLevel")}
+                placeholder={t("priorityPlaceholder")}
                 options={[
-                  { id: "HIGH", name: "Cao" },
-                  { id: "MEDIUM", name: "Trung bình" },
-                  { id: "LOW", name: "Thấp" },
+                  { id: "HIGH", name: t("high") },
+                  { id: "MEDIUM", name: t("medium") },
+                  { id: "LOW", name: t("low") },
                 ]}
                 value={formData.priorityLevel}
                 onChange={(value) => {
@@ -365,40 +436,22 @@ export default function RecruitmentRequestAdd() {
           </div>
           {/* recruitment details */}
           <div className="rounded-md border border-gray-300 p-4 gap-4 flex flex-col">
-            <h2>Thông tin tuyển dụng</h2>
+            <h2>{t("recruitmentInfo")}</h2>
             <div className="gap-4 flex flex-col">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <TextInput
-                  label="Số lượng cần tuyển"
-                  placeholder="Nhập số lượng cần tuyển"
-                  type="number"
-                  name="numberOfPositions"
-                  value={formData.numberOfPositions}
-                  onChange={handleChange}
-                  required={true}
-                  disabled={isPending || (isViewMode && !isEditing)}
-                />
-                <SelectDropdown
-                  label="Loại hình công việc"
-                  placeholder="Chọn loại hình công việc"
-                  options={[
-                    { id: "FULL_TIME", name: "Full-time" },
-                    { id: "PART_TIME", name: "Part-time" },
-                    { id: "CONTRACT", name: "Hợp đồng" },
-                    { id: "INTERNSHIP", name: "Thực tập" },
-                  ]}
-                  value={formData.employmentType}
-                  onChange={(value) => {
-                    setFormData((prev) => ({ ...prev, employmentType: value }));
-                  }}
-                  required={true}
-                  disabled={isPending || (isViewMode && !isEditing)}
-                />
-              </div>
+              <TextInput
+                label={t("numberOfPositionsLabel")}
+                placeholder={t("numberOfPositionsPlaceholder")}
+                type="number"
+                name="numberOfPositions"
+                value={formData.numberOfPositions}
+                onChange={handleChange}
+                required={true}
+                disabled={isPending || (isViewMode && !isEditing)}
+              />
 
               <CheckBoxOptions
                 isRow={true}
-                label="Nơi làm việc"
+                label={t("workplace")}
                 required={true}
                 options={locations}
                 selectedValues={selectedValues}
@@ -408,82 +461,88 @@ export default function RecruitmentRequestAdd() {
 
               <TextInput
                 isRow={true}
-                label="Lý do tuyển dụng"
-                placeholder="Nhập lý do tuyển dụng"
+                label={t("recruitmentReason")}
+                placeholder={t("recruitmentReasonPlaceholder")}
                 type="text"
-                name="requestReason"
-                value={formData.requestReason}
+                name="reason"
+                value={formData.reason}
                 onChange={handleChange}
                 required={true}
                 disabled={isPending || (isViewMode && !isEditing)}
               />
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <TextInput
-                  label="Lương tối thiểu (VNĐ)"
-                  placeholder="0"
-                  type="number"
-                  name="salaryRangeMin"
-                  value={formData.salaryRangeMin}
-                  onChange={handleChange}
-                  required={true}
+              {/* Exceed Budget Checkbox */}
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="isExceedBudget"
+                  checked={formData.isExceedBudget}
+                  onChange={(e) => {
+                    setFormData((prev) => ({
+                      ...prev,
+                      isExceedBudget: e.target.checked,
+                      // Reset salary values when unchecking
+                      salaryMin: e.target.checked ? prev.salaryMin : null,
+                      salaryMax: e.target.checked ? prev.salaryMax : null,
+                    }));
+                  }}
                   disabled={isPending || (isViewMode && !isEditing)}
+                  className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 />
-                <TextInput
-                  label="Lương tối đa (VNĐ)"
-                  placeholder="0"
-                  type="number"
-                  name="salaryRangeMax"
-                  value={formData.salaryRangeMax}
-                  onChange={handleChange}
-                  required={true}
-                  disabled={isPending || (isViewMode && !isEditing)}
-                />
+                <label
+                  htmlFor="isExceedBudget"
+                  className="text-sm text-gray-700 cursor-pointer select-none"
+                >
+                  {t("exceedBudget")}
+                </label>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <TextInput
-                  label="Ngày bắt đầu dự kiến"
-                  placeholder="YYYY-MM-DD"
-                  type="date"
-                  name="expectedStartDate"
-                  value={formData.expectedStartDate}
-                  onChange={handleChange}
-                  required={true}
-                  disabled={isPending || (isViewMode && !isEditing)}
-                />
-                <TextInput
-                  label="Deadline"
-                  placeholder="YYYY-MM-DD"
-                  type="date"
-                  name="deadline"
-                  value={formData.deadline}
-                  onChange={handleChange}
-                  required={true}
-                  disabled={isPending || (isViewMode && !isEditing)}
-                />
-              </div>
+              {/* Salary fields - only show when isExceedBudget is checked */}
+              {formData.isExceedBudget && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <TextInput
+                    label={t("minSalary")}
+                    placeholder={t("salaryPlaceholder")}
+                    type="number"
+                    name="salaryMin"
+                    value={formData.salaryMin || ""}
+                    onChange={handleChange}
+                    required={true}
+                    disabled={isPending || (isViewMode && !isEditing)}
+                  />
+                  <TextInput
+                    label={t("maxSalary")}
+                    placeholder={t("salaryPlaceholder")}
+                    type="number"
+                    name="salaryMax"
+                    value={formData.salaryMax || ""}
+                    onChange={handleChange}
+                    required={true}
+                    disabled={isPending || (isViewMode && !isEditing)}
+                  />
+                </div>
+              )}
             </div>
           </div>
           {/* justification */}
           <div className="rounded-md border border-gray-300 p-4 gap-4 flex flex-col">
-            <h2>Mô tả công việc</h2>
+            <h2>{t("jobDescriptionSection")}</h2>
             <textarea
-              placeholder="Nhập nội dung mô tả công việc"
+              placeholder={t("jobDescriptionPlaceholder")}
               className="border border-gray-300 p-2 rounded-md text-gray-700
-              focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+              focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent
               disabled:opacity-50 disabled:cursor-not-allowed
               min-h-[100px] resize-y
               "
-              value={formData.jobDescription}
-              name="jobDescription"
+              value={formData.description}
+              name="description"
               onChange={handleChange}
               disabled={isPending || (isViewMode && !isEditing)}
             />
             <textarea
-              placeholder="Nhập nội dung yêu cầu ứng viên"
+              placeholder={t("requirementsPlaceholder")}
               className="border border-gray-300 p-2 rounded-md text-gray-700
-              focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+              focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent
               disabled:opacity-50 disabled:cursor-not-allowed
               min-h-[100px] resize-y
               "
@@ -493,14 +552,14 @@ export default function RecruitmentRequestAdd() {
               disabled={isPending || (isViewMode && !isEditing)}
             />
             <textarea
-              placeholder="Nhập nội dung quyền lợi"
+              placeholder={t("benefitsPlaceholder")}
               className="border border-gray-300 p-2 rounded-md text-gray-700
-              focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+              focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent
               disabled:opacity-50 disabled:cursor-not-allowed
               min-h-[100px] resize-y
               "
-              value={formData.preferredQualifications}
-              name="preferredQualifications"
+              value={formData.benefits}
+              name="benefits"
               onChange={handleChange}
               disabled={isPending || (isViewMode && !isEditing)}
             />
