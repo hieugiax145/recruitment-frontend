@@ -5,6 +5,7 @@ import RecruitmentRequests from "../../features/recruitment-requests/Recruitment
 import JobPositions from "../../features/job-positions/JobPositions";
 import Calendar from "../../features/calendar/Calendar";
 import Candidate from "../../features/candidate/Candidate";
+import CandidateDetail from "../../features/candidate/CandidateDetail";
 import Email from "../../features/email/Email";
 import RecruitmentRequestAdd from "../../features/recruitment-requests/RecruitmentRequestAdd";
 import RedirectIfAuth from "../../components/RedirectIfAuth";
@@ -55,16 +56,20 @@ export const router = createBrowserRouter([
         element: <JobPositionsAdd />,
       },
       {
-        path:"/job-positions/:id/candidates",
-        element:<JobPositionCandidates />
+        path: "/job-positions/:id/candidates",
+        element: <JobPositionCandidates />,
       },
       {
         path: "/calendar",
         element: <Calendar />,
       },
       {
-        path: "/candidate",
+        path: "/candidates",
         element: <Candidate />,
+      },
+      {
+        path: "/candidates/:id",
+        element: <CandidateDetail />,
       },
       {
         path: "/email",
