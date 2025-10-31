@@ -17,4 +17,8 @@ export const userServices = {
   getDepartments: async () => {
     return await api.get("/user-service/departments");
   },
+
+  getUsers: async (params = {}) => {
+    return await api.get("/user-service/users", { params });
+  },
 };

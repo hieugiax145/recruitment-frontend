@@ -46,7 +46,7 @@ const Sidebar = ({ isVisible, toggleSidebar, sidebarWidth }) => {
 
           `}
           >
-            Title
+            {t("appName")}
           </span>
           <div
             onClick={toggleSidebar}

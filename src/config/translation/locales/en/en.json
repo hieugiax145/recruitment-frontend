@@ -1,4 +1,5 @@
 {
+  "appName": "HR System",
   "login": "Login",
   "register": "Register",
   "username": "Username",
@@ -172,5 +173,45 @@
   "errorDeadlineRequired": "Please select deadline",
   "updateSuccess": "Update successful",
   "errorUpdateRequest": "An error occurred while updating the request",
-  "errorCreateRequest": "An error occurred while creating the request"
+  "errorCreateRequest": "An error occurred while creating the request",
+
+  "viewDetail": "View Detail",
+  "viewCandidate": "View Candidates",
+  "applicantsCount": "applicants",
+  "notes": "Notes",
+  "generalInformation": "General Information",
+  "jobPositionTitle": "Job Position Title",
+  "recruitmentRequestLabel": "Recruitment Request",
+  "chooseRecruitmentRequest": "Choose recruitment request",
+  "positionQuantity": "Number of Positions",
+  "experienceLevel": "Experience Level",
+  "yearsExperience": "Years of Experience",
+  "workLocation": "Work Location",
+  "applicationDeadline": "Application Deadline",
+  "salaryInfo": "Salary Information",
+  "jobDescription": "Job Description",
+  "enterJobDescription": "Enter brief position description",
+  "enterJobRequirements": "Enter job requirements",
+  "enterBenefits": "Enter benefits",
+  "editJobPosition": "Edit Job Position",
+  "createJobPosition": "Create Job Position",
+  "savePosition": "Save Position",
+  "enterRecruitmentReason": "Please enter position title",
+  "chooseRecruitmentRequestError": "Please choose recruitment request",
+  "fillFromRequest": "Filled information from recruitment request",
+  "errorUpdatePosition": "Error updating position",
+  "errorCreatePosition": "Error creating position",
+  "employmentTypes": {
+    "fullTime": "Full-time",
+    "partTime": "Part-time",
+    "contract": "Contract",
+    "internship": "Internship"
+  },
+  "experienceLevels": {
+    "entry": "Entry-level",
+    "mid": "Mid-level",
+    "senior": "Senior-level",
+    "lead": "Lead",
+    "manager": "Manager"
+  }
 }

@@ -1,4 +1,14 @@
-import { Edit, Trash2, Eye, Users, UserPlus, RefreshCw, CheckCircle, PauseCircle, XCircle } from "lucide-react";
+import {
+  Edit,
+  Trash2,
+  Eye,
+  Users,
+  UserPlus,
+  RefreshCw,
+  CheckCircle,
+  PauseCircle,
+  XCircle,
+} from "lucide-react";
 import DropdownMenu from "../../../components/ui/DropdownMenu";
 
 export default function PositionCard({
@@ -14,8 +24,10 @@ export default function PositionCard({
   onUpdateStatus,
 }) {
   const getStatusStyle = (status) => {
-    switch (status) {
+    const s = String(status || "").toLowerCase();
+    switch (s) {
       case "active":
+      case "published":
         return "bg-[#E7F6EC] text-[#12B76A] border border-[#12B76A]";
       case "draft":
         return "bg-[#EFF4FF] text-[#3E63DD] border border-[#3E63DD]";
@@ -25,6 +37,29 @@ export default function PositionCard({
         return "bg-gray-100 text-gray-600";
     }
   };
+
+  const getStatusLabel = (status) => {
+    const s = String(status || "").toLowerCase();
+    if (s === "published" || s === "active") return "PUBLISHED";
+    if (s === "draft") return "DRAFT";
+    if (s === "closed") return "CLOSED";
+    return status;
+  };
+
+  // Build status submenu based on current status
+  const statusTransitions = [
+    { label: "Còn tuyển", icon: CheckCircle, value: "PUBLISHED" },
+    { label: "Tạm dừng", icon: PauseCircle, value: "DRAFT" },
+    { label: "Đã đủ", icon: XCircle, value: "CLOSED" },
+  ];
+  const currentStatus = getStatusLabel(position.status);
+  const statusSubmenu = statusTransitions
+    .filter((opt) => opt.value !== currentStatus)
+    .map((opt) => ({
+      label: opt.label,
+      icon: opt.icon,
+      onClick: () => onUpdateStatus && onUpdateStatus(position, opt.value),
+    }));
 
   // Build menu options
   const menuOptions = [
@@ -43,27 +78,12 @@ export default function PositionCard({
       icon: UserPlus,
       onClick: () => onAddCandidate(position),
     },
-    onUpdateStatus && {
-      label: "Cập nhật trạng thái",
-      icon: RefreshCw,
-      submenu: [
-        {
-          label: "Còn tuyển",
-          icon: CheckCircle,
-          onClick: () => onUpdateStatus(position, "active"),
-        },
-        {
-          label: "Tạm dừng",
-          icon: PauseCircle,
-          onClick: () => onUpdateStatus(position, "draft"),
-        },
-        {
-          label: "Đã đủ",
-          icon: XCircle,
-          onClick: () => onUpdateStatus(position, "closed"),
-        },
-      ],
-    },
+    onUpdateStatus &&
+      statusSubmenu.length > 0 && {
+        label: "Cập nhật trạng thái",
+        icon: RefreshCw,
+        submenu: statusSubmenu,
+      },
     onEdit && {
       label: "Chỉnh sửa",
       icon: Edit,
@@ -108,7 +128,7 @@ export default function PositionCard({
                   position.status
                 )}`}
               >
-                {position.status}
+                {getStatusLabel(position.status)}
               </span>
             </div>
             <h3
@@ -176,7 +196,7 @@ export default function PositionCard({
             position.status
           )}`}
         >
-          {position.status}
+          {getStatusLabel(position.status)}
         </span>
         <DropdownMenu options={menuOptions} />
       </div>

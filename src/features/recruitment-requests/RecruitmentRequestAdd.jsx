@@ -1,4 +1,4 @@
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, X, AlertTriangle } from "lucide-react";
 import Button from "../../components/ui/Button";
 import ContentHeader from "../../components/ui/ContentHeader";
 import TextInput from "../../components/ui/TextInput";
@@ -9,7 +9,7 @@ import SelectDropdown from "../../components/ui/SelectDropdown";
 import { useAuth } from "../../context/AuthContext";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
-import { useAllDepartments } from "../../hooks/useDepartments";
+import Modal from "../../components/ui/Modal";
 import {
   useCreateRecruitmentRequest,
   useUpdateRecruitmentRequest,
@@ -25,6 +25,8 @@ export default function RecruitmentRequestAdd() {
   const navigate = useNavigate();
   const isViewMode = !!id;
   const [isEditing, setIsEditing] = useState(false);
+  const [showRejectDialog, setShowRejectDialog] = useState(false);
+  const [rejectionReason, setRejectionReason] = useState("");
 
   const [formData, setFormData] = useState({
     title: "",
@@ -41,28 +43,16 @@ export default function RecruitmentRequestAdd() {
     location: "",
     jobCategoryId: 1,
     requesterId: user?.id || null,
-    departmentId: user?.department?.id || null,
+    departmentId: user?.department?.id || null, // Always use logged-in user's department
   });
 
   const [selectedValues, setSelectedValues] = useState([]);
-
-  const {
-    data: departmentsData,
-    isLoading: departmentsLoading,
-    isError: departmentsError,
-  } = useAllDepartments();
 
   const {
     data: existingRequest,
     isLoading: requestLoading,
     isError: requestError,
   } = useRecruitmentRequest(id);
-
-  useEffect(() => {
-    if (departmentsError) {
-      toast.error(t("errorLoadDepartments"));
-    }
-  }, [departmentsError, t]);
 
   useEffect(() => {
     if (requestError) {
@@ -93,7 +83,7 @@ export default function RecruitmentRequestAdd() {
         location: existingRequest.location || "",
         jobCategoryId: existingRequest.jobCategoryId || 1,
         requesterId: existingRequest.requesterId || user?.id || null,
-        departmentId: existingRequest.departmentId || null,
+        departmentId: user?.department?.id || null, // Always use logged-in user's department
       });
 
       if (existingRequest.location) {
@@ -244,25 +234,27 @@ export default function RecruitmentRequestAdd() {
 
   const handleReject = () => {
     if (!id) return;
+    setShowRejectDialog(true);
+  };
 
-    // Prompt user for rejection reason
-    const reason = window.prompt("Vui lòng nhập lý do từ chối:");
+  const confirmReject = () => {
+    if (rejectMutation.isPending) return;
 
-    if (!reason || !reason.trim()) {
+    if (!rejectionReason || !rejectionReason.trim()) {
       toast.error("Vui lòng nhập lý do từ chối");
       return;
     }
 
     const rejectData = {
-      reason: reason.trim(),
+      reason: rejectionReason.trim(),
     };
 
     rejectMutation.mutate(
       { id, data: rejectData },
       {
         onSuccess: () => {
-          toast.success(t("rejectSuccess") || "Yêu cầu đã bị từ chối");
-          // Refetch để cập nhật UI
+          setShowRejectDialog(false);
+          setRejectionReason("");
         },
       }
     );
@@ -392,18 +384,11 @@ export default function RecruitmentRequestAdd() {
                 readOnly={true}
               />
 
-              <SelectDropdown
+              <TextInput
                 label={t("department")}
-                placeholder={t("department")}
-                options={departmentsData || []}
-                value={formData.departmentId}
-                onChange={(value) => {
-                  setFormData((prev) => ({ ...prev, departmentId: value }));
-                }}
-                required={true}
-                disabled={
-                  departmentsLoading || isPending || (isViewMode && !isEditing)
-                }
+                placeholder={user?.department?.name || t("department")}
+                readOnly={true}
+                value={user?.department?.name || ""}
               />
 
               <TextInput
@@ -566,6 +551,93 @@ export default function RecruitmentRequestAdd() {
           </div>
         </div>
       </div>
+
+      {/* Reject Dialog */}
+      <Modal
+        isOpen={showRejectDialog}
+        onClose={() => {
+          if (!rejectMutation.isPending) {
+            setShowRejectDialog(false);
+            setRejectionReason("");
+          }
+        }}
+        size="md"
+      >
+        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md relative">
+          {/* Close button */}
+          {!rejectMutation.isPending && (
+            <div
+              onClick={() => {
+                setShowRejectDialog(false);
+                setRejectionReason("");
+              }}
+              className="absolute top-4 right-4 p-1.5 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer z-10"
+              aria-label="Close"
+            >
+              <X className="h-4 w-4 text-gray-500" />
+            </div>
+          )}
+
+          <div className="p-6 pr-12">
+            {/* Icon & Content */}
+            <div className="flex gap-4 mb-4">
+              {/* Icon */}
+              <div className="flex-shrink-0 w-12 h-12 bg-red-50 text-red-600 rounded-xl flex items-center justify-center">
+                <AlertTriangle className="h-6 w-6" />
+              </div>
+
+              {/* Text Content */}
+              <div className="flex-1">
+                {/* Title */}
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  Từ chối yêu cầu
+                </h3>
+
+                {/* Message */}
+                <p className="text-sm text-gray-600 leading-relaxed">
+                  Vui lòng nhập lý do từ chối yêu cầu này
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Input field */}
+          <div className="px-6 pb-6">
+            <textarea
+              placeholder="Nhập lý do từ chối..."
+              value={rejectionReason}
+              onChange={(e) => setRejectionReason(e.target.value)}
+              disabled={rejectMutation.isPending}
+              rows={3}
+              className="w-full border border-gray-300 p-2 rounded-md text-gray-700
+                focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent
+                disabled:opacity-50 disabled:cursor-not-allowed resize-y"
+            />
+          </div>
+
+          {/* Actions */}
+          <div className="px-6 pb-6 flex gap-3 border-t border-gray-100">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowRejectDialog(false);
+                setRejectionReason("");
+              }}
+              disabled={rejectMutation.isPending}
+              className="flex-1"
+            >
+              Hủy
+            </Button>
+            <Button
+              onClick={confirmReject}
+              disabled={rejectMutation.isPending || !rejectionReason.trim()}
+              className="flex-1"
+            >
+              {rejectMutation.isPending ? "Đang xử lý..." : "Từ chối"}
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

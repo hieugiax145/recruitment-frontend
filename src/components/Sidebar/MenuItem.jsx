@@ -11,7 +11,7 @@ const MenuItem = ({ link, text, icon, isCollapsed }) => {
       relative flex items-center rounded-md px-2 py-2 my-2
       justify-center
 
-      ${isActive ? "bg-red-100/50 text-[#af1b1b]" : "hover:text-black"}
+      ${isActive ? "bg-red-100/50 text-[#af1b1b]" : "text-gray-900 hover:text-black"}
       `}
       >
         {icon}

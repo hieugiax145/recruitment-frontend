@@ -44,7 +44,20 @@ export default function JobPositionAdd() {
 
   // Fetch recruitment requests for dropdown
   const { data: requestsData } = useRecruitmentRequests();
-  const recruitmentRequests = requestsData?.data?.result || [];
+  const allRecruitmentRequests = requestsData?.data?.result || [];
+  // Filter only approved requests, but include the selected one if editing
+  const recruitmentRequests = allRecruitmentRequests.filter((req) => {
+    // If editing and this request is already selected, include it
+    if (
+      isEditMode &&
+      existingPosition?.recruitmentRequestId &&
+      req.id === existingPosition.recruitmentRequestId
+    ) {
+      return true;
+    }
+    // Otherwise, only include approved requests
+    return req.status === "APPROVED";
+  });
 
   const createMutation = useCreateJobPosition();
   const updateMutation = useUpdateJobPosition();
@@ -230,7 +243,7 @@ export default function JobPositionAdd() {
                 onChange={handleRecruitmentRequestChange}
                 options={recruitmentRequests.map((req) => ({
                   id: req.id,
-                  name: `${req.title} (ID: ${req.id})`,
+                  name: req.title,
                 }))}
                 disabled={isPending}
                 placeholder="Chọn yêu cầu tuyển dụng"

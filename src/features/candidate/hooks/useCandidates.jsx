@@ -112,3 +112,51 @@ export const useDeleteCandidate = () => {
     },
   });
 };
+
+// Custom hook to add a comment to an application
+export const useAddCandidateComment = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ applicationId, content }) => {
+      const payload = { applicationId, content };
+      const response = await candidateServices.commentCandidate(
+        applicationId,
+        payload
+      );
+      return response.data;
+    },
+    onSuccess: (_data, variables) => {
+      // Refresh the specific candidate detail
+      queryClient.invalidateQueries({
+        queryKey: candidateKeys.detail(variables.applicationId),
+      });
+      toast.success("Đã gửi nhận xét");
+    },
+    onError: (error) => {
+      const errorMessage =
+        error.response?.data?.message || "Không thể gửi nhận xét";
+      toast.error(errorMessage);
+    },
+  });
+};
+
+// Custom hook to change candidate stage (for drag and drop)
+export const useChangeStageCandidate = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, stage }) => {
+      const response = await candidateServices.changeStageCandidate(id, stage);
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: candidateKeys.all });
+    },
+    onError: (error) => {
+      const errorMessage =
+        error.response?.data?.message || "Không thể thay đổi trạng thái";
+      toast.error(errorMessage);
+    },
+  });
+};

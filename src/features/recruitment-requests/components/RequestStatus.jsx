@@ -1,4 +1,7 @@
+import { useTranslation } from "react-i18next";
+
 export default function RequestStatus({ status }) {
+  const { t } = useTranslation();
   // Normalize status to uppercase for consistent comparison
   const normalizedStatus = status?.toUpperCase();
 
@@ -18,18 +21,13 @@ export default function RequestStatus({ status }) {
   };
 
   const getStatusLabel = (status) => {
-    switch (status) {
-      case "APPROVED":
-        return "Đã duyệt";
-      case "PENDING":
-        return "Chờ duyệt";
-      case "REJECTED":
-        return "Từ chối";
-      case "IN_PROGRESS":
-        return "Đang xử lý";
-      default:
-        return status;
-    }
+    const statusMap = {
+      APPROVED: "status.approved",
+      PENDING: "status.pending",
+      REJECTED: "status.rejected",
+      IN_PROGRESS: "status.inProgress",
+    };
+    return t(statusMap[status] || status);
   };
 
   const statusColor = getStatusColor(normalizedStatus);

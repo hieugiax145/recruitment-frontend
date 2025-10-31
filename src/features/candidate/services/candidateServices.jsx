@@ -37,4 +37,12 @@ export const candidateServices = {
   deleteCandidate: async (id) => {
     return api.delete(`/candidate-service/applications/${id}`);
   },
+
+  commentCandidate: async (id, data) => {
+    return api.post(`/candidate-service/comments`, data);
+  },
+
+  changeStageCandidate: async (id, stage) => {
+    return api.put(`/candidate-service/applications/status/${id}?status=${stage}`);
+  },
 };

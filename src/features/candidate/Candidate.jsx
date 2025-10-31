@@ -84,7 +84,6 @@ export default function Candidate() {
                   {tableHeaders(t("email"))}
                   {tableHeaders(t("phone"))}
                   {tableHeaders(t("appliedPosition"))}
-                  {tableHeaders(t("department"))}
                   {tableHeaders(t("appliedDate"))}
                   {tableHeaders(t("status"))}
                 </tr>
@@ -111,19 +110,18 @@ export default function Candidate() {
                         #{candidate.id}
                       </td>
                       <td className="p-4 text-sm text-gray-900 font-medium">
-                        {candidate.candidateName || "-"}
+                        {candidate.fullName || "-"}
                       </td>
                       <td className="p-4 text-sm text-gray-600">
-                        {candidate.candidateEmail || "-"}
+                        {candidate.email || "-"}
                       </td>
                       <td className="p-4 text-sm text-gray-600">
-                        {candidate.candidatePhone || "-"}
+                        {candidate.phone || "-"}
                       </td>
                       <td className="p-4 text-sm text-gray-900">
-                        {candidate.jobPositionTitle || "-"}
-                      </td>
-                      <td className="p-4 text-sm text-gray-600">
-                        {candidate.departmentName || "-"}
+                        {candidate.jobPosition?.title ||
+                          candidate.jobPositionTitle ||
+                          "-"}
                       </td>
                       <td className="p-4 text-sm text-gray-600">
                         {formatDate(candidate.appliedDate)}

@@ -1,4 +1,5 @@
 {
+  "appName": "HR System",
   "login": "Đăng nhập",
   "register": "Đăng ký",
   "username": "Tên đăng nhập",
@@ -172,5 +173,45 @@
   "errorDeadlineRequired": "Vui lòng chọn deadline",
   "updateSuccess": "Cập nhật thành công",
   "errorUpdateRequest": "Có lỗi xảy ra khi cập nhật yêu cầu",
-  "errorCreateRequest": "Có lỗi xảy ra khi tạo yêu cầu"
+  "errorCreateRequest": "Có lỗi xảy ra khi tạo yêu cầu",
+
+  "viewDetail": "Xem chi tiết",
+  "viewCandidate": "Xem ứng viên",
+  "applicantsCount": "ứng viên",
+  "notes": "Ghi chú",
+  "generalInformation": "Thông tin cơ bản",
+  "jobPositionTitle": "Tên vị trí tuyển dụng",
+  "recruitmentRequestLabel": "Yêu cầu tuyển dụng",
+  "chooseRecruitmentRequest": "Chọn yêu cầu tuyển dụng",
+  "positionQuantity": "Số lượng cần tuyển",
+  "experienceLevel": "Cấp độ kinh nghiệm",
+  "yearsExperience": "Số năm kinh nghiệm",
+  "workLocation": "Địa điểm làm việc",
+  "applicationDeadline": "Hạn nộp hồ sơ",
+  "salaryInfo": "Thông tin lương thưởng",
+  "jobDescription": "Mô tả công việc",
+  "enterJobDescription": "Nhập mô tả ngắn về vị trí",
+  "enterJobRequirements": "Nhập yêu cầu công việc",
+  "enterBenefits": "Nhập quyền lợi",
+  "editJobPosition": "Chỉnh sửa vị trí tuyển dụng",
+  "createJobPosition": "Tạo vị trí tuyển dụng",
+  "savePosition": "Lưu vị trí",
+  "enterRecruitmentReason": "Vui lòng nhập tên vị trí",
+  "chooseRecruitmentRequestError": "Vui lòng chọn yêu cầu tuyển dụng",
+  "fillFromRequest": "Đã điền thông tin từ yêu cầu tuyển dụng",
+  "errorUpdatePosition": "Có lỗi xảy ra khi cập nhật vị trí",
+  "errorCreatePosition": "Có lỗi xảy ra khi tạo vị trí",
+  "employmentTypes": {
+    "fullTime": "Toàn thời gian",
+    "partTime": "Bán thời gian",
+    "contract": "Hợp đồng",
+    "internship": "Thực tập"
+  },
+  "experienceLevels": {
+    "entry": "Mới vào nghề",
+    "mid": "Trung cấp",
+    "senior": "Cao cấp",
+    "lead": "Trưởng nhóm",
+    "manager": "Quản lý"
+  }
 }

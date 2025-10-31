@@ -13,6 +13,7 @@ import {
   MoreVertical,
   Search,
   Briefcase,
+  Filter,
 } from "lucide-react";
 import Pagination from "../../components/ui/Pagination";
 import { useState, useEffect, useRef } from "react";
@@ -21,10 +22,17 @@ import PositionCard from "./components/PositionCard";
 import PositionDetail from "./components/PositionDetail";
 import ConfirmDialog from "../../components/ui/ConfirmDialog";
 import AddCandidateModal from "../candidate/components/AddCandidateModal";
-import { useJobPositions, useDeleteJobPosition, useUpdateJobPosition } from "./hooks/useJobPositions";
+import {
+  useJobPositions,
+  useDeleteJobPosition,
+  useUpdateJobPosition,
+} from "./hooks/useJobPositions";
+import { jobServices } from "./services/jobServices";
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
 import { formatSalary } from "../../utils/utils";
+import SelectDropdown from "../../components/ui/SelectDropdown";
+import { useAllDepartments } from "../../hooks/useDepartments";
 
 export default function JobPositions() {
   const { t } = useTranslation();
@@ -43,19 +51,39 @@ export default function JobPositions() {
   const [positionToDelete, setPositionToDelete] = useState(null);
   const [showAddCandidateModal, setShowAddCandidateModal] = useState(false);
   const [positionForCandidate, setPositionForCandidate] = useState(null);
+  const [selectedDepartmentId, setSelectedDepartmentId] = useState(null);
 
   // Fetch job positions from API
   const { data, isLoading, isError, error } = useJobPositions();
   const deleteMutation = useDeleteJobPosition();
   const updateMutation = useUpdateJobPosition();
 
+  // Fetch departments for filter
+  const { data: departmentsData } = useAllDepartments();
+  const departments = Array.isArray(departmentsData) ? departmentsData : [];
+
   // Get positions from API response and map to UI format
   const rawPositions = Array.isArray(data?.data?.result)
     ? data.data.result
     : [];
 
+  // Filter positions by department if selected
+  const filteredRawPositions = selectedDepartmentId
+    ? rawPositions.filter((pos) => {
+        const selectedDept = departments.find(
+          (d) => d.id === selectedDepartmentId
+        );
+        if (!selectedDept) return true;
+        return (
+          pos.departmentId === selectedDepartmentId ||
+          pos.department?.id === selectedDepartmentId ||
+          pos.departmentName === selectedDept.name
+        );
+      })
+    : rawPositions;
+
   // Map API data to UI format
-  const positions = rawPositions.map((pos) => ({
+  const positions = filteredRawPositions.map((pos) => ({
     id: pos.id.toString(),
     title: pos.title,
     description: pos.description,
@@ -276,12 +304,27 @@ export default function JobPositions() {
     setShowDeleteDialog(true);
   };
 
-  const handleUpdateStatus = (position, newStatus) => {
-    console.log("Update position status:", position.id, "to", newStatus);
-    updateMutation.mutate({
-      id: position.id,
-      data: { status: newStatus }
-    });
+  const handleUpdateStatus = async (position, newStatus) => {
+    try {
+      if (newStatus === "PUBLISHED") {
+        await jobServices.publishJobPosition(position.id);
+      } else if (newStatus === "CLOSED") {
+        await jobServices.closeJobPosition(position.id);
+      } else if (newStatus === "DRAFT") {
+        await jobServices.reopenJobPosition(position.id);
+      } else {
+        await jobServices.updateJobPosition(position.id, { status: newStatus });
+      }
+      // Refresh list
+      updateMutation.reset();
+      // Using updateMutation's onSuccess invalidation pattern
+      updateMutation.mutate(
+        { id: position.id, data: {} },
+        { onSuccess: () => {} }
+      );
+    } catch (error) {
+      // The hooks already handle toasts; fallback here if direct service fails
+    }
   };
 
   const confirmDelete = () => {
@@ -358,16 +401,33 @@ export default function JobPositions() {
       <ContentHeader
         title={t("listJobPosition")}
         actions={
-          <Can allowedRoles={["MANAGER", "ADMIN"]}>
-            <Button
-              onClick={() => {
-                navigate("/job-positions/new");
-              }}
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              {t("createNewPosition")}
-            </Button>
-          </Can>
+          <div className="flex gap-2 items-center">
+            <div className="w-[200px] [&>div>label]:hidden [&>div]:gap-0">
+              <SelectDropdown
+                placeholder="Lọc phòng ban"
+                options={[
+                  { id: null, name: "Tất cả phòng ban" },
+                  ...departments.map((dept) => ({
+                    id: dept.id,
+                    name: dept.name,
+                  })),
+                ]}
+                value={selectedDepartmentId}
+                onChange={setSelectedDepartmentId}
+                className="[&>div>div>div]:h-9 [&>div>div>div]:px-4 [&>div>div>div]:py-2 [&>div>div>div]:shadow-sm [&>div>div>div]:hover:border-gray-400"
+              />
+            </div>
+            <Can allowedRoles={["MANAGER", "ADMIN"]}>
+              <Button
+                onClick={() => {
+                  navigate("/job-positions/new");
+                }}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                {t("createNewPosition")}
+              </Button>
+            </Can>
+          </div>
         }
       />
       <div

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import ContentHeader from "../../components/ui/ContentHeader";
 import { ArrowLeft, User, Mail, Calendar, FileText, Phone } from "lucide-react";
 import Button from "../../components/ui/Button";
@@ -15,14 +16,28 @@ import { SortableContext } from "@dnd-kit/sortable";
 import { toast } from "react-toastify";
 import CandidateCard, { CandidateCardBase } from "./components/CandidateCard";
 import CandidateColumn from "./components/CandidateColumn";
+import {
+  useCandidates,
+  useChangeStageCandidate,
+  candidateKeys,
+} from "../candidate/hooks/useCandidates";
+import { useJobPosition } from "./hooks/useJobPositions";
+import LoadingOverlay from "../../components/ui/LoadingOverlay";
+import AddCandidateModal from "../candidate/components/AddCandidateModal";
 
 // Candidate status columns configuration
 const CANDIDATE_STATUSES = [
   {
-    id: "APPLICATION_RECEIVED",
-    label: "Tiếp nhận hồ sơ",
+    id: "NEW",
+    label: "Mới",
     color: "#3B82F6", // Blue
     bgColor: "#EFF6FF",
+  },
+  {
+    id: "REVIEWING",
+    label: "Đang xem xét",
+    color: "#6366F1", // Indigo
+    bgColor: "#EEF2FF",
   },
   {
     id: "INTERVIEW",
@@ -48,98 +63,11 @@ const CANDIDATE_STATUSES = [
     color: "#EF4444", // Red
     bgColor: "#FEE2E2",
   },
-];
-
-// Mock data - replace with API call
-const MOCK_CANDIDATES = [
   {
-    id: "1",
-    name: "Nguyễn Văn A",
-    email: "nguyenvana@gmail.com",
-    phone: "0901234567",
-    status: "APPLICATION_RECEIVED",
-    appliedDate: "2025-10-20",
-    avatar: null,
-    position: "Senior Backend Developer",
-    experience: "5 năm",
-    education: "Đại học Bách Khoa",
-  },
-  {
-    id: "2",
-    name: "Trần Thị B",
-    email: "tranthib@gmail.com",
-    phone: "0912345678",
-    status: "APPLICATION_RECEIVED",
-    appliedDate: "2025-10-19",
-    avatar: null,
-    position: "Senior Backend Developer",
-    experience: "6 năm",
-    education: "Đại học Công nghệ",
-  },
-  {
-    id: "3",
-    name: "Lê Văn C",
-    email: "levanc@gmail.com",
-    phone: "0923456789",
-    status: "INTERVIEW",
-    appliedDate: "2025-10-18",
-    avatar: null,
-    position: "Senior Backend Developer",
-    experience: "7 năm",
-    education: "Đại học KHTN",
-    interviewDate: "2025-10-25",
-  },
-  {
-    id: "4",
-    name: "Phạm Thị D",
-    email: "phamthid@gmail.com",
-    phone: "0934567890",
-    status: "INTERVIEW",
-    appliedDate: "2025-10-17",
-    avatar: null,
-    position: "Senior Backend Developer",
-    experience: "5 năm",
-    education: "Đại học Kinh tế",
-    interviewDate: "2025-10-26",
-  },
-  {
-    id: "5",
-    name: "Hoàng Văn E",
-    email: "hoangvane@gmail.com",
-    phone: "0945678901",
-    status: "OFFER",
-    appliedDate: "2025-10-15",
-    avatar: null,
-    position: "Senior Backend Developer",
-    experience: "8 năm",
-    education: "Đại học Sư phạm",
-    offerDate: "2025-10-22",
-  },
-  {
-    id: "6",
-    name: "Võ Thị F",
-    email: "vothif@gmail.com",
-    phone: "0956789012",
-    status: "HIRED",
-    appliedDate: "2025-10-10",
-    avatar: null,
-    position: "Senior Backend Developer",
-    experience: "6 năm",
-    education: "Đại học Ngoại thương",
-    hiredDate: "2025-10-23",
-  },
-  {
-    id: "7",
-    name: "Đặng Văn G",
-    email: "dangvang@gmail.com",
-    phone: "0967890123",
-    status: "REJECTED",
-    appliedDate: "2025-10-08",
-    avatar: null,
-    position: "Senior Backend Developer",
-    experience: "3 năm",
-    education: "Đại học Luật",
-    rejectedReason: "Không đủ kinh nghiệm",
+    id: "ARCHIVED",
+    label: "Lưu trữ",
+    color: "#6B7280", // Gray
+    bgColor: "#F3F4F6",
   },
 ];
 
@@ -147,9 +75,41 @@ const MOCK_CANDIDATES = [
 export default function JobPositionCandidates() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [selectedCandidate, setSelectedCandidate] = useState(null);
-  const [candidates, setCandidates] = useState(MOCK_CANDIDATES);
   const [activeCandidate, setActiveCandidate] = useState(null);
+  const [showAddCandidateModal, setShowAddCandidateModal] = useState(false);
+
+  // Fetch job position data
+  const { data: jobPosition } = useJobPosition(id);
+
+  // Fetch candidates for this job position
+  const {
+    data: candidatesData,
+    isLoading,
+    error,
+  } = useCandidates({
+    jobPositionId: id,
+  });
+  const changeStageMutation = useChangeStageCandidate();
+
+  // Normalize candidates data - handle both 'name' and 'fullName' fields
+  const normalizeCandidate = (candidate) => ({
+    ...candidate,
+    name: candidate.name || candidate.fullName || "",
+  });
+
+  // Extract candidates array from response - handle nested structure
+  const candidatesArray = Array.isArray(candidatesData?.data?.result)
+    ? candidatesData.data.result
+    : Array.isArray(candidatesData?.result)
+    ? candidatesData.result
+    : Array.isArray(candidatesData)
+    ? candidatesData
+    : [];
+
+  // Normalize all candidates
+  const candidates = candidatesArray.map(normalizeCandidate);
 
   // Configure drag sensors
   const sensors = useSensors(
@@ -167,7 +127,8 @@ export default function JobPositionCandidates() {
   }, {});
 
   const handleCandidateClick = (candidate) => {
-    setSelectedCandidate(candidate);
+    // Normalize candidate data before setting it
+    setSelectedCandidate(normalizeCandidate(candidate));
   };
 
   const handleDragStart = (event) => {
@@ -177,42 +138,11 @@ export default function JobPositionCandidates() {
   };
 
   const handleDragOver = (event) => {
-    const { active, over } = event;
-    if (!over) return;
-
-    const activeId = active.id;
-    const overId = over.id;
-
-    // Find the candidate being dragged
-    const activeCandidate = candidates.find((c) => c.id === activeId);
-    if (!activeCandidate) return;
-
-    // Determine the target status
-    let targetStatus = null;
-
-    // Check if dropping over a column
-    if (CANDIDATE_STATUSES.find((s) => s.id === overId)) {
-      targetStatus = overId;
-    } else {
-      // Dropping over another candidate - find its status
-      const overCandidate = candidates.find((c) => c.id === overId);
-      if (overCandidate) {
-        targetStatus = overCandidate.status;
-      }
-    }
-
-    // Update candidate status if changed and move to end of column
-    if (targetStatus && activeCandidate.status !== targetStatus) {
-      setCandidates((prev) => {
-        // Remove the candidate from its current position
-        const filtered = prev.filter((c) => c.id !== activeId);
-        // Add it to the end with new status
-        return [...filtered, { ...activeCandidate, status: targetStatus }];
-      });
-    }
+    // This handler is kept for visual feedback during drag
+    // The actual status update happens in handleDragEnd
   };
 
-  const handleDragEnd = (event) => {
+  const handleDragEnd = async (event) => {
     const { active, over } = event;
     setActiveCandidate(null);
 
@@ -241,17 +171,25 @@ export default function JobPositionCandidates() {
       const statusLabel = CANDIDATE_STATUSES.find(
         (s) => s.id === targetStatus
       )?.label;
-      toast.success(
-        `Đã chuyển ${candidate.name} sang ${statusLabel || targetStatus}`
-      );
 
-      // Here you would call an API to update the candidate status
-      // await updateCandidateStatus(candidate.id, targetStatus);
+      // Change candidate stage via API
+      try {
+        await changeStageMutation.mutateAsync({
+          id: candidate.id,
+          stage: targetStatus,
+        });
+        toast.success(
+          `Đã chuyển ${candidate.name} sang ${statusLabel || targetStatus}`
+        );
+      } catch (error) {
+        // Error is already handled by the mutation's onError
+        console.error("Failed to change candidate stage:", error);
+      }
     }
   };
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col relative">
       {/* Header */}
       <ContentHeader
         title={
@@ -263,55 +201,68 @@ export default function JobPositionCandidates() {
               <ArrowLeft className="h-5 w-5 text-gray-600" />
             </div>
             <h2 className="text-xl font-semibold text-gray-900">
-              Ứng viên - Senior Backend Developer
+              Ứng viên - {jobPosition?.title}
             </h2>
           </div>
         }
         actions={
-          <Button onClick={() => navigate("/candidates")}>
+          <Button onClick={() => setShowAddCandidateModal(true)}>
             <User className="h-4 w-4 mr-2" />
             Thêm ứng viên
           </Button>
         }
       />
 
-      {/* Kanban Board with Drag & Drop */}
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCorners}
-        onDragStart={handleDragStart}
-        onDragOver={handleDragOver}
-        onDragEnd={handleDragEnd}
-      >
-        <div className="flex-1 mt-4 overflow-x-auto overflow-y-hidden px-1 min-h-0">
-          <div className="flex gap-3 min-w-max h-full">
-            <SortableContext items={CANDIDATE_STATUSES.map((s) => s.id)}>
-              {CANDIDATE_STATUSES.map((status) => (
-                <CandidateColumn
-                  key={status.id}
-                  status={status}
-                  candidates={candidatesByStatus[status.id] || []}
-                  onCandidateClick={handleCandidateClick}
-                />
-              ))}
-            </SortableContext>
+      {/* Error State */}
+      {error && (
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-red-500">
+            Có lỗi xảy ra khi tải dữ liệu: {error.message || "Unknown error"}
           </div>
         </div>
+      )}
 
-        {/* Drag Overlay */}
-        <DragOverlay>
-          {activeCandidate ? (
-            <div className="rotate-3 scale-105">
-              <CandidateCardBase candidate={activeCandidate} />
+      {/* Kanban Board with Drag & Drop */}
+      {!error && (
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCorners}
+          onDragStart={handleDragStart}
+          onDragOver={handleDragOver}
+          onDragEnd={handleDragEnd}
+        >
+          <div className="flex-1 mt-4 overflow-x-auto overflow-y-hidden px-1 min-h-0 relative">
+            <div className="flex gap-3 min-w-max h-full">
+              <SortableContext items={CANDIDATE_STATUSES.map((s) => s.id)}>
+                {CANDIDATE_STATUSES.map((status) => (
+                  <CandidateColumn
+                    key={status.id}
+                    status={status}
+                    candidates={candidatesByStatus[status.id] || []}
+                    onCandidateClick={handleCandidateClick}
+                  />
+                ))}
+              </SortableContext>
             </div>
-          ) : null}
-        </DragOverlay>
-      </DndContext>
+            {/* Loading Overlay */}
+            {/* <LoadingOverlay show={isLoading} /> */}
+          </div>
+
+          {/* Drag Overlay */}
+          <DragOverlay>
+            {activeCandidate ? (
+              <div className="rotate-3 scale-105">
+                <CandidateCardBase candidate={activeCandidate} />
+              </div>
+            ) : null}
+          </DragOverlay>
+        </DndContext>
+      )}
 
       {/* Candidate Detail Modal */}
       {selectedCandidate && (
         <div
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] flex items-center justify-center p-4"
           onClick={() => setSelectedCandidate(null)}
         >
           <div
@@ -400,6 +351,19 @@ export default function JobPositionCandidates() {
           </div>
         </div>
       )}
+
+      {/* Add Candidate Modal */}
+      <AddCandidateModal
+        isOpen={showAddCandidateModal}
+        onClose={() => setShowAddCandidateModal(false)}
+        jobPosition={jobPosition || null}
+        onSuccess={() => {
+          // Refresh candidates list after successful addition
+          queryClient.invalidateQueries({
+            queryKey: candidateKeys.list({ jobPositionId: id }),
+          });
+        }}
+      />
 
       {/* Custom scrollbar styles */}
       <style jsx>{`

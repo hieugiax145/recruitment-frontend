@@ -20,4 +20,16 @@ export const jobServices = {
   deleteJobPosition: async (id) => {
     return api.delete(`/job-service/job-positions/${id}`);
   },
+
+  publishJobPosition: async (id) => {
+    return api.post(`/job-service/job-positions/${id}/publish`);
+  },
+
+  closeJobPosition: async (id) => {
+    return api.post(`/job-service/job-positions/${id}/close`);
+  },
+
+  reopenJobPosition: async (id) => {
+    return api.post(`/job-service/job-positions/${id}/reopen`);
+  },
 };

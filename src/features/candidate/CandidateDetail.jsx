@@ -1,34 +1,29 @@
-import { useParams, useNavigate, useLocation } from "react-router-dom";
-import { useCandidate } from "./hooks/useCandidates";
+import { useParams, useNavigate } from "react-router-dom";
+import { useCandidate, useAddCandidateComment } from "./hooks/useCandidates";
 import ContentHeader from "../../components/ui/ContentHeader";
 import Button from "../../components/ui/Button";
 import CandidateInfoCard from "./components/CandidateInfoCard";
 import JobPositionInfoCard from "./components/JobPositionInfoCard";
 import UpcomingScheduleCard from "./components/UpcomingScheduleCard";
 import FeedbackCard from "./components/FeedbackCard";
+import NotesCard from "./components/NotesCard";
 import ApplicationProgress from "./components/ApplicationProgress";
 import ResumeViewer from "./components/ResumeViewer";
 import { useTranslation } from "react-i18next";
+import { Calendar } from "lucide-react";
 
 export default function CandidateDetail() {
   const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
-  const location = useLocation();
+  // Always fetch candidate detail by ID
+  const { data, isLoading, isError, error } = useCandidate(id);
+  const addComment = useAddCandidateComment();
 
-  // Get candidate from navigation state (passed from list)
-  const candidateFromState = location.state?.candidate;
+  const candidate = data?.data;
 
-  // Fetch candidate detail from API (fallback if no state or when refresh)
-  const { data, isLoading, isError, error } = useCandidate(id, {
-    enabled: !candidateFromState, // Only fetch if no state
-  });
-
-  // Use state candidate if available, otherwise use API data
-  const candidate = candidateFromState || data?.data;
-
-  // Show loading only if fetching from API (not from state)
-  if (!candidateFromState && isLoading) {
+  // Loading state
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center h-full">
         <div className="text-gray-500">Đang tải...</div>
@@ -36,8 +31,8 @@ export default function CandidateDetail() {
     );
   }
 
-  // Show error only if API call failed (not from state)
-  if (!candidateFromState && isError) {
+  // Error state
+  if (isError) {
     return (
       <div className="flex flex-col items-center justify-center h-full gap-4">
         <div className="text-red-500">Lỗi: {error?.message}</div>
@@ -59,6 +54,13 @@ export default function CandidateDetail() {
   const displayName = candidate.fullName || candidate.candidateName || "-";
   const displayEmail = candidate.email || candidate.candidateEmail || "-";
   const displayPhone = candidate.phone || candidate.candidatePhone || "-";
+  const jobPositionTitle = candidate.jobPosition?.title || "-";
+  const departmentName = candidate.jobPosition?.departmentName || "-";
+  const salaryMin = candidate.jobPosition?.salaryMin;
+  const salaryMax = candidate.jobPosition?.salaryMax;
+  const currency = candidate.jobPosition?.currency;
+  const experienceLevel = candidate.jobPosition?.experienceLevel;
+  const yearsOfExperience = candidate.jobPosition?.yearsOfExperience;
 
   return (
     <div className="flex flex-col h-full">
@@ -71,7 +73,21 @@ export default function CandidateDetail() {
             <Button variant="outline" onClick={() => navigate("/candidates")}>
               {t("close")}
             </Button>
-            <Button>{t("updateStatus")}</Button>
+            <Button
+              onClick={() =>
+                navigate("/calendar", {
+                  state: {
+                    createSchedule: true,
+                    candidateId: candidate.id,
+                    candidateName: displayName,
+                    candidateEmail: displayEmail,
+                  },
+                })
+              }
+            >
+              <Calendar className="h-4 w-4 mr-2" />
+              Tạo lịch
+            </Button>
           </div>
         }
       />
@@ -89,16 +105,26 @@ export default function CandidateDetail() {
             />
 
             <JobPositionInfoCard
-              jobPositionTitle={candidate.jobPositionTitle}
-              departmentName={candidate.departmentName}
+              jobPositionTitle={jobPositionTitle}
+              departmentName={departmentName}
+              salaryMin={salaryMin}
+              salaryMax={salaryMax}
+              currency={currency}
+              experienceLevel={experienceLevel}
+              yearsOfExperience={yearsOfExperience}
             />
 
-            <UpcomingScheduleCard />
+            <UpcomingScheduleCard schedules={candidate.upcomingSchedules} />
+
+            <NotesCard notes={candidate.notes} />
 
             <FeedbackCard
               feedback={candidate.feedback}
-              notes={candidate.notes}
               rejectionReason={candidate.rejectionReason}
+              comments={candidate.comments}
+              onAddComment={(content) =>
+                addComment.mutate({ applicationId: candidate.id, content })
+              }
             />
           </div>
 

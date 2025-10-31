@@ -1,33 +1,40 @@
+import { useTranslation } from "react-i18next";
+
 export default function CandidateStatus({ status }) {
+  const { t } = useTranslation();
+
   const getStatusStyle = (status) => {
     switch (status) {
-      case "SUBMITTED":
-        return "bg-[#EFF4FF] text-[#3E63DD] border border-[#3E63DD]";
-      case "SCREENING":
-        return "bg-[#FEF6E7] text-[#F79009] border border-[#F79009]";
+      case "NEW":
+        return "bg-[#EFF6FF] text-[#3B82F6] border border-[#3B82F6]";
+      case "REVIEWING":
+        return "bg-[#EEF2FF] text-[#6366F1] border border-[#6366F1]";
       case "INTERVIEW":
-        return "bg-[#E0E7FF] text-[#6366F1] border border-[#6366F1]";
+        return "bg-[#FEF3C7] text-[#F59E0B] border border-[#F59E0B]";
       case "OFFER":
-        return "bg-[#ECFDF3] text-[#10B981] border border-[#10B981]";
+        return "bg-[#F5F3FF] text-[#8B5CF6] border border-[#8B5CF6]";
       case "HIRED":
-        return "bg-[#E7F6EC] text-[#12B76A] border border-[#12B76A]";
+        return "bg-[#D1FAE5] text-[#10B981] border border-[#10B981]";
       case "REJECTED":
-        return "bg-[#FEE4E2] text-[#F04438] border border-[#F04438]";
+        return "bg-[#FEE2E2] text-[#EF4444] border border-[#EF4444]";
+      case "ARCHIVED":
+        return "bg-[#F3F4F6] text-[#6B7280] border border-[#6B7280]";
       default:
         return "bg-gray-100 text-gray-600 border border-gray-300";
     }
   };
 
   const getStatusLabel = (status) => {
-    const labels = {
-      SUBMITTED: "Đã nộp",
-      SCREENING: "Sàng lọc",
-      INTERVIEW: "Phỏng vấn",
-      OFFER: "Offer",
-      HIRED: "Đã tuyển",
-      REJECTED: "Từ chối",
+    const statusMap = {
+      NEW: "status.new",
+      REVIEWING: "status.reviewing",
+      INTERVIEW: "status.interview",
+      OFFER: "status.offer",
+      HIRED: "status.hired",
+      REJECTED: "status.rejected",
+      ARCHIVED: "status.archived",
     };
-    return labels[status] || status;
+    return t(statusMap[status] || status);
   };
 
   return (

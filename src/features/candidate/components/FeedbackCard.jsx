@@ -1,7 +1,27 @@
-import { MessageSquare } from "lucide-react";
+import { useState } from "react";
+import { MessageSquare, Send } from "lucide-react";
+import Button from "../../../components/ui/Button";
 
-export default function FeedbackCard({ feedback, notes, rejectionReason }) {
-  const hasContent = feedback || notes || rejectionReason;
+export default function FeedbackCard({
+  feedback,
+  rejectionReason,
+  comments = [],
+  onAddComment,
+}) {
+  const [newComment, setNewComment] = useState("");
+  const hasContent =
+    feedback ||
+    rejectionReason ||
+    (Array.isArray(comments) && comments.length > 0);
+
+  const handleSubmit = () => {
+    const content = newComment.trim();
+    if (!content) return;
+    if (typeof onAddComment === "function") {
+      onAddComment(content);
+    }
+    setNewComment("");
+  };
 
   return (
     <div className="bg-white rounded-xl shadow p-6">
@@ -18,13 +38,41 @@ export default function FeedbackCard({ feedback, notes, rejectionReason }) {
               </p>
             </div>
           )}
-          {notes && (
-            <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
-              <p className="text-sm text-gray-600 whitespace-pre-wrap">
-                {notes}
-              </p>
+          {Array.isArray(comments) && comments.length > 0 && (
+            <div className="space-y-2">
+              {comments.map((c) => (
+                <div
+                  key={c.id}
+                  className="bg-white rounded-lg p-3 border border-gray-200"
+                >
+                  <div className="text-xs text-gray-500 mb-1 font-medium">
+                    {c.userName || "Người dùng"}
+                  </div>
+                  <p className="text-sm text-gray-700 whitespace-pre-wrap">
+                    {c.content}
+                  </p>
+                </div>
+              ))}
             </div>
           )}
+          <div className="mt-3">
+            <div className="flex items-center justify-center gap-2">
+              <input
+                type="text"
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                placeholder="Nhập nhận xét..."
+                className="w-80 text-sm px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-200 focus:border-red-300"
+              />
+              <Button
+                onClick={handleSubmit}
+                disabled={!newComment.trim()}
+                aria-label="Gửi nhận xét"
+              >
+                <Send className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
           {rejectionReason && (
             <div className="bg-red-50 rounded-lg p-3 border border-red-200">
               <div className="text-xs text-red-700 font-medium mb-1">
