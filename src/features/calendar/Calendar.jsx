@@ -13,6 +13,7 @@ import ScheduleCard from "./components/ScheduleCard";
 import DayTimeline from "./components/DayTimeline";
 import MonthView from "./components/MonthView";
 import WeekView from "./components/WeekView";
+import LoadingContent from "../../components/ui/LoadingContent";
 
 export default function Calendar() {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -54,7 +55,7 @@ export default function Calendar() {
     };
   })();
 
-  const { data: calendarData } = useCalendarQuery(calendarParams);
+  const { data: calendarData, isLoading } = useCalendarQuery(calendarParams);
 
   // Extract schedules from API response
   const schedules = Array.isArray(calendarData?.data?.result)
@@ -236,6 +237,16 @@ export default function Calendar() {
     setShowScheduleDetailModal(false);
     setSelectedSchedule(null);
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col h-full overflow-hidden">
+        <div className="flex-1 flex items-center justify-center">
+          <LoadingContent />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-full overflow-hidden">

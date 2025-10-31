@@ -11,6 +11,7 @@ import ApplicationProgress from "./components/ApplicationProgress";
 import ResumeViewer from "./components/ResumeViewer";
 import { useTranslation } from "react-i18next";
 import { Calendar } from "lucide-react";
+import LoadingContent from "../../components/ui/LoadingContent";
 
 export default function CandidateDetail() {
   const { t } = useTranslation();
@@ -25,8 +26,22 @@ export default function CandidateDetail() {
   // Loading state
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <div className="text-gray-500">Đang tải...</div>
+      <div className="flex flex-col h-full">
+        <ContentHeader
+          title={t("candidateDetail")}
+          subtitle="..."
+          onBack={() => navigate("/candidates")}
+          actions={
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={() => navigate("/candidates")}>
+                {t("close")}
+              </Button>
+            </div>
+          }
+        />
+        <div className="flex-1 flex items-center justify-center mt-4">
+          <LoadingContent />
+        </div>
       </div>
     );
   }

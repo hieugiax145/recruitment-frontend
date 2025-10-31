@@ -24,6 +24,7 @@ import {
 import { useJobPosition } from "./hooks/useJobPositions";
 import LoadingOverlay from "../../components/ui/LoadingOverlay";
 import AddCandidateModal from "../candidate/components/AddCandidateModal";
+import LoadingContent from "../../components/ui/LoadingContent";
 
 // Candidate status columns configuration
 const CANDIDATE_STATUSES = [
@@ -187,6 +188,37 @@ export default function JobPositionCandidates() {
       }
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="h-full flex flex-col relative">
+        <ContentHeader
+          title={
+            <div className="flex items-center gap-3">
+              <div
+                onClick={() => navigate("/job-positions")}
+                className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
+              >
+                <ArrowLeft className="h-5 w-5 text-gray-600" />
+              </div>
+              <h2 className="text-xl font-semibold text-gray-900">
+                Ứng viên - {jobPosition?.title || "..."}
+              </h2>
+            </div>
+          }
+          actions={
+            <Button onClick={() => setShowAddCandidateModal(true)}>
+              <User className="h-4 w-4 mr-2" />
+              Thêm ứng viên
+            </Button>
+          }
+        />
+        <div className="flex-1 flex items-center justify-center">
+          <LoadingContent />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-full flex flex-col relative">

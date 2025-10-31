@@ -17,6 +17,7 @@ import {
   useApproveRecruitmentRequest,
   useRejectRecruitmentRequest,
 } from "./hooks/useRecruitmentRequests";
+import LoadingContent from "../../components/ui/LoadingContent";
 
 export default function RecruitmentRequestAdd() {
   const { id } = useParams();
@@ -293,6 +294,28 @@ export default function RecruitmentRequestAdd() {
     }
     return "text-[#A3A3A3] text-sm";
   };
+
+  if (requestLoading && isViewMode) {
+    return (
+      <div className="flex flex-col h-full">
+        <ContentHeader
+          title={isViewMode ? t("requestDetail") : t("addRecruitmentRequest")}
+          actions={
+            <Button
+              variant="outline"
+              onClick={() => navigate(-1)}
+              disabled={true}
+            >
+              {t("close")}
+            </Button>
+          }
+        />
+        <div className="flex-1 flex items-center justify-center mt-4">
+          <LoadingContent />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-full">

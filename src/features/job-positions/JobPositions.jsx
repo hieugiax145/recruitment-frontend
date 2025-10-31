@@ -33,6 +33,7 @@ import { useTranslation } from "react-i18next";
 import { formatSalary } from "../../utils/utils";
 import SelectDropdown from "../../components/ui/SelectDropdown";
 import { useAllDepartments } from "../../hooks/useDepartments";
+import LoadingContent from "../../components/ui/LoadingContent";
 
 export default function JobPositions() {
   const { t } = useTranslation();
@@ -395,6 +396,48 @@ export default function JobPositions() {
       window.removeEventListener("resize", handleScroll);
     };
   }, [selectedPosition, isDetailFixed]);
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col h-full">
+        <ContentHeader
+          title={t("listJobPosition")}
+          actions={
+            <div className="flex gap-2 items-center">
+              <div className="w-[200px] [&>div>label]:hidden [&>div]:gap-0">
+                <SelectDropdown
+                  placeholder="Lọc phòng ban"
+                  options={[
+                    { id: null, name: "Tất cả phòng ban" },
+                    ...departments.map((dept) => ({
+                      id: dept.id,
+                      name: dept.name,
+                    })),
+                  ]}
+                  value={selectedDepartmentId}
+                  onChange={setSelectedDepartmentId}
+                  className="[&>div>div>div]:h-9 [&>div>div>div]:px-4 [&>div>div>div]:py-2 [&>div>div>div]:shadow-sm [&>div>div>div]:hover:border-gray-400"
+                />
+              </div>
+              <Can allowedRoles={["MANAGER", "ADMIN"]}>
+                <Button
+                  onClick={() => {
+                    navigate("/job-positions/new");
+                  }}
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  {t("createNewPosition")}
+                </Button>
+              </Can>
+            </div>
+          }
+        />
+        <div className="flex-1 flex items-center justify-center mt-4">
+          <LoadingContent />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-full">

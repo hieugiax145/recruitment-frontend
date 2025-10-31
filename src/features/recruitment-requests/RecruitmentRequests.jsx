@@ -14,6 +14,7 @@ import {
   useRecruitmentRequests,
   useDeleteRecruitmentRequest,
 } from "./hooks/useRecruitmentRequests";
+import LoadingContent from "../../components/ui/LoadingContent";
 
 export default function RecruitmentRequests() {
   const { t } = useTranslation();
@@ -87,6 +88,31 @@ export default function RecruitmentRequests() {
       </>
     );
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col h-full">
+        <ContentHeader
+          title={t("listRequest")}
+          actions={
+            <Can allowedRoles={["MANAGER"]}>
+              <Button
+                onClick={() => {
+                  navigate("/recruitment-requests/new");
+                }}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                {t("createNewRequest")}
+              </Button>
+            </Can>
+          }
+        />
+        <div className="flex-1 flex items-center justify-center mt-4">
+          <LoadingContent />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-full">

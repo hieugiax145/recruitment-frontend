@@ -40,14 +40,14 @@ const Sidebar = ({ isVisible, toggleSidebar, sidebarWidth }) => {
       h-full flex flex-col truncate bg-white rounded-xl shadow-lg
       border border-[#f3f3f3] "
       >
-        <div className="flex items-center justify-between p-4">
-          <span
+        <div className={`flex items-center ${isVisible ? "justify-between" : "justify-center"} p-4`}>
+          {isVisible && <span
             className={`overflow-hidden transition-all duration-300
 
           `}
           >
             {t("appName")}
-          </span>
+          </span>}
           <div
             onClick={toggleSidebar}
             className="p-1 bg-white hover:bg-gray-100 rounded-lg cursor-pointer"

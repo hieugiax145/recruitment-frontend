@@ -1,10 +1,7 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { Outlet } from "react-router-dom";
-import { useIsFetching, useIsMutating } from "@tanstack/react-query";
 import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
-import LoadingContent from "./ui/LoadingContent";
-import LoadingOverlay from "./ui/LoadingOverlay";
 
 const EXPANDED = 260;
 const COLLAPSED = 100;
@@ -12,16 +9,6 @@ const APPBAR_HEIGHT = 60;
 
 const Layout = () => {
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
-  const isFetching = useIsFetching();
-  const isMutating = useIsMutating();
-  const [hasShownContent, setHasShownContent] = useState(false);
-  const showOverlay = hasShownContent && (isFetching > 0 || isMutating > 0);
-
-  useEffect(() => {
-    if (isFetching === 0 && isMutating === 0) {
-      setHasShownContent(true);
-    }
-  }, [isFetching, isMutating]);
 
   const sidebarWidth = useMemo(
     () => (isSidebarVisible ? EXPANDED : COLLAPSED),
@@ -65,14 +52,7 @@ const Layout = () => {
         }}
       >
         <div className="h-full max-w-[1600px] mx-auto relative">
-          {!hasShownContent && (isFetching > 0 || isMutating > 0) ? (
-            <LoadingContent />
-          ) : (
-            <>
-              <Outlet />
-              <LoadingOverlay show={showOverlay} />
-            </>
-          )}
+          <Outlet />
         </div>
       </main>
     </div>

@@ -7,6 +7,7 @@ import CandidateStatus from "./components/CandidateStatus";
 import { useCandidates } from "./hooks/useCandidates";
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
+import LoadingContent from "../../components/ui/LoadingContent";
 
 export default function Candidate() {
   const { t } = useTranslation();
@@ -60,6 +61,24 @@ export default function Candidate() {
       </th>
     );
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col h-full">
+        <ContentHeader
+          title={t("listCandidate")}
+          actions={
+            <div className="flex gap-3">
+              {/* Add filter or export buttons here if needed */}
+            </div>
+          }
+        />
+        <div className="flex-1 flex items-center justify-center mt-4">
+          <LoadingContent />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-full">

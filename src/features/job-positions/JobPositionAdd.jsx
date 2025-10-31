@@ -11,6 +11,7 @@ import {
   useJobPosition,
 } from "./hooks/useJobPositions";
 import { useRecruitmentRequests } from "../recruitment-requests/hooks/useRecruitmentRequests";
+import LoadingContent from "../../components/ui/LoadingContent";
 
 export default function JobPositionAdd() {
   const { id } = useParams();
@@ -190,6 +191,35 @@ export default function JobPositionAdd() {
   };
 
   const isPending = createMutation.isPending || updateMutation.isPending;
+
+  if (positionLoading && isEditMode) {
+    return (
+      <div className="flex flex-col h-full">
+        <ContentHeader
+          title={
+            isEditMode ? "Chỉnh sửa vị trí tuyển dụng" : "Tạo vị trí tuyển dụng"
+          }
+          actions={
+            <>
+              <Button onClick={() => onSubmit()} disabled={true}>
+                Đang tải...
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => navigate(-1)}
+                disabled={true}
+              >
+                Hủy
+              </Button>
+            </>
+          }
+        />
+        <div className="flex-1 flex items-center justify-center mt-4">
+          <LoadingContent />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-full">
