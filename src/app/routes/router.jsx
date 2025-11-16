@@ -18,8 +18,7 @@ import JobPositionsAdd from "../../features/job-positions/JobPositionAdd";
 import JobPositionCandidates from "../../features/job-positions/JobPositionCandidates";
 import Home from "../../features/dashboard/Home";
 import Roles from "../../features/roles/Roles";
-import RoleDetail from "../../features/roles/RoleDetail";
-import RoleAdd from "../../features/roles/RoleAdd";
+import RoleForm from "../../features/roles/RoleForm";
 
 export const router = createBrowserRouter([
   {
@@ -56,11 +55,11 @@ export const router = createBrowserRouter([
       },
       {
         path: "/roles/new",
-        element: <RoleAdd />,
+        element: <RoleForm />,
       },
       {
         path: "/roles/:id",
-        element: <RoleDetail />,
+        element: <RoleForm />,
       },
       {
         path: "/employees",
