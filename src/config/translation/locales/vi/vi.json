@@ -3,19 +3,119 @@
   "login": "Đăng nhập",
   "register": "Đăng ký",
   "username": "Tên đăng nhập",
+  "employeeName": "Tên nhân sự",
+  "addAccount": "Thêm tài khoản",
   "password": "Mật khẩu",
   "language": "Ngôn ngữ",
   "email": "Email",
+  "avatar": "Ảnh đại diện",
+  "clickToUpload": "Click để chọn ảnh",
+  "maxSize": "Tối đa",
+  "remove": "Xóa ảnh",
+
+  "permissions": {
+    "label": "Phân quyền",
+    "selectAll": "Tất cả"
+  },
+
+  "permissionGroups": {
+    "services": {
+      "user": "Người dùng",
+      "job": "Công việc",
+      "candidate": "Ứng viên",
+      "communications": "Thông báo"
+    },
+
+    "resources": {
+      "permission": "Quyền",
+      "role": "Vai trò",
+      "user": "Tài khoản",
+      "department": "Phòng ban",
+      "employee": "Nhân viên",
+      "position": "Chức vụ",
+      "job-position": "Vị trí tuyển dụng",
+      "recruitment-request": "Yêu cầu tuyển dụng",
+      "application": "Đơn ứng tuyển",
+      "candidate": "Ứng viên",
+      "comment": "Bình luận",
+      "schedule": "Lịch hẹn",
+      "job-skill": "Kỹ năng",
+      "job-category": "Danh mục công việc"
+    },
+
+    "actions": {
+      "read": "Xem",
+      "create": "Tạo",
+      "update": "Sửa",
+      "delete": "Xóa",
+      "publish": "Xuất bản",
+      "close": "Đóng",
+      "reopen": "Mở lại",
+      "approve": "Phê duyệt",
+      "reject": "Từ chối",
+      "status": "Thay đổi trạng thái",
+      "accept": "Chấp nhận",
+      "change-stage": "Chuyển giai đoạn",
+      "update-status": "Cập nhật trạng thái",
+      "calendar": "Lịch"
+    }
+  },
+
+  "services": {
+    "user": "Người dùng",
+    "job": "Công việc",
+    "candidate": "Ứng viên",
+    "communications": "Giao tiếp"
+  },
+
+  "resources": {
+    "permission": "Quyền",
+    "role": "Vai trò",
+    "user": "Tài khoản",
+    "department": "Phòng ban",
+    "employee": "Nhân viên",
+    "position": "Chức vụ",
+    "job-position": "Vị trí tuyển dụng",
+    "recruitment-request": "Yêu cầu tuyển dụng",
+    "application": "Đơn ứng tuyển",
+    "candidate": "Ứng viên",
+    "comment": "Bình luận",
+    "schedule": "Lịch hẹn",
+    "job-skill": "Kỹ năng",
+    "job-category": "Danh mục công việc"
+  },
+
+  
 
   "welcomeMessage": "Chào mừng bạn đến với React và react-i18next",
   "countSheepMessage_one": "Có <1>{{count}}</1> con cừu",
   "countSheepMessage_other": "Có <1>{{count}}</1> con cừu",
 
   "home": "Trang chủ",
+  "accountManagement": "Quản lý tài khoản",
+  "employeeManagement": "Quản lý nhân sự",
+  "employeesList": "Danh sách nhân sự",
+  "addEmployee": "Thêm nhân sự",
+  "employeeCode": "Mã nhân sự",
+  "hasAccount": "Có tài khoản",
+  "startDate": "Ngày bắt đầu",
+  "positionLevel": "Cấp độ vị trí",
+  "manager": "Quản lý",
+  "employeeDetail": "Chi tiết nhân sự",
+  "role": "Vai trò",
+  "active": "Hoạt động",
+  "inactive": "Không hoạt động",
   "recruitmentReq": "Yêu cầu tuyển dụng",
   "jobPosition": "Vị trí tuyển dụng",
   "candidate": "Ứng viên",
   "calendar": "Lịch",
+  "roleManagement": "Quản lý vai trò",
+  "addRole": "Thêm vai trò",
+  "roleDetail": "Chi tiết vai trò",
+  "roleInformation": "Thông tin vai trò",
+  "roleName": "Tên vai trò",
+  "roleDescription": "Mô tả",
+  "afterCreateEditPerms": "Sau khi tạo, hãy phân quyền tại trang chi tiết vai trò.",
 
   "profile": "Hồ sơ",
   "settings": "Cài đặt",
@@ -189,7 +289,6 @@
   "workLocation": "Địa điểm làm việc",
   "applicationDeadline": "Hạn nộp hồ sơ",
   "salaryInfo": "Thông tin lương thưởng",
-  "jobDescription": "Mô tả công việc",
   "enterJobDescription": "Nhập mô tả ngắn về vị trí",
   "enterJobRequirements": "Nhập yêu cầu công việc",
   "enterBenefits": "Nhập quyền lợi",
@@ -201,6 +300,10 @@
   "fillFromRequest": "Đã điền thông tin từ yêu cầu tuyển dụng",
   "errorUpdatePosition": "Có lỗi xảy ra khi cập nhật vị trí",
   "errorCreatePosition": "Có lỗi xảy ra khi tạo vị trí",
+  "errorInvalidImage": "Vui lòng chọn file ảnh",
+  "errorImageSize": "Kích thước file không được vượt quá 5MB",
+  "chooseDepartment": "Chọn phòng ban",
+  "chooseRole": "Chọn vai trò",
   "employmentTypes": {
     "fullTime": "Toàn thời gian",
     "partTime": "Bán thời gian",
