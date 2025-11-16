@@ -70,7 +70,7 @@ export default function useConfirmDialog() {
         }
       }}
     >
-      <div className="absolute inset-0 bg-black bg-opacity-50 transition-opacity" />
+      <div className="absolute inset-0 bg-black/20 backdrop-blur-sm transition-opacity" />
 
       <div className="relative bg-white rounded-xl shadow-xl w-full max-w-md animate-in fade-in zoom-in-95 duration-200">
         <div className="p-6">
