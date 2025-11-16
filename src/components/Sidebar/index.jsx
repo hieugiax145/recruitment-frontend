@@ -8,6 +8,7 @@ import {
   House,
   Mail,
   UsersRound,
+  GitBranch,
 } from "lucide-react";
 
 const Sidebar = ({ isVisible, toggleSidebar, sidebarWidth }) => {
@@ -17,6 +18,7 @@ const Sidebar = ({ isVisible, toggleSidebar, sidebarWidth }) => {
     { text: t("accountManagement", { defaultValue: "Quản lý tài khoản" }), link: "/users", icon: <UsersRound /> },
     { text: t("roleManagement", { defaultValue: "Quản lý vai trò" }), link: "/roles", icon: <UsersRound /> },
     { text: t("employeeManagement", { defaultValue: "Quản lý nhân sự" }), link: "/employees", icon: <UsersRound /> },
+    { text: t("workflowManagement", { defaultValue: "Luồng phê duyệt" }), link: "/workflows", icon: <GitBranch /> },
     {
       text: t("recruitmentReq"),
       link: "/recruitment-requests",

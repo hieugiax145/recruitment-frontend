@@ -19,6 +19,8 @@ import JobPositionCandidates from "../../features/job-positions/JobPositionCandi
 import Home from "../../features/dashboard/Home";
 import Roles from "../../features/roles/Roles";
 import RoleForm from "../../features/roles/RoleForm";
+import Workflows from "../../features/workflows/Workflows";
+import WorkflowForm from "../../features/workflows/WorkflowForm";
 
 export const router = createBrowserRouter([
   {
@@ -64,6 +66,18 @@ export const router = createBrowserRouter([
       {
         path: "/roles/:id",
         element: <RoleForm />,
+      },
+      {
+        path: "/workflows",
+        element: <Workflows />,
+      },
+      {
+        path: "/workflows/new",
+        element: <WorkflowForm />,
+      },
+      {
+        path: "/workflows/:id",
+        element: <WorkflowForm />,
       },
       {
         path: "/employees",
