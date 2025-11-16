@@ -7,12 +7,20 @@ import Calendar from "../../features/calendar/Calendar";
 import Candidate from "../../features/candidate/Candidate";
 import CandidateDetail from "../../features/candidate/CandidateDetail";
 import Email from "../../features/email/Email";
+import Users from "../../features/users/Users";
+import UserAdd from "../../features/users/UserAdd";
+import Employees from "../../features/employees/Employees";
+import EmployeeAdd from "../../features/employees/EmployeeAdd";
+import EmployeeDetail from "../../features/employees/EmployeeDetail";
 import RecruitmentRequestAdd from "../../features/recruitment-requests/RecruitmentRequestAdd";
 import RedirectIfAuth from "../../components/RedirectIfAuth";
 import ProtectedRoute from "../../components/ProtectedRoute";
 import JobPositionsAdd from "../../features/job-positions/JobPositionAdd";
 import JobPositionCandidates from "../../features/job-positions/JobPositionCandidates";
 import Home from "../../features/dashboard/Home";
+import Roles from "../../features/roles/Roles";
+import RoleDetail from "../../features/roles/RoleDetail";
+import RoleAdd from "../../features/roles/RoleAdd";
 
 export const router = createBrowserRouter([
   {
@@ -34,6 +42,38 @@ export const router = createBrowserRouter([
       {
         path: "/",
         element: <Home />,
+      },
+      {
+        path: "/users",
+        element: <Users />,
+      },
+      {
+        path: "/users/new",
+        element: <UserAdd />,
+      },
+      {
+        path: "/roles",
+        element: <Roles />,
+      },
+      {
+        path: "/roles/new",
+        element: <RoleAdd />,
+      },
+      {
+        path: "/roles/:id",
+        element: <RoleDetail />,
+      },
+      {
+        path: "/employees",
+        element: <Employees />,
+      },
+      {
+        path: "/employees/new",
+        element: <EmployeeAdd />,
+      },
+      {
+        path: "/employees/:id",
+        element: <EmployeeDetail />,
       },
       {
         path: "/recruitment-requests",

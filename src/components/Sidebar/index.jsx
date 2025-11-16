@@ -14,6 +14,9 @@ const Sidebar = ({ isVisible, toggleSidebar, sidebarWidth }) => {
   const { t } = useTranslation();
   const menuItems = [
     { text: t("home"), link: "/", icon: <House /> },
+    { text: t("accountManagement", { defaultValue: "Quản lý tài khoản" }), link: "/users", icon: <UsersRound /> },
+    { text: t("roleManagement", { defaultValue: "Quản lý vai trò" }), link: "/roles", icon: <UsersRound /> },
+    { text: t("employeeManagement", { defaultValue: "Quản lý nhân sự" }), link: "/employees", icon: <UsersRound /> },
     {
       text: t("recruitmentReq"),
       link: "/recruitment-requests",
@@ -40,14 +43,20 @@ const Sidebar = ({ isVisible, toggleSidebar, sidebarWidth }) => {
       h-full flex flex-col truncate bg-white rounded-xl shadow-lg
       border border-[#f3f3f3] "
       >
-        <div className={`flex items-center ${isVisible ? "justify-between" : "justify-center"} p-4`}>
-          {isVisible && <span
-            className={`overflow-hidden transition-all duration-300
+        <div
+          className={`flex items-center ${
+            isVisible ? "justify-between" : "justify-center"
+          } p-4`}
+        >
+          {isVisible && (
+            <span
+              className={`overflow-hidden transition-all duration-300
 
           `}
-          >
-            {t("appName")}
-          </span>}
+            >
+              {t("appName")}
+            </span>
+          )}
           <div
             onClick={toggleSidebar}
             className="p-1 bg-white hover:bg-gray-100 rounded-lg cursor-pointer"
