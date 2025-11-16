@@ -98,11 +98,11 @@ export default function Users() {
                   users.map((u) => {
                     const isActive = u._active !== undefined ? u._active : true;
                     return (
-                      <tr key={u.id} className="hover:bg-gray-50">
+                      <tr key={u.id} className="hover:bg-gray-50 cursor-pointer" onClick={() => navigate(`/users/${u.id}`)}>
                         <td className="p-4 text-sm text-gray-900">#{u.id}</td>
-                        <td className="p-4 text-sm text-gray-900">{u.name || u.fullName || "-"}</td>
+                        <td className="p-4 text-sm text-gray-900">{u.employee?.name || "-"}</td>
                         <td className="p-4 text-sm text-gray-600">{u.email || "-"}</td>
-                        <td className="p-4 text-sm text-gray-600">{u.department?.name || "-"}</td>
+                        <td className="p-4 text-sm text-gray-600">{u.employee?.department?.name || "-"}</td>
                         <td className="p-4 text-sm text-gray-600">{u.role?.name || "-"}</td>
                         <td className="p-4 text-sm text-gray-600">{isActive ? t("active") : t("inactive")}</td>
                       </tr>

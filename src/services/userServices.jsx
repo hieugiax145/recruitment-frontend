@@ -21,6 +21,9 @@ export const userServices = {
   getUsers: async (params = {}) => {
     return await api.get("/user-service/users", { params });
   },
+  getUser: async (id) => {
+    return await api.get(`/user-service/users/${id}`);
+  },
   createUser: async (data) => {
     if (data instanceof FormData) {
       return await api.post("/user-service/users", data, {
@@ -30,6 +33,16 @@ export const userServices = {
       });
     }
     return await api.post("/user-service/users", data);
+  },
+  updateUser: async (id, data) => {
+    if (data instanceof FormData) {
+      return await api.put(`/user-service/users/${id}`, data, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+    }
+    return await api.put(`/user-service/users/${id}`, data);
   },
 
   getRoles: async (params = {}) => {

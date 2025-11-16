@@ -8,7 +8,7 @@ import Candidate from "../../features/candidate/Candidate";
 import CandidateDetail from "../../features/candidate/CandidateDetail";
 import Email from "../../features/email/Email";
 import Users from "../../features/users/Users";
-import UserAdd from "../../features/users/UserAdd";
+import UserForm from "../../features/users/UserForm";
 import Employees from "../../features/employees/Employees";
 import EmployeeForm from "../../features/employees/EmployeeForm";
 import RecruitmentRequestAdd from "../../features/recruitment-requests/RecruitmentRequestAdd";
@@ -47,7 +47,11 @@ export const router = createBrowserRouter([
       },
       {
         path: "/users/new",
-        element: <UserAdd />,
+        element: <UserForm />,
+      },
+      {
+        path: "/users/:id",
+        element: <UserForm />,
       },
       {
         path: "/roles",
