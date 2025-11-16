@@ -52,4 +52,7 @@ export const userServices = {
   getPermissions: async (params = {}) => {
     return await api.get("/user-service/permissions", { params });
   },
+  getPositions: async (params = {}) => {
+    return await api.get("/user-service/positions", { params });
+  },
 };

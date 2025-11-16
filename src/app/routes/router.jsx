@@ -10,8 +10,7 @@ import Email from "../../features/email/Email";
 import Users from "../../features/users/Users";
 import UserAdd from "../../features/users/UserAdd";
 import Employees from "../../features/employees/Employees";
-import EmployeeAdd from "../../features/employees/EmployeeAdd";
-import EmployeeDetail from "../../features/employees/EmployeeDetail";
+import EmployeeForm from "../../features/employees/EmployeeForm";
 import RecruitmentRequestAdd from "../../features/recruitment-requests/RecruitmentRequestAdd";
 import RedirectIfAuth from "../../components/RedirectIfAuth";
 import ProtectedRoute from "../../components/ProtectedRoute";
@@ -69,11 +68,11 @@ export const router = createBrowserRouter([
       },
       {
         path: "/employees/new",
-        element: <EmployeeAdd />,
+        element: <EmployeeForm />,
       },
       {
         path: "/employees/:id",
-        element: <EmployeeDetail />,
+        element: <EmployeeForm />,
       },
       {
         path: "/recruitment-requests",

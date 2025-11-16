@@ -64,17 +64,18 @@ export default function Employees() {
                   <th className="p-4 text-left text-sm font-medium text-gray-600">{t("employeeName")}</th>
                   <th className="p-4 text-left text-sm font-medium text-gray-600">{t("email")}</th>
                   <th className="p-4 text-left text-sm font-medium text-gray-600">{t("phone")}</th>
+                  <th className="p-4 text-left text-sm font-medium text-gray-600">{t("gender", { defaultValue: "Gender" })}</th>
+                  <th className="p-4 text-left text-sm font-medium text-gray-600">{t("idNumber", { defaultValue: "ID Number" })}</th>
                   <th className="p-4 text-left text-sm font-medium text-gray-600">{t("department")}</th>
                   <th className="p-4 text-left text-sm font-medium text-gray-600">{t("position")}</th>
-                  <th className="p-4 text-left text-sm font-medium text-gray-600">{t("positionLevel")}</th>
-                  <th className="p-4 text-left text-sm font-medium text-gray-600">{t("manager")}</th>
+                  {/* removed position level column as requested */}
                   <th className="p-4 text-left text-sm font-medium text-gray-600">{t("status")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
                 {employees.length === 0 ? (
                   <tr>
-                    <td colSpan="8" className="p-8 text-center text-gray-500">{t("noData")}</td>
+                    <td colSpan="9" className="p-8 text-center text-gray-500">{t("noData")}</td>
                   </tr>
                 ) : (
                   employees.map((e) => {
@@ -85,10 +86,11 @@ export default function Employees() {
                         <td className="p-4 text-sm text-gray-900">{e.name || "-"}</td>
                         <td className="p-4 text-sm text-gray-600">{e.email || "-"}</td>
                         <td className="p-4 text-sm text-gray-600">{e.phone || "-"}</td>
+                        <td className="p-4 text-sm text-gray-600">{e.gender || "-"}</td>
+                        <td className="p-4 text-sm text-gray-600">{e.idNumber || "-"}</td>
                         <td className="p-4 text-sm text-gray-600">{e.department?.name || "-"}</td>
                         <td className="p-4 text-sm text-gray-600">{e.position?.name || "-"}</td>
-                        <td className="p-4 text-sm text-gray-600">{e.position?.level || "-"}</td>
-                        <td className="p-4 text-sm text-gray-600">{e.manager?.name || "-"}</td>
+                        {/* removed position level cell */}
                         <td className="p-4 text-sm text-gray-600">{isActive ? t("active") : t("inactive")}</td>
                       </tr>
                     );

@@ -70,13 +70,10 @@ export default function useConfirmDialog() {
         }
       }}
     >
-      {/* Backdrop */}
       <div className="absolute inset-0 bg-black bg-opacity-50 transition-opacity" />
 
-      {/* Dialog */}
       <div className="relative bg-white rounded-xl shadow-xl w-full max-w-md animate-in fade-in zoom-in-95 duration-200">
         <div className="p-6">
-          {/* Icon & Content */}
           <div className="text-center">
             {config.variant === "danger" && (
               <div className="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
@@ -96,15 +93,12 @@ export default function useConfirmDialog() {
               </div>
             )}
 
-            {/* Title */}
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
               {config.title}
             </h3>
 
-            {/* Message */}
             <p className="text-gray-600 mb-6">{config.message}</p>
 
-            {/* Actions */}
             <div className="flex gap-3 justify-center">
               <button
                 onClick={hideConfirm}

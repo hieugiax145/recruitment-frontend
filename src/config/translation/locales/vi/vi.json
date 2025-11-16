@@ -12,6 +12,15 @@
   "clickToUpload": "Click để chọn ảnh",
   "maxSize": "Tối đa",
   "remove": "Xóa ảnh",
+  "gender": "Giới tính",
+  "male": "Nam",
+  "female": "Nữ",
+  "other": "Khác",
+  "address": "Địa chỉ",
+  "nationality": "Quốc tịch",
+  "dateOfBirth": "Ngày sinh",
+  "idNumber": "CMND/CCCD",
+  "choosePosition": "Chọn chức vụ",
 
   "permissions": {
     "label": "Phân quyền",
@@ -146,6 +155,7 @@
   "loading": "Đang tải...",
   "noData": "Không có dữ liệu",
   "error": "Lỗi",
+  "isRequired": "là bắt buộc",
 
   "errorLoadingRequests": "Không thể tải danh sách yêu cầu",
   "errorLoadingPositions": "Không thể tải danh sách vị trí tuyển dụng",

@@ -15,7 +15,7 @@ const TextInput = ({
 }) => {
   return (
     <div className={`flex ${isRow ? "items-center gap-4" : "flex-col gap-2"}`}>
-      <label className="block text-gray-700" htmlFor={label}>
+      <label className="block font-medium text-gray-700" htmlFor={label}>
         {label}
         {required && <span className="text-red-500"> *</span>}
       </label>
