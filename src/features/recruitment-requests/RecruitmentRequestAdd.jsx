@@ -16,8 +16,14 @@ import {
   useRecruitmentRequest,
   useApproveRecruitmentRequest,
   useRejectRecruitmentRequest,
+  useSubmitRecruitmentRequest,
+  useReturnRecruitmentRequest,
+  useCancelRecruitmentRequest,
+  useWithdrawRecruitmentRequest,
 } from "./hooks/useRecruitmentRequests";
 import LoadingContent from "../../components/ui/LoadingContent";
+import { useWorkflows } from "../../hooks/useWorkflows";
+import { useAllDepartments } from "../../hooks/useDepartments";
 
 export default function RecruitmentRequestAdd() {
   const { id } = useParams();
@@ -28,10 +34,16 @@ export default function RecruitmentRequestAdd() {
   const [isEditing, setIsEditing] = useState(false);
   const [showRejectDialog, setShowRejectDialog] = useState(false);
   const [rejectionReason, setRejectionReason] = useState("");
+  const [showSubmitDialog, setShowSubmitDialog] = useState(false);
+  const [showReturnDialog, setShowReturnDialog] = useState(false);
+  const [returnReason, setReturnReason] = useState("");
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const [cancelReason, setCancelReason] = useState("");
+  const [showWithdrawDialog, setShowWithdrawDialog] = useState(false);
 
   const [formData, setFormData] = useState({
     title: "",
-    numberOfPositions: 1,
+    quantity: 1,
     priorityLevel: "HIGH",
     reason: "",
     description: "",
@@ -42,9 +54,9 @@ export default function RecruitmentRequestAdd() {
     salaryMax: null,
     currency: "VND",
     location: "",
-    jobCategoryId: 1,
     requesterId: user?.id || null,
-    departmentId: user?.department?.id || null, // Always use logged-in user's department
+    departmentId: user?.department?.id || null,
+    workflowId: null,
   });
 
   const [selectedValues, setSelectedValues] = useState([]);
@@ -71,7 +83,7 @@ export default function RecruitmentRequestAdd() {
 
       setFormData({
         title: existingRequest.title || "",
-        numberOfPositions: existingRequest.numberOfPositions || 1,
+        quantity: existingRequest.quantity || 1,
         priorityLevel: existingRequest.priorityLevel || "HIGH",
         reason: existingRequest.reason || "",
         description: existingRequest.description || "",
@@ -82,9 +94,9 @@ export default function RecruitmentRequestAdd() {
         salaryMax: existingRequest.salaryMax || null,
         currency: existingRequest.currency || "VND",
         location: existingRequest.location || "",
-        jobCategoryId: existingRequest.jobCategoryId || 1,
         requesterId: existingRequest.requesterId || user?.id || null,
-        departmentId: user?.department?.id || null, // Always use logged-in user's department
+        departmentId: existingRequest.department?.id || null,
+        workflowId: existingRequest.workflowId || null,
       });
 
       if (existingRequest.location) {
@@ -97,10 +109,26 @@ export default function RecruitmentRequestAdd() {
     }
   }, [existingRequest, isViewMode, user]);
 
+  const { data: departmentsData } = useAllDepartments();
+  const departments = departmentsData || [];
+
+  const selectedDepartmentId = formData.departmentId || user?.department?.id;
+
+  const { data: workflowsData } = useWorkflows(
+    { departmentId: selectedDepartmentId, type: "RECRUITMENT", isActive: true },
+    { enabled: !!selectedDepartmentId }
+  );
+
+  const workflows = workflowsData?.data?.result || [];
+
   const createMutation = useCreateRecruitmentRequest();
   const updateMutation = useUpdateRecruitmentRequest();
   const approveMutation = useApproveRecruitmentRequest();
   const rejectMutation = useRejectRecruitmentRequest();
+  const submitMutation = useSubmitRecruitmentRequest();
+  const returnMutation = useReturnRecruitmentRequest();
+  const cancelMutation = useCancelRecruitmentRequest();
+  const withdrawMutation = useWithdrawRecruitmentRequest();
 
   const locations = [
     {
@@ -117,8 +145,22 @@ export default function RecruitmentRequestAdd() {
     },
   ];
 
+  const isGeneralInfoField = (fieldName) => {
+    const generalFields = [
+      "title", "reason", "requesterId", "departmentId", "workflowId" 
+    ];
+    return generalFields.includes(fieldName);
+  };
+
   const handleChange = (e) => {
     const { name, value, files } = e.target;
+
+    // Prevent editing general info fields during edit mode
+    if (isEditing && isGeneralInfoField(name)) {
+      toast.warning(t("generalInfoEditRestricted"));
+      return;
+    }
+
     setFormData((prev) => ({
       ...prev,
       [name]: files ? files[0] : value,
@@ -155,7 +197,7 @@ export default function RecruitmentRequestAdd() {
       toast.error(t("errorDepartmentRequired"));
       return;
     }
-    if (!formData.numberOfPositions || formData.numberOfPositions < 1) {
+    if (!formData.quantity || formData.quantity < 1) {
       toast.error(t("errorPositionCountInvalid"));
       return;
     }
@@ -261,18 +303,112 @@ export default function RecruitmentRequestAdd() {
     );
   };
 
+  const handleSubmit = () => {
+    if (!id) return;
+    setShowSubmitDialog(true);
+  };
+
+  const confirmSubmit = () => {
+    submitMutation.mutate(
+      { id, data: {} },
+      {
+        onSuccess: () => {
+          setShowSubmitDialog(false);
+        },
+      }
+    );
+  };
+
+  const handleReturn = () => {
+    if (!id) return;
+    setShowReturnDialog(true);
+  };
+
+  const confirmReturn = () => {
+    if (returnMutation.isPending) return;
+    if (!returnReason || !returnReason.trim()) {
+      toast.error("Vui lòng nhập lý do trả về");
+      return;
+    }
+    returnMutation.mutate(
+      { id, data: { reason: returnReason.trim() } },
+      {
+        onSuccess: () => {
+          setShowReturnDialog(false);
+          setReturnReason("");
+        },
+      }
+    );
+  };
+
+  const handleCancel = () => {
+    if (!id) return;
+    setShowCancelDialog(true);
+  };
+
+  const confirmCancel = () => {
+    if (cancelMutation.isPending) return;
+    if (!cancelReason || !cancelReason.trim()) {
+      toast.error("Vui lòng nhập lý do hủy");
+      return;
+    }
+    cancelMutation.mutate(
+      { id, data: { reason: cancelReason.trim() } },
+      {
+        onSuccess: () => {
+          setShowCancelDialog(false);
+          setCancelReason("");
+        },
+      }
+    );
+  };
+
+  const handleWithdraw = () => {
+    if (!id) return;
+    setShowWithdrawDialog(true);
+  };
+
+  const confirmWithdraw = () => {
+    withdrawMutation.mutate(
+      { id, data: {} },
+      {
+        onSuccess: () => {
+          setShowWithdrawDialog(false);
+        },
+      }
+    );
+  };
+
   const isPending =
     createMutation.isPending ||
     updateMutation.isPending ||
     approveMutation.isPending ||
-    rejectMutation.isPending;
+    rejectMutation.isPending ||
+    submitMutation.isPending ||
+    returnMutation.isPending ||
+    cancelMutation.isPending ||
+    withdrawMutation.isPending;
 
+  const isAdmin = user?.role?.name === "ADMIN";
   const isCEO = user?.role?.name === "CEO";
+  const isManager = user?.role?.name === "MANAGER";
+  const isDraft = existingRequest?.status === "DRAFT";
+  const isPendingStatus = existingRequest?.status === "PENDING";
   const isApproved = existingRequest?.status === "APPROVED";
   const isRejected = existingRequest?.status === "REJECTED";
-  const isPendingApproval = existingRequest?.status === "PENDING";
-  const canEdit = isViewMode && !isApproved && !isCEO;
-  const canApprove = isViewMode && isCEO && isPendingApproval;
+  const isReturned = existingRequest?.status === "RETURNED";
+  
+  // Admin có thể làm tất cả
+  const isRequester = existingRequest?.requesterId === user?.id;
+  const canSubmit = isViewMode && (isRequester || isAdmin) && (isDraft || isReturned);
+  const canWithdraw = isViewMode && (isRequester || isAdmin) && isPendingStatus;
+  const canCancelRequest = isViewMode && (isRequester || isAdmin) && (isDraft || isPendingStatus || isReturned);
+  
+  const canApprove = isViewMode && (isAdmin) && isPendingStatus;
+  const canRejectRequest = isViewMode && (isAdmin) && isPendingStatus;
+  const canReturn = isViewMode && (isAdmin) && isPendingStatus;
+  
+  const canEdit = isViewMode && (isRequester || isAdmin) && (isDraft || isReturned) && !isEditing;
 
   const getCurrentStatus = () => {
     if (!isViewMode) return "DRAFT";
@@ -282,10 +418,12 @@ export default function RecruitmentRequestAdd() {
   const currentStatus = getCurrentStatus();
 
   const progressSteps = [
-    { key: "DRAFT", label: t("waitingSubmit") },
-    { key: "PENDING", label: t("processing") },
-    { key: "APPROVED", label: t("approved") },
-    { key: "REJECTED", label: t("rejected") },
+    { key: "DRAFT", label: "Nháp" },
+    { key: "PENDING", label: "Đang xử lý" },
+    { key: "APPROVED", label: "Đã duyệt" },
+    { key: "REJECTED", label: "Từ chối" },
+    { key: "RETURNED", label: "Trả về" },
+    { key: "CANCELLED", label: "Đã hủy" },
   ];
 
   const getStepStyle = (stepKey) => {
@@ -323,31 +461,58 @@ export default function RecruitmentRequestAdd() {
         title={isViewMode ? t("requestDetail") : t("addRecruitmentRequest")}
         actions={
           <>
-            {/* CEO Actions - Approve/Reject */}
-            {canApprove && (
-              <>
-                <Button onClick={handleApprove} disabled={isPending}>
-                  {approveMutation.isPending
-                    ? t("approving") || "Đang phê duyệt..."
-                    : t("approve") || "Phê duyệt"}
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={handleReject}
-                  disabled={isPending}
-                  className="border-red-600 text-red-600 hover:bg-red-50"
-                >
-                  {rejectMutation.isPending
-                    ? t("rejecting") || "Đang từ chối..."
-                    : t("reject") || "Từ chối"}
-                </Button>
-              </>
+            {/* Requester Actions */}
+            {canSubmit && (
+              <Button onClick={handleSubmit} disabled={isPending}>
+                {submitMutation.isPending ? "Đang nộp..." : "Nộp yêu cầu"}
+              </Button>
+            )}
+            
+            {canWithdraw && (
+              <Button 
+                variant="outline" 
+                onClick={handleWithdraw} 
+                disabled={isPending}
+                className="border-orange-600 text-orange-600 hover:bg-orange-50"
+              >
+                {withdrawMutation.isPending ? "Đang thu hồi..." : "Thu hồi"}
+              </Button>
             )}
 
-            {/* Non-CEO Actions - Edit */}
-            {isViewMode && !isEditing && canEdit && (
+            {/* Approver Actions */}
+            {canApprove && (
+              <Button onClick={handleApprove} disabled={isPending}>
+                {approveMutation.isPending ? "Đang phê duyệt..." : "Phê duyệt"}
+              </Button>
+            )}
+            
+            {canRejectRequest && (
+              <Button
+                variant="outline"
+                onClick={handleReject}
+                disabled={isPending}
+                className="border-red-600 text-red-600 hover:bg-red-50"
+              >
+                {rejectMutation.isPending ? "Đang từ chối..." : "Từ chối"}
+              </Button>
+            )}
+            
+            {canReturn && (
+              <Button
+                variant="outline"
+                onClick={handleReturn}
+                disabled={isPending}
+                className="border-yellow-600 text-yellow-600 hover:bg-yellow-50"
+              >
+                {returnMutation.isPending ? "Đang trả về..." : "Trả về"}
+              </Button>
+            )}
+
+            {/* Edit Action */}
+            {canEdit && (
               <Button onClick={() => setIsEditing(true)}>{t("edit")}</Button>
             )}
+            
             {isViewMode && isEditing && (
               <Button onClick={() => onSubmit()} disabled={isPending}>
                 {isPending ? t("updating") : t("update")}
@@ -395,6 +560,82 @@ export default function RecruitmentRequestAdd() {
             </div>
           ))}
         </div>
+        {/* Steps & Tracking Table - only in view mode and has workflow */}
+        {isViewMode && existingRequest?.workflowInfo?.workflow && (
+          <div className="mb-6 bg-white rounded-xl shadow overflow-hidden">
+            <div className="p-6 border-b border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-900">Các bước phê duyệt & trạng thái xử lý</h3>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-red-50">
+                  <tr>
+                    <th className="p-4 text-left text-sm font-medium text-gray-600 whitespace-nowrap">Thứ tự</th>
+                    <th className="p-4 text-left text-sm font-medium text-gray-600 whitespace-nowrap">Tên bước</th>
+                    <th className="p-4 text-left text-sm font-medium text-gray-600 whitespace-nowrap">Trạng thái xử lý</th>
+                    <th className="p-4 text-left text-sm font-medium text-gray-600 whitespace-nowrap">Người thao tác</th>
+                    <th className="p-4 text-left text-sm font-medium text-gray-600 whitespace-nowrap">Thời gian</th>
+                    <th className="p-4 text-left text-sm font-medium text-gray-600 whitespace-nowrap">Ghi chú</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {existingRequest.workflowInfo.workflow.steps.map((step, idx) => {
+                    // Tìm approvalTrackings cho step này
+                    const approvalTrackings = Array.isArray(existingRequest.workflowInfo.approvalTrackings)
+                      ? existingRequest.workflowInfo.approvalTrackings.filter(tr => tr.stepId === step.id)
+                      : [];
+                    
+                    let trackingStatus = "Chưa xử lý";
+                    let actionUserName = "-";
+                    let actionTime = "-";
+                    let notes = "-";
+                    
+                    // Kiểm tra xem step này có phải là step hiện tại không
+                    const isCurrentStep = existingRequest.workflowInfo.currentStepId === step.id;
+                    
+                    if (approvalTrackings.length > 0) {
+                      // Lấy tracking gần nhất (có thể sắp xếp theo actionAt hoặc lấy phần tử cuối)
+                      const latestTracking = approvalTrackings[approvalTrackings.length - 1];
+                      const status = latestTracking.status;
+                      
+                      if (status === "APPROVED") trackingStatus = "Đã duyệt";
+                      else if (status === "REJECTED") trackingStatus = "Từ chối";
+                      else if (status === "RETURNED") trackingStatus = "Trả về";
+                      else if (status === "CANCELLED") trackingStatus = "Đã hủy";
+                      else if (status === "PENDING") trackingStatus = "Đang chờ";
+                      else trackingStatus = status;
+                      
+                      // Lấy tên người thao tác
+                      actionUserName = latestTracking.actionUserName || "-";
+                      
+                      // Lấy thời gian thao tác
+                      if (latestTracking.actionAt) {
+                        actionTime = new Date(latestTracking.actionAt).toLocaleString("vi-VN");
+                      }
+                      
+                      // Lấy ghi chú
+                      notes = latestTracking.notes || "-";
+                    }
+                    
+                    return (
+                      <tr 
+                        key={step.id} 
+                        className={`border-b last:border-b-0 border-gray-200 ${isCurrentStep ? "bg-yellow-50" : "hover:bg-gray-50"}`}
+                      >
+                        <td className="p-4 text-sm whitespace-nowrap">{step.stepOrder}</td>
+                        <td className={`p-4 text-sm whitespace-nowrap ${isCurrentStep ? "font-semibold" : ""}`}>{step.stepName}</td>
+                        <td className="p-4 text-sm whitespace-nowrap">{trackingStatus}</td>
+                        <td className="p-4 text-sm whitespace-nowrap max-w-[150px] truncate">{actionUserName}</td>
+                        <td className="p-4 text-sm whitespace-nowrap">{actionTime}</td>
+                        <td className="p-4 text-sm max-w-[200px] truncate" title={notes}>{notes}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
         {/* form */}
         <div className="flex flex-col gap-4">
           {/* general info */}
@@ -407,12 +648,30 @@ export default function RecruitmentRequestAdd() {
                 readOnly={true}
               />
 
-              <TextInput
-                label={t("department")}
-                placeholder={user?.department?.name || t("department")}
-                readOnly={true}
-                value={user?.department?.name || ""}
-              />
+              {user?.department?.id ? (
+                <TextInput
+                  label={t("department")}
+                  placeholder={user?.department?.name || t("department")}
+                  readOnly={true}
+                  value={user?.department?.name || ""}
+                />
+              ) : (
+                <SelectDropdown
+                  label={t("department")}
+                  placeholder={t("selectDepartment", { defaultValue: "Chọn phòng ban" })}
+                  options={departments.map(d => ({ id: d.id, name: d.name }))}
+                  value={formData.departmentId}
+                  onChange={(value) => {
+                    setFormData((prev) => ({ 
+                      ...prev, 
+                      departmentId: value,
+                      workflowId: null
+                    }));
+                  }}
+                  required={true}
+                  disabled={isPending || (isViewMode ||isEditing)}
+                />
+              )}
 
               <TextInput
                 label={t("positionLabel")}
@@ -422,7 +681,7 @@ export default function RecruitmentRequestAdd() {
                 value={formData.title}
                 onChange={handleChange}
                 required={true}
-                disabled={isPending || (isViewMode && !isEditing)}
+                disabled={isPending || (isViewMode ||isEditing)}
               />
 
               <SelectDropdown
@@ -438,7 +697,19 @@ export default function RecruitmentRequestAdd() {
                   setFormData((prev) => ({ ...prev, priorityLevel: value }));
                 }}
                 required={true}
-                disabled={isPending || (isViewMode && !isEditing)}
+                disabled={isPending || (isViewMode ||isEditing)}
+              />
+
+              <SelectDropdown
+                label={t("workflow", { defaultValue: "Luồng phê duyệt" })}
+                placeholder={selectedDepartmentId ? t("selectWorkflow", { defaultValue: "Chọn luồng phê duyệt" }) : t("selectDepartmentFirst", { defaultValue: "Chọn phòng ban trước" })}
+                options={workflows.map(w => ({ id: w.id, name: w.name }))}
+                value={formData.workflowId}
+                onChange={(value) => {
+                  setFormData((prev) => ({ ...prev, workflowId: value }));
+                }}
+                required={true}
+                disabled={!selectedDepartmentId || isPending || (isViewMode && !isEditing)}
               />
             </div>
           </div>
@@ -450,8 +721,8 @@ export default function RecruitmentRequestAdd() {
                 label={t("numberOfPositionsLabel")}
                 placeholder={t("numberOfPositionsPlaceholder")}
                 type="number"
-                name="numberOfPositions"
-                value={formData.numberOfPositions}
+                name="quantity"
+                value={formData.quantity}
                 onChange={handleChange}
                 required={true}
                 disabled={isPending || (isViewMode && !isEditing)}
@@ -575,6 +846,36 @@ export default function RecruitmentRequestAdd() {
         </div>
       </div>
 
+      {/* Submit Dialog */}
+      <Modal
+        isOpen={showSubmitDialog}
+        onClose={() => !submitMutation.isPending && setShowSubmitDialog(false)}
+        size="md"
+      >
+        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md relative">
+          {!submitMutation.isPending && (
+            <div
+              onClick={() => setShowSubmitDialog(false)}
+              className="absolute top-4 right-4 p-1.5 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer z-10"
+            >
+              <X className="h-4 w-4 text-gray-500" />
+            </div>
+          )}
+          <div className="p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Nộp yêu cầu</h3>
+            <p className="text-sm text-gray-600 mb-4">Bạn có chắc chắn muốn nộp yêu cầu tuyển dụng này?</p>
+            <div className="flex gap-3">
+              <Button variant="outline" onClick={() => setShowSubmitDialog(false)} disabled={submitMutation.isPending} className="flex-1">
+                Hủy
+              </Button>
+              <Button onClick={confirmSubmit} disabled={submitMutation.isPending} className="flex-1">
+                {submitMutation.isPending ? "Đang xử lý..." : "Nộp"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      </Modal>
+
       {/* Reject Dialog */}
       <Modal
         isOpen={showRejectDialog}
@@ -587,7 +888,6 @@ export default function RecruitmentRequestAdd() {
         size="md"
       >
         <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md relative">
-          {/* Close button */}
           {!rejectMutation.isPending && (
             <div
               onClick={() => {
@@ -595,36 +895,21 @@ export default function RecruitmentRequestAdd() {
                 setRejectionReason("");
               }}
               className="absolute top-4 right-4 p-1.5 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer z-10"
-              aria-label="Close"
             >
               <X className="h-4 w-4 text-gray-500" />
             </div>
           )}
-
           <div className="p-6 pr-12">
-            {/* Icon & Content */}
             <div className="flex gap-4 mb-4">
-              {/* Icon */}
               <div className="flex-shrink-0 w-12 h-12 bg-red-50 text-red-600 rounded-xl flex items-center justify-center">
                 <AlertTriangle className="h-6 w-6" />
               </div>
-
-              {/* Text Content */}
               <div className="flex-1">
-                {/* Title */}
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  Từ chối yêu cầu
-                </h3>
-
-                {/* Message */}
-                <p className="text-sm text-gray-600 leading-relaxed">
-                  Vui lòng nhập lý do từ chối yêu cầu này
-                </p>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Từ chối yêu cầu</h3>
+                <p className="text-sm text-gray-600 leading-relaxed">Vui lòng nhập lý do từ chối yêu cầu này</p>
               </div>
             </div>
           </div>
-
-          {/* Input field */}
           <div className="px-6 pb-6">
             <textarea
               placeholder="Nhập lý do từ chối..."
@@ -637,8 +922,6 @@ export default function RecruitmentRequestAdd() {
                 disabled:opacity-50 disabled:cursor-not-allowed resize-y"
             />
           </div>
-
-          {/* Actions */}
           <div className="px-6 pb-6 flex gap-3 border-t border-gray-100">
             <Button
               variant="outline"
@@ -658,6 +941,174 @@ export default function RecruitmentRequestAdd() {
             >
               {rejectMutation.isPending ? "Đang xử lý..." : "Từ chối"}
             </Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Return Dialog */}
+      <Modal
+        isOpen={showReturnDialog}
+        onClose={() => {
+          if (!returnMutation.isPending) {
+            setShowReturnDialog(false);
+            setReturnReason("");
+          }
+        }}
+        size="md"
+      >
+        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md relative">
+          {!returnMutation.isPending && (
+            <div
+              onClick={() => {
+                setShowReturnDialog(false);
+                setReturnReason("");
+              }}
+              className="absolute top-4 right-4 p-1.5 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer z-10"
+            >
+              <X className="h-4 w-4 text-gray-500" />
+            </div>
+          )}
+          <div className="p-6 pr-12">
+            <div className="flex gap-4 mb-4">
+              <div className="flex-shrink-0 w-12 h-12 bg-yellow-50 text-yellow-600 rounded-xl flex items-center justify-center">
+                <AlertTriangle className="h-6 w-6" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Trả về yêu cầu</h3>
+                <p className="text-sm text-gray-600 leading-relaxed">Vui lòng nhập lý do trả về yêu cầu này</p>
+              </div>
+            </div>
+          </div>
+          <div className="px-6 pb-6">
+            <textarea
+              placeholder="Nhập lý do trả về..."
+              value={returnReason}
+              onChange={(e) => setReturnReason(e.target.value)}
+              disabled={returnMutation.isPending}
+              rows={3}
+              className="w-full border border-gray-300 p-2 rounded-md text-gray-700
+                focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent
+                disabled:opacity-50 disabled:cursor-not-allowed resize-y"
+            />
+          </div>
+          <div className="px-6 pb-6 flex gap-3 border-t border-gray-100">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowReturnDialog(false);
+                setReturnReason("");
+              }}
+              disabled={returnMutation.isPending}
+              className="flex-1"
+            >
+              Hủy
+            </Button>
+            <Button
+              onClick={confirmReturn}
+              disabled={returnMutation.isPending || !returnReason.trim()}
+              className="flex-1"
+            >
+              {returnMutation.isPending ? "Đang xử lý..." : "Trả về"}
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Cancel Dialog */}
+      <Modal
+        isOpen={showCancelDialog}
+        onClose={() => {
+          if (!cancelMutation.isPending) {
+            setShowCancelDialog(false);
+            setCancelReason("");
+          }
+        }}
+        size="md"
+      >
+        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md relative">
+          {!cancelMutation.isPending && (
+            <div
+              onClick={() => {
+                setShowCancelDialog(false);
+                setCancelReason("");
+              }}
+              className="absolute top-4 right-4 p-1.5 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer z-10"
+            >
+              <X className="h-4 w-4 text-gray-500" />
+            </div>
+          )}
+          <div className="p-6 pr-12">
+            <div className="flex gap-4 mb-4">
+              <div className="flex-shrink-0 w-12 h-12 bg-red-50 text-red-600 rounded-xl flex items-center justify-center">
+                <AlertTriangle className="h-6 w-6" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Hủy yêu cầu</h3>
+                <p className="text-sm text-gray-600 leading-relaxed">Vui lòng nhập lý do hủy yêu cầu này</p>
+              </div>
+            </div>
+          </div>
+          <div className="px-6 pb-6">
+            <textarea
+              placeholder="Nhập lý do hủy..."
+              value={cancelReason}
+              onChange={(e) => setCancelReason(e.target.value)}
+              disabled={cancelMutation.isPending}
+              rows={3}
+              className="w-full border border-gray-300 p-2 rounded-md text-gray-700
+                focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent
+                disabled:opacity-50 disabled:cursor-not-allowed resize-y"
+            />
+          </div>
+          <div className="px-6 pb-6 flex gap-3 border-t border-gray-100">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowCancelDialog(false);
+                setCancelReason("");
+              }}
+              disabled={cancelMutation.isPending}
+              className="flex-1"
+            >
+              Hủy
+            </Button>
+            <Button
+              onClick={confirmCancel}
+              disabled={cancelMutation.isPending || !cancelReason.trim()}
+              className="flex-1"
+            >
+              {cancelMutation.isPending ? "Đang xử lý..." : "Xác nhận"}
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Withdraw Dialog */}
+      <Modal
+        isOpen={showWithdrawDialog}
+        onClose={() => !withdrawMutation.isPending && setShowWithdrawDialog(false)}
+        size="md"
+      >
+        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md relative">
+          {!withdrawMutation.isPending && (
+            <div
+              onClick={() => setShowWithdrawDialog(false)}
+              className="absolute top-4 right-4 p-1.5 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer z-10"
+            >
+              <X className="h-4 w-4 text-gray-500" />
+            </div>
+          )}
+          <div className="p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Thu hồi yêu cầu</h3>
+            <p className="text-sm text-gray-600 mb-4">Bạn có chắc chắn muốn thu hồi yêu cầu tuyển dụng này?</p>
+            <div className="flex gap-3">
+              <Button variant="outline" onClick={() => setShowWithdrawDialog(false)} disabled={withdrawMutation.isPending} className="flex-1">
+                Hủy
+              </Button>
+              <Button onClick={confirmWithdraw} disabled={withdrawMutation.isPending} className="flex-1">
+                {withdrawMutation.isPending ? "Đang xử lý..." : "Thu hồi"}
+              </Button>
+            </div>
           </div>
         </div>
       </Modal>

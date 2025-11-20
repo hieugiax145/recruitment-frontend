@@ -20,11 +20,27 @@ export const reqServices = {
     return api.delete(`/job-service/recruitment-requests/${id}`);
   },
 
+  submitRequest: async (id, data) => {
+    return api.post(`/job-service/recruitment-requests/submit/${id}`, data);
+  },
+
   approveRequest: async (id, data) => {
-    return api.post(`/job-service/recruitment-requests/${id}/approve`, data);
+    return api.post(`/job-service/recruitment-requests/approve/${id}`, data);
   },
 
   rejectRequest: async (id, data) => {
-    return api.post(`/job-service/recruitment-requests/${id}/reject`, data);
+    return api.post(`/job-service/recruitment-requests/reject/${id}`, data);
+  },
+
+  returnRequest: async (id, data) => {
+    return api.post(`/job-service/recruitment-requests/return/${id}`, data);
+  },
+
+  cancelRequest: async (id, data) => {
+    return api.post(`/job-service/recruitment-requests/cancel/${id}`, data);
+  },
+
+  withdrawRequest: async (id, data) => {
+    return api.post(`/job-service/recruitment-requests/withdraw/${id}`, data);
   },
 };

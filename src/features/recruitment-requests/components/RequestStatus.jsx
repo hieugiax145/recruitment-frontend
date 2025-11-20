@@ -2,32 +2,43 @@ import { useTranslation } from "react-i18next";
 
 export default function RequestStatus({ status }) {
   const { t } = useTranslation();
-  // Normalize status to uppercase for consistent comparison
   const normalizedStatus = status?.toUpperCase();
 
   const getStatusColor = (status) => {
     switch (status) {
-      case "APPROVED":
-        return "text-[#00B300] bg-[#F0FFF0] border border-[#00B300] rounded-[25px] px-4 py-0.5 text-xs inline-block min-w-[85px] text-center";
-      case "REJECTED":
-        return "text-[#FF0000] bg-[#FFF0F0] border border-[#FF0000] rounded-[25px] px-4 py-0.5 text-xs inline-block min-w-[85px] text-center";
+      case "DRAFT":
+        return "text-gray-500 bg-gray-100 border border-gray-200 rounded-full px-3 py-0.5 text-xs font-medium min-w-[85px] text-center";
+      case "SUBMITTED":
+        return "text-blue-600 bg-blue-100 border border-blue-200 rounded-full px-3 py-0.5 text-xs font-medium min-w-[85px] text-center";
       case "PENDING":
-        return "text-[#FFA500] bg-[#FFF8E1] border border-[#FFA500] rounded-[25px] px-4 py-0.5 text-xs inline-block min-w-[85px] text-center";
+        return "text-orange-600 bg-orange-100 border border-orange-200 rounded-full px-3 py-0.5 text-xs font-medium min-w-[85px] text-center";
       case "IN_PROGRESS":
-        return "text-[#7B61FF] bg-[#F4F1FE] border border-[#7B61FF] rounded-[25px] px-4 py-0.5 text-xs inline-block min-w-[85px] text-center";
+        return "text-indigo-600 bg-indigo-100 border border-indigo-200 rounded-full px-3 py-0.5 text-xs font-medium min-w-[85px] text-center";
+      case "APPROVED":
+        return "text-green-600 bg-green-100 border border-green-200 rounded-full px-3 py-0.5 text-xs font-medium min-w-[85px] text-center";
+      case "REJECTED":
+        return "text-red-600 bg-red-100 border border-red-200 rounded-full px-3 py-0.5 text-xs font-medium min-w-[85px] text-center";
+      case "RETURNED":
+        return "text-yellow-700 bg-yellow-100 border border-yellow-200 rounded-full px-3 py-0.5 text-xs font-medium min-w-[85px] text-center";
+      case "CANCELLED":
+        return "text-gray-400 bg-gray-50 border border-gray-200 rounded-full px-3 py-0.5 text-xs font-medium min-w-[85px] text-center";
       default:
-        return "text-[#7B61FF] bg-[#F4F1FE] border border-[#7B61FF] rounded-[25px] px-4 py-0.5 text-xs inline-block min-w-[85px] text-center";
+        return "text-indigo-600 bg-indigo-100 border border-indigo-200 rounded-full px-3 py-0.5 text-xs font-medium min-w-[85px] text-center";
     }
   };
 
   const getStatusLabel = (status) => {
     const statusMap = {
-      APPROVED: "status.approved",
-      PENDING: "status.pending",
-      REJECTED: "status.rejected",
-      IN_PROGRESS: "status.inProgress",
+      DRAFT: t("status.draft", "Nháp"),
+      SUBMITTED: t("status.submitted", "Đã nộp"),
+      PENDING: t("status.pending", "Đang xử lý"),
+      IN_PROGRESS: t("status.inProgress", "Đang thực hiện"),
+      APPROVED: t("status.approved", "Đã duyệt"),
+      REJECTED: t("status.rejected", "Từ chối"),
+      RETURNED: t("status.returned", "Trả về"),
+      CANCELLED: t("status.cancelled", "Đã hủy"),
     };
-    return t(statusMap[status] || status);
+    return statusMap[status] || status;
   };
 
   const statusColor = getStatusColor(normalizedStatus);

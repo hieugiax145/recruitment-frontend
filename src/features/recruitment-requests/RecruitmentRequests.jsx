@@ -119,7 +119,7 @@ export default function RecruitmentRequests() {
       <ContentHeader
         title={t("listRequest")}
         actions={
-          <Can allowedRoles={["MANAGER"]}>
+          
             <Button
               onClick={() => {
                 navigate("/recruitment-requests/new");
@@ -128,7 +128,6 @@ export default function RecruitmentRequests() {
               <Plus className="h-4 w-4 mr-2" />
               {t("createNewRequest")}
             </Button>
-          </Can>
         }
       />
       <div className="flex-1 flex flex-col mt-4 min-h-0">

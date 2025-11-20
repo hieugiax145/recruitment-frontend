@@ -129,3 +129,84 @@ export const useRejectRecruitmentRequest = () => {
     },
   });
 };
+
+export const useSubmitRecruitmentRequest = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, data }) => {
+      const response = await reqServices.submitRequest(id, data);
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: recruitmentRequestKeys.all });
+      toast.success("Yêu cầu đã được nộp thành công");
+    },
+    onError: (error) => {
+      const errorMessage =
+        error.response?.data?.message || "Không thể nộp yêu cầu";
+      toast.error(errorMessage);
+    },
+  });
+};
+
+export const useReturnRecruitmentRequest = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, data }) => {
+      const response = await reqServices.returnRequest(id, data);
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: recruitmentRequestKeys.all });
+      toast.success("Yêu cầu đã được trả về");
+    },
+    onError: (error) => {
+      const errorMessage =
+        error.response?.data?.message || "Không thể trả về yêu cầu";
+      toast.error(errorMessage);
+    },
+  });
+};
+
+export const useCancelRecruitmentRequest = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, data }) => {
+      const response = await reqServices.cancelRequest(id, data);
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: recruitmentRequestKeys.all });
+      toast.success("Yêu cầu đã được hủy");
+    },
+    onError: (error) => {
+      const errorMessage =
+        error.response?.data?.message || "Không thể hủy yêu cầu";
+      toast.error(errorMessage);
+    },
+  });
+};
+
+export const useWithdrawRecruitmentRequest = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, data }) => {
+      const response = await reqServices.withdrawRequest(id, data);
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: recruitmentRequestKeys.all });
+      toast.success("Yêu cầu đã được thu hồi");
+    },
+    onError: (error) => {
+      const errorMessage =
+        error.response?.data?.message || "Không thể thu hồi yêu cầu";
+      toast.error(errorMessage);
+    },
+  });
+};
+
