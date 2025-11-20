@@ -2,6 +2,7 @@ import { useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { AutoTextSize } from "auto-text-size";
 import UserDropdown from "./UserDropdown";
+import NotificationsDropdown from "./NotificationsDropdown";
 import { useNavigate } from "react-router-dom";
 const Navbar = ({ isSidebarVisible, title, sidebarWidth }) => {
   const location = useLocation();
@@ -61,7 +62,10 @@ const Navbar = ({ isSidebarVisible, title, sidebarWidth }) => {
             </AutoTextSize>
           </div>
         </div>
-        <UserDropdown />
+        <div className="flex items-center gap-2">
+          <NotificationsDropdown />
+          <UserDropdown />
+        </div>
       </div>
     </div>
   );
