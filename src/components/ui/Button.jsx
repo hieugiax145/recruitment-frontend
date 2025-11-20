@@ -7,6 +7,7 @@ const Button = ({
   className,
   variant = "solid",
   disabled,
+  type = "button",
   ...props
 }) => {
   const getVariantStyles = () => {
@@ -32,7 +33,8 @@ const Button = ({
   const variantStyles = getVariantStyles();
 
   return (
-    <div
+    <button
+      type={type}
       className={cn(
         `inline-flex items-center justify-center
         px-4 py-2 h-9 rounded-md font-medium shadow-sm
@@ -42,10 +44,11 @@ const Button = ({
       )}
       style={variantStyles.style}
       onClick={disabled ? undefined : onClick}
+      disabled={disabled}
       {...props}
     >
       {children}
-    </div>
+    </button>
   );
 };
 
