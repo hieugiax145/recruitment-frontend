@@ -9,6 +9,7 @@ import LoadingContent from "../../components/ui/LoadingContent";
 import { useUsers } from "../../hooks/useUsers";
 import Pagination from "../../components/ui/Pagination";
 import { toast } from "react-toastify";
+import { PERMISSIONS } from "../../constants/permissions";
 
 export default function Users() {
   const { t } = useTranslation();
@@ -43,7 +44,7 @@ export default function Users() {
           title={t("accountManagement")}
           actions={
             <div className="flex gap-2 items-center">
-              <Can allowedRoles={["ADMIN"]}>
+              <Can permission={PERMISSIONS.USERS_CREATE}>
                 <Button onClick={() => navigate("/users/new")}>
                   <Plus className="h-4 w-4 mr-2" />
                   {t("addAccount")}
@@ -65,7 +66,7 @@ export default function Users() {
         title={t("accountManagement")}
         actions={
           <div className="flex gap-2 items-center">
-            <Can allowedRoles={["ADMIN"]}>
+            <Can permission={PERMISSIONS.USERS_CREATE}>
               <Button onClick={() => navigate("/users/new")}>
                 <Plus className="h-4 w-4 mr-2" />
                 {t("addAccount")}

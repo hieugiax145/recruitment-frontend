@@ -10,25 +10,81 @@ import {
   UsersRound,
   GitBranch,
 } from "lucide-react";
+import { usePermission } from "../../hooks/usePermission";
+import { PERMISSIONS } from "../../constants/permissions";
 
 const Sidebar = ({ isVisible, toggleSidebar, sidebarWidth }) => {
   const { t } = useTranslation();
+  const { can } = usePermission();
+  
   const menuItems = [
-    { text: t("home"), link: "/", icon: <House /> },
-    { text: t("accountManagement", { defaultValue: "Quản lý tài khoản" }), link: "/users", icon: <UsersRound /> },
-    { text: t("roleManagement", { defaultValue: "Quản lý vai trò" }), link: "/roles", icon: <UsersRound /> },
-    { text: t("employeeManagement", { defaultValue: "Quản lý nhân sự" }), link: "/employees", icon: <UsersRound /> },
-    { text: t("workflowManagement", { defaultValue: "Luồng phê duyệt" }), link: "/workflows", icon: <GitBranch /> },
+    { 
+      text: t("home"), 
+      link: "/", 
+      icon: <House />,
+      permission: null // Dashboard accessible to all authenticated users
+    },
+    { 
+      text: t("accountManagement", { defaultValue: "Quản lý tài khoản" }), 
+      link: "/users", 
+      icon: <UsersRound />,
+      permission: PERMISSIONS.USERS_READ
+    },
+    { 
+      text: t("roleManagement", { defaultValue: "Quản lý vai trò" }), 
+      link: "/roles", 
+      icon: <UsersRound />,
+      permission: PERMISSIONS.ROLES_READ
+    },
+    { 
+      text: t("employeeManagement", { defaultValue: "Quản lý nhân sự" }), 
+      link: "/employees", 
+      icon: <UsersRound />,
+      permission: PERMISSIONS.EMPLOYEES_READ
+    },
+    { 
+      text: t("workflowManagement", { defaultValue: "Luồng phê duyệt" }), 
+      link: "/workflows", 
+      icon: <GitBranch />,
+      permission: PERMISSIONS.RECRUITMENT_REQUESTS_READ // Workflows related to recruitment
+    },
     {
       text: t("recruitmentReq"),
       link: "/recruitment-requests",
       icon: <ClipboardList />,
+      permission: PERMISSIONS.RECRUITMENT_REQUESTS_READ
     },
-    { text: t("jobPosition"), link: "/job-positions", icon: <Briefcase /> },
-    { text: t("candidate"), link: "/candidates", icon: <UsersRound /> },
-    { text: t("calendar"), link: "/calendar", icon: <CalendarDays /> },
-    { text: t("email"), link: "/email", icon: <Mail /> },
+    { 
+      text: t("jobPosition"), 
+      link: "/job-positions", 
+      icon: <Briefcase />,
+      permission: PERMISSIONS.JOB_POSITIONS_READ
+    },
+    { 
+      text: t("candidate"), 
+      link: "/candidates", 
+      icon: <UsersRound />,
+      permission: PERMISSIONS.CANDIDATES_READ
+    },
+    { 
+      text: t("calendar"), 
+      link: "/calendar", 
+      icon: <CalendarDays />,
+      permission: PERMISSIONS.SCHEDULES_READ
+    },
+    { 
+      text: t("email"), 
+      link: "/email", 
+      icon: <Mail />,
+      permission: null // Email accessible to all authenticated users
+    },
   ];
+
+  // Filter menu items based on permissions
+  const visibleMenuItems = menuItems.filter(item => {
+    if (!item.permission) return true; // No permission required
+    return can(item.permission);
+  });
 
   return (
     <aside
@@ -70,7 +126,7 @@ const Sidebar = ({ isVisible, toggleSidebar, sidebarWidth }) => {
           className="flex-1 p-2 overflow-y-auto truncate
         [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
-          {menuItems.map((item) => (
+          {visibleMenuItems.map((item) => (
             <MenuItem
               key={item.text}
               link={item.link}

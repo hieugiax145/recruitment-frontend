@@ -9,11 +9,16 @@ import Pagination from "../../components/ui/Pagination";
 import { useWorkflows, useDeleteWorkflow } from "../../hooks/useWorkflows";
 import { toast } from "react-toastify";
 import useConfirmDialog from "../../hooks/useConfirmDialog";
+import SelectDropdown from "../../components/ui/SelectDropdown";
+import { useAllDepartments } from "../../hooks/useDepartments";
+import Can from "../../components/Can";
+import { PERMISSIONS } from "../../constants/permissions";
 
 export default function Workflows() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedDepartmentId, setSelectedDepartmentId] = useState(null);
   const itemsPerPage = 10;
 
   const { data, isLoading, isError, error } = useWorkflows({
@@ -23,7 +28,16 @@ export default function Workflows() {
   const deleteWorkflow = useDeleteWorkflow();
   const { ConfirmDialogComponent, showConfirm } = useConfirmDialog();
 
-  const workflows = Array.isArray(data?.data?.result) ? data.data.result : [];
+  // Fetch departments for filter
+  const { data: departmentsData } = useAllDepartments();
+  const departments = Array.isArray(departmentsData) ? departmentsData : [];
+
+  const allWorkflows = Array.isArray(data?.data?.result) ? data.data.result : [];
+  
+  // Filter by selected department
+  const workflows = selectedDepartmentId
+    ? allWorkflows.filter((wf) => wf.departmentId === selectedDepartmentId)
+    : allWorkflows;
   const meta = data?.data?.meta;
 
   useEffect(() => {
@@ -59,10 +73,26 @@ export default function Workflows() {
         <ContentHeader
           title={t("workflowManagement", { defaultValue: "Quản lý luồng phê duyệt" })}
           actions={
-            <Button onClick={() => navigate("/workflows/new")}>
-              <Plus className="h-4 w-4 mr-2" />
-              {t("addWorkflow", { defaultValue: "Thêm luồng phê duyệt" })}
-            </Button>
+            <div className="flex items-center gap-4">
+              <SelectDropdown
+                value={selectedDepartmentId}
+                onChange={setSelectedDepartmentId}
+                options={[
+                  { id: null, name: "Tất cả phòng ban" },
+                  ...departments.map((d) => ({ id: d.id, name: d.name })),
+                ]}
+                placeholder="Tất cả phòng ban"
+                hideLabel
+                compact
+                className="min-w-[200px]"
+              />
+              <Can permission={PERMISSIONS.RECRUITMENT_REQUESTS_CREATE}>
+                <Button onClick={() => navigate("/workflows/new")}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  {t("addWorkflow", { defaultValue: "Thêm luồng phê duyệt" })}
+                </Button>
+              </Can>
+            </div>
           }
         />
         <div className="flex-1 flex items-center justify-center mt-4">
@@ -77,10 +107,26 @@ export default function Workflows() {
       <ContentHeader
         title={t("workflowManagement", { defaultValue: "Quản lý luồng phê duyệt" })}
         actions={
-          <Button onClick={() => navigate("/workflows/new")}>
-            <Plus className="h-4 w-4 mr-2" />
-            {t("addWorkflow", { defaultValue: "Thêm luồng phê duyệt" })}
-          </Button>
+          <div className="flex items-center gap-4">
+            <SelectDropdown
+              value={selectedDepartmentId}
+              onChange={setSelectedDepartmentId}
+              options={[
+                { id: null, name: "Tất cả phòng ban" },
+                ...departments.map((d) => ({ id: d.id, name: d.name })),
+              ]}
+              placeholder="Tất cả phòng ban"
+              hideLabel
+              compact
+              className="min-w-[200px]"
+            />
+            <Can permission={PERMISSIONS.RECRUITMENT_REQUESTS_CREATE}>
+              <Button onClick={() => navigate("/workflows/new")}>
+                <Plus className="h-4 w-4 mr-2" />
+                {t("addWorkflow", { defaultValue: "Thêm luồng phê duyệt" })}
+              </Button>
+            </Can>
+          </div>
         }
       />
 

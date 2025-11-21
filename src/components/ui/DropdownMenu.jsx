@@ -1,12 +1,26 @@
 import { MoreVertical, ChevronRight } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { cn } from "../../utils/utils";
 
 export default function DropdownMenu({ options = [], position = "right" }) {
   const [showMenu, setShowMenu] = useState(false);
   const [hoveredSubmenu, setHoveredSubmenu] = useState(null);
+  const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
   const menuRef = useRef(null);
+  const buttonRef = useRef(null);
   const submenuTimeoutRef = useRef(null);
+
+  // Update menu position when showing
+  useEffect(() => {
+    if (showMenu && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      setMenuPosition({
+        top: rect.bottom + window.scrollY + 4,
+        left: position === "left" ? rect.left + window.scrollX : rect.right + window.scrollX - 160,
+      });
+    }
+  }, [showMenu, position]);
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -65,23 +79,27 @@ export default function DropdownMenu({ options = [], position = "right" }) {
   };
 
   return (
-    <div className="relative" ref={menuRef}>
-      <div
-        className="p-1 hover:bg-gray-100 rounded transition-colors cursor-pointer"
-        onClick={(e) => {
-          e.stopPropagation();
-          setShowMenu(!showMenu);
-        }}
-      >
-        <MoreVertical className="h-4 w-4 text-gray-600 hover:text-gray-800" />
+    <>
+      <div className="relative" ref={buttonRef}>
+        <div
+          className="p-1 hover:bg-gray-100 rounded transition-colors cursor-pointer"
+          onClick={(e) => {
+            e.stopPropagation();
+            setShowMenu(!showMenu);
+          }}
+        >
+          <MoreVertical className="h-4 w-4 text-gray-600 hover:text-gray-800" />
+        </div>
       </div>
 
-      {showMenu && (
+      {showMenu && createPortal(
         <div
-          className={cn(
-            "absolute mt-1 min-w-[160px] bg-white rounded-lg shadow-lg border border-gray-200 z-50 py-1",
-            getPositionClass()
-          )}
+          ref={menuRef}
+          className="fixed min-w-[160px] bg-white rounded-lg shadow-lg border border-gray-200 z-[100] py-1"
+          style={{
+            top: `${menuPosition.top}px`,
+            left: `${menuPosition.left}px`,
+          }}
         >
           {options.map((option, index) => {
             // Skip if option is hidden
@@ -129,7 +147,7 @@ export default function DropdownMenu({ options = [], position = "right" }) {
                   {/* Submenu */}
                   {hoveredSubmenu === index && (
                     <div
-                      className="absolute left-full top-0 ml-0.5 min-w-[160px] bg-white rounded-lg shadow-lg border border-gray-200 z-50 py-1"
+                      className="absolute left-full top-0 ml-0.5 min-w-[160px] bg-white rounded-lg shadow-lg border border-gray-200 z-[100] py-1"
                       onMouseEnter={() => handleSubmenuEnter(index)}
                       onMouseLeave={handleSubmenuLeave}
                     >
@@ -197,8 +215,9 @@ export default function DropdownMenu({ options = [], position = "right" }) {
               </div>
             );
           })}
-        </div>
+        </div>,
+        document.body
       )}
-    </div>
+    </>
   );
 }

@@ -8,18 +8,37 @@ import { useCandidates } from "./hooks/useCandidates";
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
 import LoadingContent from "../../components/ui/LoadingContent";
+import SelectDropdown from "../../components/ui/SelectDropdown";
+import { useJobPositions } from "../job-positions/hooks/useJobPositions";
 
 export default function Candidate() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedJobPositionId, setSelectedJobPositionId] = useState(null);
+  const [selectedStatus, setSelectedStatus] = useState(null);
   const itemsPerPage = 10;
 
   // Fetch candidates
   const { data, isLoading, isError, error, refetch } = useCandidates();
 
+  // Fetch job positions for filter
+  const { data: jobPositionsData } = useJobPositions();
+  const jobPositions = Array.isArray(jobPositionsData?.data?.result) 
+    ? jobPositionsData.data.result 
+    : [];
+
   // Get candidates from the query data
-  const candidates = Array.isArray(data?.data?.result) ? data.data.result : [];
+  const allCandidates = Array.isArray(data?.data?.result) ? data.data.result : [];
+  
+  // Filter by selected job position and status
+  const candidates = allCandidates.filter((c) => {
+    const matchesPosition = !selectedJobPositionId || 
+      c.jobPosition?.id === selectedJobPositionId || 
+      c.jobPositionId === selectedJobPositionId;
+    const matchesStatus = !selectedStatus || c.status === selectedStatus;
+    return matchesPosition && matchesStatus;
+  });
 
   // Show toast notification when there's an error
   useEffect(() => {
@@ -69,7 +88,36 @@ export default function Candidate() {
           title={t("listCandidate")}
           actions={
             <div className="flex gap-3">
-              {/* Add filter or export buttons here if needed */}
+              <SelectDropdown
+                value={selectedJobPositionId}
+                onChange={setSelectedJobPositionId}
+                options={[
+                  { id: null, name: "Tất cả vị trí" },
+                  ...jobPositions.map((jp) => ({ id: jp.id, name: jp.title })),
+                ]}
+                placeholder="Tất cả vị trí"
+                hideLabel
+                compact
+                className="min-w-[200px]"
+              />
+              <SelectDropdown
+                value={selectedStatus}
+                onChange={setSelectedStatus}
+                options={[
+                  { id: null, name: "Tất cả trạng thái" },
+                  { id: "SUBMITTED", name: "Đã nộp" },
+                  { id: "REVIEWING", name: "Đang xem xét" },
+                  { id: "INTERVIEW", name: "Phỏng vấn" },
+                  { id: "OFFER", name: "Đã đề xuất" },
+                  { id: "HIRED", name: "Đã tuyển" },
+                  { id: "REJECTED", name: "Từ chối" },
+                  { id: "ARCHIVED", name: "Lưu trữ" },
+                ]}
+                placeholder="Tất cả trạng thái"
+                hideLabel
+                compact
+                className="min-w-[200px]"
+              />
             </div>
           }
         />
@@ -86,7 +134,36 @@ export default function Candidate() {
         title={t("listCandidate")}
         actions={
           <div className="flex gap-3">
-            {/* Add filter or export buttons here if needed */}
+            <SelectDropdown
+              value={selectedJobPositionId}
+              onChange={setSelectedJobPositionId}
+              options={[
+                { id: null, name: "Tất cả vị trí" },
+                ...jobPositions.map((jp) => ({ id: jp.id, name: jp.title })),
+              ]}
+              placeholder="Tất cả vị trí"
+              hideLabel
+              compact
+              className="min-w-[200px]"
+            />
+            <SelectDropdown
+              value={selectedStatus}
+              onChange={setSelectedStatus}
+              options={[
+                { id: null, name: "Tất cả trạng thái" },
+                { id: "SUBMITTED", name: "Đã nộp" },
+                { id: "REVIEWING", name: "Đang xem xét" },
+                { id: "INTERVIEW", name: "Phỏng vấn" },
+                { id: "OFFER", name: "Đã đề xuất" },
+                { id: "HIRED", name: "Đã tuyển" },
+                { id: "REJECTED", name: "Từ chối" },
+                { id: "ARCHIVED", name: "Lưu trữ" },
+              ]}
+              placeholder="Tất cả trạng thái"
+              hideLabel
+              compact
+              className="min-w-[200px]"
+            />
           </div>
         }
       />

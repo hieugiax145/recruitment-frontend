@@ -6,6 +6,8 @@ import LoadingContent from "../../components/ui/LoadingContent";
 import { useAllRoles } from "../../hooks/useRoles";
 import Button from "../../components/ui/Button";
 import { Plus } from "lucide-react";
+import Can from "../../components/Can";
+import { PERMISSIONS } from "../../constants/permissions";
 
 export default function Roles() {
   const { t } = useTranslation();
@@ -15,7 +17,7 @@ export default function Roles() {
   if (isLoading) {
     return (
       <div className="flex flex-col h-full">
-        <ContentHeader title={t("roleManagement", { defaultValue: "Role Management" })} actions={<Button onClick={() => navigate("/roles/new")}><Plus className="h-4 w-4 mr-2" />{t("addRole", { defaultValue: "Add Role" })}</Button>} />
+        <ContentHeader title={t("roleManagement", { defaultValue: "Role Management" })} actions={<Can permission={PERMISSIONS.ROLES_CREATE}><Button onClick={() => navigate("/roles/new")}><Plus className="h-4 w-4 mr-2" />{t("addRole", { defaultValue: "Add Role" })}</Button></Can>} />
         <div className="flex-1 flex items-center justify-center mt-4">
           <LoadingContent />
         </div>
@@ -25,7 +27,7 @@ export default function Roles() {
 
   return (
     <div className="flex flex-col h-full">
-      <ContentHeader title={t("roleManagement", { defaultValue: "Role Management" })} actions={<Button onClick={() => navigate("/roles/new")}><Plus className="h-4 w-4 mr-2" />{t("addRole", { defaultValue: "Add Role" })}</Button>} />
+      <ContentHeader title={t("roleManagement", { defaultValue: "Role Management" })} actions={<Can permission={PERMISSIONS.ROLES_CREATE}><Button onClick={() => navigate("/roles/new")}><Plus className="h-4 w-4 mr-2" />{t("addRole", { defaultValue: "Add Role" })}</Button></Can>} />
       <div className="flex-1 flex flex-col mt-4 min-h-0">
         <div className="flex-1 bg-white rounded-xl shadow overflow-hidden">
           <div className="overflow-auto">

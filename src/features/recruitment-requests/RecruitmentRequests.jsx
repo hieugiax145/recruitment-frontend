@@ -15,6 +15,9 @@ import {
   useDeleteRecruitmentRequest,
 } from "./hooks/useRecruitmentRequests";
 import LoadingContent from "../../components/ui/LoadingContent";
+import SelectDropdown from "../../components/ui/SelectDropdown";
+import { useAllDepartments } from "../../hooks/useDepartments";
+import { PERMISSIONS } from "../../constants/permissions";
 
 export default function RecruitmentRequests() {
   const { t } = useTranslation();
@@ -22,6 +25,7 @@ export default function RecruitmentRequests() {
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedRequests, setSelectedRequests] = useState([]);
+  const [selectedDepartmentId, setSelectedDepartmentId] = useState(null);
   const itemsPerPage = 10;
 
   // Check if user is MANAGER
@@ -40,9 +44,18 @@ export default function RecruitmentRequests() {
   // Using useMutation for delete
   const deleteMutation = useDeleteRecruitmentRequest();
 
+  // Fetch departments for filter
+  const { data: departmentsData } = useAllDepartments();
+  const departments = Array.isArray(departmentsData) ? departmentsData : [];
+
   // Get requests from the query data or use fallback
   // Ensure requests is always an array
-  const requests = Array.isArray(data?.data?.result) ? data.data.result : [];
+  const allRequests = Array.isArray(data?.data?.result) ? data.data.result : [];
+  
+  // Filter by selected department
+  const requests = selectedDepartmentId
+    ? allRequests.filter((req) => req.department?.id === selectedDepartmentId)
+    : allRequests;
 
   // Show toast notification when there's an error
   useEffect(() => {
@@ -95,16 +108,30 @@ export default function RecruitmentRequests() {
         <ContentHeader
           title={t("listRequest")}
           actions={
-            <Can allowedRoles={["MANAGER"]}>
-              <Button
-                onClick={() => {
-                  navigate("/recruitment-requests/new");
-                }}
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                {t("createNewRequest")}
-              </Button>
-            </Can>
+            <div className="flex items-center gap-4">
+              <SelectDropdown
+                value={selectedDepartmentId}
+                onChange={setSelectedDepartmentId}
+                options={[
+                  { id: null, name: "Tất cả phòng ban" },
+                  ...departments.map((d) => ({ id: d.id, name: d.name })),
+                ]}
+                placeholder="Tất cả phòng ban"
+                hideLabel
+                compact
+                className="min-w-[200px]"
+              />
+              <Can permission={PERMISSIONS.RECRUITMENT_REQUESTS_CREATE}>
+                <Button
+                  onClick={() => {
+                    navigate("/recruitment-requests/new");
+                  }}
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  {t("createNewRequest")}
+                </Button>
+              </Can>
+            </div>
           }
         />
         <div className="flex-1 flex items-center justify-center mt-4">
@@ -119,15 +146,30 @@ export default function RecruitmentRequests() {
       <ContentHeader
         title={t("listRequest")}
         actions={
-          
-            <Button
-              onClick={() => {
-                navigate("/recruitment-requests/new");
-              }}
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              {t("createNewRequest")}
-            </Button>
+          <div className="flex items-center gap-4">
+            <SelectDropdown
+              value={selectedDepartmentId}
+              onChange={setSelectedDepartmentId}
+              options={[
+                { id: null, name: "Tất cả phòng ban" },
+                ...departments.map((d) => ({ id: d.id, name: d.name })),
+              ]}
+              placeholder="Tất cả phòng ban"
+              hideLabel
+              compact
+              className="min-w-[200px]"
+            />
+            <Can permission={PERMISSIONS.RECRUITMENT_REQUESTS_CREATE}>
+              <Button
+                onClick={() => {
+                  navigate("/recruitment-requests/new");
+                }}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                {t("createNewRequest")}
+              </Button>
+            </Can>
+          </div>
         }
       />
       <div className="flex-1 flex flex-col mt-4 min-h-0">

@@ -12,6 +12,8 @@ export default function SelectDropdown({
   className,
   required,
   disabled,
+  hideLabel = false,
+  compact = false,
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -39,18 +41,21 @@ export default function SelectDropdown({
   };
 
   return (
-    <div className={`flex ${isRow ? "items-center gap-4" : "flex-col gap-2"}`}>
-      <label className="block font-medium text-gray-700" htmlFor={label}>
-        {label}
-        {required && <span className="text-red-500"> *</span>}
-      </label>
+    <div className={`flex ${isRow ? "items-center gap-4" : hideLabel ? "" : "flex-col gap-2"}`}>
+      {!hideLabel && label && (
+        <label className="block font-medium text-gray-700" htmlFor={label}>
+          {label}
+          {required && <span className="text-red-500"> *</span>}
+        </label>
+      )}
       <div className={cn("relative w-full", className)} ref={dropdownRef}>
         <div
           tabIndex={disabled ? -1 : 0}
           className={cn(
-            `border border-gray-300 p-2 rounded-md text-gray-700
+            `border border-gray-300 rounded-lg text-gray-700 bg-white
         focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent
         flex items-center justify-between cursor-pointer`,
+            compact ? "px-4 py-2 h-9 text-sm" : "p-2 rounded-md",
             disabled && "opacity-50 cursor-not-allowed bg-gray-100",
             className
           )}
@@ -69,7 +74,7 @@ export default function SelectDropdown({
 
         {isOpen && !disabled && (
           <ul
-            className="absolute z-10 mt-1 w-full
+            className="absolute z-[100] mt-1 w-full
                      max-h-60 overflow-y-auto
                      rounded-md bg-white py-1
                      shadow-lg ring-1 ring-black ring-opacity-5"

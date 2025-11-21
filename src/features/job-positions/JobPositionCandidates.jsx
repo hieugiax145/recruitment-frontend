@@ -29,8 +29,8 @@ import LoadingContent from "../../components/ui/LoadingContent";
 // Candidate status columns configuration
 const CANDIDATE_STATUSES = [
   {
-    id: "NEW",
-    label: "Mới",
+    id: "SUBMITTED",
+    label: "Đã nộp",
     color: "#3B82F6", // Blue
     bgColor: "#EFF6FF",
   },
@@ -94,12 +94,6 @@ export default function JobPositionCandidates() {
   });
   const changeStageMutation = useChangeStageCandidate();
 
-  // Normalize candidates data - handle both 'name' and 'fullName' fields
-  const normalizeCandidate = (candidate) => ({
-    ...candidate,
-    name: candidate.name || candidate.fullName || "",
-  });
-
   // Extract candidates array from response - handle nested structure
   const candidatesArray = Array.isArray(candidatesData?.data?.result)
     ? candidatesData.data.result
@@ -109,8 +103,33 @@ export default function JobPositionCandidates() {
     ? candidatesData
     : [];
 
-  // Normalize all candidates
-  const candidates = candidatesArray.map(normalizeCandidate);
+  // Normalize all candidates to match API response structure
+  const candidates = candidatesArray.map((candidate) => ({
+    id: candidate.id,
+    name: candidate.fullName || candidate.name || "",
+    email: candidate.email || "",
+    phone: candidate.phone || "",
+    appliedDate: candidate.appliedDate || "",
+    status: candidate.status || "SUBMITTED",
+    priority: candidate.priority || null,
+    rejectionReason: candidate.rejectionReason || null,
+    resumeUrl: candidate.resumeUrl || "",
+    feedback: candidate.feedback || "",
+    notes: candidate.notes || "",
+    candidateId: candidate.candidateId,
+    jobPositionId: candidate.jobPositionId,
+    jobPositionTitle: candidate.jobPositionTitle || "",
+    departmentId: candidate.departmentId,
+    departmentName: candidate.departmentName || "",
+    experience: candidate.experience || "Chưa cập nhật",
+    education: candidate.education || "Chưa cập nhật",
+  }));
+
+  // Normalize candidates data - handle both 'name' and 'fullName' fields
+  const normalizeCandidate = (candidate) => ({
+    ...candidate,
+    name: candidate.name || candidate.fullName || "",
+  });
 
   // Configure drag sensors
   const sensors = useSensors(
@@ -130,6 +149,20 @@ export default function JobPositionCandidates() {
   const handleCandidateClick = (candidate) => {
     // Normalize candidate data before setting it
     setSelectedCandidate(normalizeCandidate(candidate));
+  };
+
+  const handleChangeStatus = async (candidate, newStatus) => {
+    const statusLabel = CANDIDATE_STATUSES.find((s) => s.id === newStatus)?.label;
+    
+    try {
+      await changeStageMutation.mutateAsync({
+        id: candidate.id,
+        stage: newStatus,
+      });
+      toast.success(`Đã chuyển ${candidate.name} sang ${statusLabel || newStatus}`);
+    } catch (error) {
+      console.error("Failed to change candidate stage:", error);
+    }
   };
 
   const handleDragStart = (event) => {
@@ -152,26 +185,39 @@ export default function JobPositionCandidates() {
     const activeId = active.id;
     const overId = over.id;
 
+    console.log("Drag end:", { activeId, overId });
+
     // Find the candidate
     const candidate = candidates.find((c) => c.id === activeId);
-    if (!candidate) return;
+    if (!candidate) {
+      console.log("Candidate not found:", activeId);
+      return;
+    }
+
+    console.log("Found candidate:", candidate);
 
     // Determine target status
     let targetStatus = null;
     if (CANDIDATE_STATUSES.find((s) => s.id === overId)) {
       targetStatus = overId;
+      console.log("Target is a column:", targetStatus);
     } else {
       const overCandidate = candidates.find((c) => c.id === overId);
       if (overCandidate) {
         targetStatus = overCandidate.status;
+        console.log("Target is a candidate, using status:", targetStatus);
       }
     }
+
+    console.log("Target status:", targetStatus, "Current status:", candidate.status);
 
     if (targetStatus && candidate.status !== targetStatus) {
       // Get status label for toast
       const statusLabel = CANDIDATE_STATUSES.find(
         (s) => s.id === targetStatus
       )?.label;
+
+      console.log("Calling changeStage API with:", { id: candidate.id, stage: targetStatus });
 
       // Change candidate stage via API
       try {
@@ -221,7 +267,8 @@ export default function JobPositionCandidates() {
   }
 
   return (
-    <div className="h-full flex flex-col relative">
+    //đang bị lệch 
+    <div className="flex flex-col h-full">
       {/* Header */}
       <ContentHeader
         title={
@@ -263,8 +310,8 @@ export default function JobPositionCandidates() {
           onDragOver={handleDragOver}
           onDragEnd={handleDragEnd}
         >
-          <div className="flex-1 mt-4 overflow-x-auto overflow-y-hidden px-1 min-h-0 relative">
-            <div className="flex gap-3 min-w-max h-full">
+          <div className="flex-1 mt-4 px-1 min-h-0 relative overflow-hidden">
+            <div className="flex gap-3 h-full pb-4 overflow-x-auto overflow-y-hidden">
               <SortableContext items={CANDIDATE_STATUSES.map((s) => s.id)}>
                 {CANDIDATE_STATUSES.map((status) => (
                   <CandidateColumn
@@ -272,6 +319,8 @@ export default function JobPositionCandidates() {
                     status={status}
                     candidates={candidatesByStatus[status.id] || []}
                     onCandidateClick={handleCandidateClick}
+                    onChangeStatus={handleChangeStatus}
+                    allStatuses={CANDIDATE_STATUSES}
                   />
                 ))}
               </SortableContext>

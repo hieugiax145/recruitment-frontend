@@ -11,12 +11,15 @@ import { useCreateUser, useUpdateUser, useUser } from "../../hooks/useUsers";
 import { useEmployees } from "../../hooks/useEmployees";
 import { toast } from "react-toastify";
 import useConfirmDialog from "../../hooks/useConfirmDialog";
+import { PERMISSIONS } from "../../constants/permissions";
+import { usePermission } from "../../hooks/usePermission";
 
 export default function UserForm() {
   const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const formRef = useRef(null);
+  const { can } = usePermission();
 
   const isAddMode = !id;
   const [isEditMode, setIsEditMode] = useState(isAddMode);
@@ -165,17 +168,23 @@ export default function UserForm() {
                 {t("cancel", { defaultValue: "Hủy" })}
               </Button>
               {isAddMode ? (
-                <Button onClick={() => formRef.current?.requestSubmit()}>
-                  {t("save", { defaultValue: "Lưu" })}
-                </Button>
+                can(PERMISSIONS.USERS_CREATE) && (
+                  <Button onClick={() => formRef.current?.requestSubmit()}>
+                    {t("save", { defaultValue: "Lưu" })}
+                  </Button>
+                )
               ) : isEditMode ? (
-                <Button onClick={() => formRef.current?.requestSubmit()}>
-                  {t("save", { defaultValue: "Lưu" })}
-                </Button>
+                can(PERMISSIONS.USERS_UPDATE) && (
+                  <Button onClick={() => formRef.current?.requestSubmit()}>
+                    {t("save", { defaultValue: "Lưu" })}
+                  </Button>
+                )
               ) : (
-                <Button onClick={() => setIsEditMode(true)}>
-                  {t("edit", { defaultValue: "Sửa" })}
-                </Button>
+                can(PERMISSIONS.USERS_UPDATE) && (
+                  <Button onClick={() => setIsEditMode(true)}>
+                    {t("edit", { defaultValue: "Sửa" })}
+                  </Button>
+                )
               )}
             </>
           }
@@ -202,12 +211,14 @@ export default function UserForm() {
                 <Button variant="outline" onClick={() => navigate(-1)}>
                   {t("cancel", { defaultValue: "Hủy" })}
                 </Button>
-                <Button
-                  onClick={() => formRef.current?.requestSubmit()}
-                  disabled={isPending}
-                >
-                  {t("save", { defaultValue: "Lưu" })}
-                </Button>
+                {can(PERMISSIONS.USERS_CREATE) && (
+                  <Button
+                    onClick={() => formRef.current?.requestSubmit()}
+                    disabled={isPending}
+                  >
+                    {t("save", { defaultValue: "Lưu" })}
+                  </Button>
+                )}
               </>
             ) : isEditMode ? (
               <>
@@ -227,30 +238,36 @@ export default function UserForm() {
                 >
                   {t("cancel", { defaultValue: "Hủy" })}
                 </Button>
-                <Button
-                  onClick={() => formRef.current?.requestSubmit()}
-                  disabled={isPending}
-                >
-                  {t("save", { defaultValue: "Lưu" })}
-                </Button>
+                {can(PERMISSIONS.USERS_UPDATE) && (
+                  <Button
+                    onClick={() => formRef.current?.requestSubmit()}
+                    disabled={isPending}
+                  >
+                    {t("save", { defaultValue: "Lưu" })}
+                  </Button>
+                )}
               </>
             ) : (
               <>
                 <Button variant="outline" onClick={() => navigate(-1)}>
                   {t("cancel", { defaultValue: "Hủy" })}
                 </Button>
-                <Button
-                  variant={userData?._active ? "outline" : "primary"}
-                  onClick={handleToggleActive}
-                  disabled={isPending}
-                >
-                  {userData?._active
-                    ? t("deactivate", { defaultValue: "Vô hiệu hóa" })
-                    : t("activate", { defaultValue: "Kích hoạt" })}
-                </Button>
-                <Button onClick={() => setIsEditMode(true)}>
-                  {t("edit", { defaultValue: "Sửa" })}
-                </Button>
+                {can(PERMISSIONS.USERS_UPDATE) && (
+                  <Button
+                    variant={userData?._active ? "outline" : "primary"}
+                    onClick={handleToggleActive}
+                    disabled={isPending}
+                  >
+                    {userData?._active
+                      ? t("deactivate", { defaultValue: "Vô hiệu hóa" })
+                      : t("activate", { defaultValue: "Kích hoạt" })}
+                  </Button>
+                )}
+                {can(PERMISSIONS.USERS_UPDATE) && (
+                  <Button onClick={() => setIsEditMode(true)}>
+                    {t("edit", { defaultValue: "Sửa" })}
+                  </Button>
+                )}
               </>
             )}
           </>

@@ -5,6 +5,8 @@ export default function CandidateColumn({
   status,
   candidates,
   onCandidateClick,
+  onChangeStatus,
+  allStatuses = [],
 }) {
   const { setNodeRef } = useSortable({
     id: status.id,
@@ -15,7 +17,7 @@ export default function CandidateColumn({
   });
 
   return (
-    <div className="flex-shrink-0 w-[280px] bg-white rounded-xl border border-gray-200 shadow-sm p-4 flex flex-col max-h-full">
+    <div className="flex-shrink-0 w-[280px] bg-white rounded-xl border border-gray-200 shadow-sm p-4 flex flex-col max-h-full overflow-visible">
       {/* Column Header */}
       <div
         className="flex items-center justify-between mb-3 pb-2.5 border-b-2 flex-shrink-0"
@@ -45,6 +47,7 @@ export default function CandidateColumn({
       <div
         ref={setNodeRef}
         className="flex-1 space-y-0 overflow-y-auto custom-scrollbar min-h-0"
+        style={{ overflowX: 'visible' }}
       >
         <SortableContext items={candidates.map((c) => c.id)}>
           {candidates.length === 0 ? (
@@ -58,13 +61,26 @@ export default function CandidateColumn({
               <p>Chưa có ứng viên</p>
             </div>
           ) : (
-            candidates.map((candidate) => (
-              <CandidateCard
-                key={candidate.id}
-                candidate={candidate}
-                onClick={onCandidateClick}
-              />
-            ))
+            candidates.map((candidate) => {
+              // Create status options excluding current status
+              const statusOptions = allStatuses
+                .filter((s) => s.id !== candidate.status)
+                .map((s) => ({
+                  label: s.label,
+                  icon: null,
+                  onClick: () => onChangeStatus(candidate, s.id),
+                }));
+
+              return (
+                <CandidateCard
+                  key={candidate.id}
+                  candidate={candidate}
+                  onClick={onCandidateClick}
+                  statusOptions={statusOptions}
+                  onChangeStatus={onChangeStatus}
+                />
+              );
+            })
           )}
         </SortableContext>
       </div>

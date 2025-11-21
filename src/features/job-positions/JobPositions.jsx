@@ -34,6 +34,7 @@ import { formatSalary } from "../../utils/utils";
 import SelectDropdown from "../../components/ui/SelectDropdown";
 import { useAllDepartments } from "../../hooks/useDepartments";
 import LoadingContent from "../../components/ui/LoadingContent";
+import { PERMISSIONS } from "../../constants/permissions";
 
 export default function JobPositions() {
   const { t } = useTranslation();
@@ -403,23 +404,17 @@ export default function JobPositions() {
         <ContentHeader
           title={t("listJobPosition")}
           actions={
-            <div className="flex gap-2 items-center">
-              <div className="w-[200px] [&>div>label]:hidden [&>div]:gap-0">
-                <SelectDropdown
-                  placeholder="Lọc phòng ban"
-                  options={[
-                    { id: null, name: "Tất cả phòng ban" },
-                    ...departments.map((dept) => ({
-                      id: dept.id,
-                      name: dept.name,
-                    })),
-                  ]}
-                  value={selectedDepartmentId}
-                  onChange={setSelectedDepartmentId}
-                  className="[&>div>div>div]:h-9 [&>div>div>div]:px-4 [&>div>div>div]:py-2 [&>div>div>div]:shadow-sm [&>div>div>div]:hover:border-gray-400"
-                />
-              </div>
-              <Can allowedRoles={["MANAGER", "ADMIN"]}>
+            <div className="flex gap-4 items-center">
+              <SelectDropdown
+                value={selectedDepartmentId}
+                onChange={setSelectedDepartmentId}
+                options={[{ id: null, name: "Tất cả phòng ban" }, ...departments.map(d => ({ id: d.id, name: d.name }))]}
+                placeholder="Tất cả phòng ban"
+                hideLabel
+                compact
+                className="min-w-[200px]"
+              />
+              <Can permission={PERMISSIONS.JOB_POSITIONS_CREATE}>
                 <Button
                   onClick={() => {
                     navigate("/job-positions/new");
@@ -444,23 +439,17 @@ export default function JobPositions() {
       <ContentHeader
         title={t("listJobPosition")}
         actions={
-          <div className="flex gap-2 items-center">
-            <div className="w-[200px] [&>div>label]:hidden [&>div]:gap-0">
-              <SelectDropdown
-                placeholder="Lọc phòng ban"
-                options={[
-                  { id: null, name: "Tất cả phòng ban" },
-                  ...departments.map((dept) => ({
-                    id: dept.id,
-                    name: dept.name,
-                  })),
-                ]}
-                value={selectedDepartmentId}
-                onChange={setSelectedDepartmentId}
-                className="[&>div>div>div]:h-9 [&>div>div>div]:px-4 [&>div>div>div]:py-2 [&>div>div>div]:shadow-sm [&>div>div>div]:hover:border-gray-400"
-              />
-            </div>
-            <Can allowedRoles={["MANAGER", "ADMIN"]}>
+          <div className="flex gap-4 items-center">
+            <SelectDropdown
+              value={selectedDepartmentId}
+              onChange={setSelectedDepartmentId}
+              options={[{ id: null, name: "Tất cả phòng ban" }, ...departments.map(d => ({ id: d.id, name: d.name }))]}
+              placeholder="Tất cả phòng ban"
+              hideLabel
+              compact
+              className="min-w-[200px]"
+            />
+            <Can permission={PERMISSIONS.JOB_POSITIONS_CREATE}>
               <Button
                 onClick={() => {
                   navigate("/job-positions/new");
@@ -484,7 +473,7 @@ export default function JobPositions() {
             selectedPosition ? "w-1/2" : "flex-1  w-full"
           } bg-white rounded-xl shadow p-6 flex flex-col`}
         >
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-visible">
             {currentPositions.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-gray-400 py-12">
                 <Briefcase className="h-16 w-16 mb-4" />
