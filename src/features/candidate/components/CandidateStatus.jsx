@@ -5,7 +5,7 @@ export default function CandidateStatus({ status }) {
 
   const getStatusStyle = (status) => {
     switch (status) {
-      case "NEW":
+      case "SUBMITTED":
         return "bg-[#EFF6FF] text-[#3B82F6] border border-[#3B82F6]";
       case "REVIEWING":
         return "bg-[#EEF2FF] text-[#6366F1] border border-[#6366F1]";
@@ -26,15 +26,15 @@ export default function CandidateStatus({ status }) {
 
   const getStatusLabel = (status) => {
     const statusMap = {
-      NEW: "status.new",
-      REVIEWING: "status.reviewing",
-      INTERVIEW: "status.interview",
-      OFFER: "status.offer",
-      HIRED: "status.hired",
-      REJECTED: "status.rejected",
-      ARCHIVED: "status.archived",
+      SUBMITTED: "Đã nộp",
+      REVIEWING: "Đang xem xét",
+      INTERVIEW: "Phỏng vấn",
+      OFFER: "Offer",
+      HIRED: "Đã tuyển",
+      REJECTED: "Từ chối",
+      ARCHIVED: "Lưu trữ",
     };
-    return t(statusMap[status] || status);
+    return statusMap[status] || status;
   };
 
   return (

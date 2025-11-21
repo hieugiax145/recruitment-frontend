@@ -1,6 +1,22 @@
-import { FileText } from "lucide-react";
+import { FileText, Download } from "lucide-react";
 
 export default function ResumeViewer({ resumeUrl }) {
+  const handleDownload = () => {
+    if (!resumeUrl) return;
+    
+    // Extract filename from URL or use default
+    const filename = resumeUrl.split('/').pop() || 'resume.pdf';
+    
+    // Create a temporary link and trigger download
+    const link = document.createElement('a');
+    link.href = resumeUrl;
+    link.download = filename;
+    link.target = '_blank';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="bg-white rounded-xl shadow p-6">
       <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
@@ -9,15 +25,24 @@ export default function ResumeViewer({ resumeUrl }) {
       </h3>
       {resumeUrl ? (
         <div className="space-y-4">
-          <a
-            href={resumeUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-sm font-medium text-gray-700"
-          >
-            <FileText size={16} />
-            Mở trong tab mới
-          </a>
+          <div className="flex gap-2">
+            <a
+              href={resumeUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-sm font-medium text-gray-700"
+            >
+              <FileText size={16} />
+              Mở trong tab mới
+            </a>
+            <button
+              onClick={handleDownload}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors text-sm font-medium text-blue-700"
+            >
+              <Download size={16} />
+              Tải xuống
+            </button>
+          </div>
           <div
             className="border border-gray-200 rounded-lg overflow-hidden bg-gray-50"
             style={{ height: "600px" }}
