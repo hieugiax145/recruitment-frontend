@@ -10,13 +10,16 @@ import NotesCard from "./components/NotesCard";
 import ApplicationProgress from "./components/ApplicationProgress";
 import ResumeViewer from "./components/ResumeViewer";
 import { useTranslation } from "react-i18next";
-import { Calendar } from "lucide-react";
+import { Calendar, Mail } from "lucide-react";
 import LoadingContent from "../../components/ui/LoadingContent";
+import { useState } from "react";
+import SendEmailModal from "./components/SendEmailModal";
 
 export default function CandidateDetail() {
   const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
+  const [showEmailModal, setShowEmailModal] = useState(false);
   // Always fetch candidate detail by ID
   const { data, isLoading, isError, error } = useCandidate(id);
   const addComment = useAddCandidateComment();
@@ -89,6 +92,13 @@ export default function CandidateDetail() {
               {t("close")}
             </Button>
             <Button
+              variant="outline"
+              onClick={() => setShowEmailModal(true)}
+            >
+              <Mail className="h-4 w-4 mr-2" />
+              Gửi email
+            </Button>
+            <Button
               onClick={() =>
                 navigate("/calendar", {
                   state: {
@@ -151,6 +161,14 @@ export default function CandidateDetail() {
           </div>
         </div>
       </div>
+
+      {/* Email Modal */}
+      <SendEmailModal
+        isOpen={showEmailModal}
+        onClose={() => setShowEmailModal(false)}
+        recipientEmail={displayEmail}
+        recipientName={displayName}
+      />
     </div>
   );
 }
