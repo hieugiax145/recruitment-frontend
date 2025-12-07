@@ -5,6 +5,7 @@ import ContentHeader from "../../components/ui/ContentHeader";
 import Button from "../../components/ui/Button";
 import TextInput from "../../components/ui/TextInput";
 import SelectDropdown from "../../components/ui/SelectDropdown";
+import RichTextEditor from "../../components/ui/RichTextEditor";
 import {
   useCreateJobPosition,
   useUpdateJobPosition,
@@ -16,7 +17,7 @@ import LoadingContent from "../../components/ui/LoadingContent";
 export default function JobPositionAdd() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const isEditMode = !!id; // Edit mode if id exists, otherwise create mode
+  const isEditMode = !!id;
 
   const [formData, setFormData] = useState({
     title: "",
@@ -36,19 +37,15 @@ export default function JobPositionAdd() {
     recruitmentRequestId: null,
   });
 
-  // Fetch existing position if editing
   const {
     data: existingPosition,
     isLoading: positionLoading,
     isError: positionError,
   } = useJobPosition(id);
 
-  // Fetch recruitment requests for dropdown
   const { data: requestsData } = useRecruitmentRequests();
   const allRecruitmentRequests = requestsData?.data?.result || [];
-  // Filter only approved requests, but include the selected one if editing
   const recruitmentRequests = allRecruitmentRequests.filter((req) => {
-    // If editing and this request is already selected, include it
     if (
       isEditMode &&
       existingPosition?.recruitmentRequestId &&
@@ -56,7 +53,6 @@ export default function JobPositionAdd() {
     ) {
       return true;
     }
-    // Otherwise, only include approved requests
     return req.status === "APPROVED";
   });
 
@@ -114,15 +110,12 @@ export default function JobPositionAdd() {
     }));
   };
 
-  // Handle recruitment request selection
   const handleRecruitmentRequestChange = (requestId) => {
-    // Find the selected request
     const selectedRequest = recruitmentRequests.find(
       (req) => req.id === requestId
     );
 
     if (selectedRequest && !isEditMode) {
-      // Auto-fill fields from recruitment request (only in create mode)
       setFormData((prev) => ({
         ...prev,
         recruitmentRequestId: requestId,
@@ -138,7 +131,6 @@ export default function JobPositionAdd() {
 
       toast.success("Đã điền thông tin từ yêu cầu tuyển dụng");
     } else {
-      // Just update the recruitmentRequestId in edit mode
       setFormData((prev) => ({
         ...prev,
         recruitmentRequestId: requestId,
@@ -147,7 +139,6 @@ export default function JobPositionAdd() {
   };
 
   const onSubmit = () => {
-    // Validation
     if (!formData.title) {
       toast.error("Vui lòng nhập tên vị trí");
       return;
@@ -159,7 +150,6 @@ export default function JobPositionAdd() {
     }
 
     if (isEditMode) {
-      // Edit mode
       updateMutation.mutate(
         { id, data: formData },
         {
@@ -176,7 +166,6 @@ export default function JobPositionAdd() {
         }
       );
     } else {
-      // Create mode
       createMutation.mutate(formData, {
         onSuccess: () => {
           navigate(-1);
@@ -250,22 +239,12 @@ export default function JobPositionAdd() {
       />
 
       <div className="flex-1 flex flex-col mt-4 overflow-y-auto p-6 gap-4 bg-white rounded-xl shadow">
-        {/* Form */}
+        
         <div className="flex flex-col gap-4">
-          {/* Thông tin cơ bản */}
+          
           <div className="rounded-md border border-gray-300 p-4 gap-4 flex flex-col">
             <h2>Thông tin cơ bản</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <TextInput
-                label="Tên vị trí tuyển dụng"
-                name="title"
-                value={formData.title}
-                onChange={handleChange}
-                placeholder="VD: Senior Backend Developer"
-                required
-                disabled={isPending}
-              />
-
               <SelectDropdown
                 label="Yêu cầu tuyển dụng"
                 name="recruitmentRequestId"
@@ -278,6 +257,16 @@ export default function JobPositionAdd() {
                 disabled={isPending}
                 placeholder="Chọn yêu cầu tuyển dụng"
                 required
+              />
+
+              <TextInput
+                label="Tên vị trí tuyển dụng"
+                name="title"
+                value={formData.title}
+                onChange={handleChange}
+                placeholder="VD: Senior Backend Developer"
+                required
+                disabled={isPending}
               />
 
               <TextInput
@@ -361,7 +350,7 @@ export default function JobPositionAdd() {
             </div>
           </div>
 
-          {/* Thông tin lương thưởng */}
+          
           <div className="rounded-md border border-gray-300 p-4 gap-4 flex flex-col">
             <h2>Thông tin lương thưởng</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -388,42 +377,50 @@ export default function JobPositionAdd() {
             </div>
           </div>
 
-          {/* Mô tả công việc */}
+          
           <div className="rounded-md border border-gray-300 p-4 gap-4 flex flex-col">
             <h2>Mô tả công việc</h2>
-            <textarea
-              placeholder="Nhập mô tả ngắn về vị trí"
-              className="border border-gray-300 p-2 rounded-md text-gray-700
-              focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent
-              disabled:opacity-50 disabled:cursor-not-allowed
-              min-h-[100px] resize-y"
-              value={formData.description}
-              name="description"
-              onChange={handleChange}
-              disabled={isPending}
-            />
-            <textarea
-              placeholder="Nhập yêu cầu công việc"
-              className="border border-gray-300 p-2 rounded-md text-gray-700
-              focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent
-              disabled:opacity-50 disabled:cursor-not-allowed
-              min-h-[100px] resize-y"
-              value={formData.requirements}
-              name="requirements"
-              onChange={handleChange}
-              disabled={isPending}
-            />
-            <textarea
-              placeholder="Nhập quyền lợi"
-              className="border border-gray-300 p-2 rounded-md text-gray-700
-              focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent
-              disabled:opacity-50 disabled:cursor-not-allowed
-              min-h-[100px] resize-y"
-              value={formData.benefits}
-              name="benefits"
-              onChange={handleChange}
-              disabled={isPending}
-            />
+            <div className="gap-4 flex flex-col">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Mô tả vị trí
+                </label>
+                <RichTextEditor
+                  value={formData.description}
+                  onChange={(value) =>
+                    setFormData((prev) => ({ ...prev, description: value }))
+                  }
+                  placeholder="Nhập mô tả ngắn về vị trí"
+                  disabled={isPending}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Yêu cầu công việc
+                </label>
+                <RichTextEditor
+                  value={formData.requirements}
+                  onChange={(value) =>
+                    setFormData((prev) => ({ ...prev, requirements: value }))
+                  }
+                  placeholder="Nhập yêu cầu công việc"
+                  disabled={isPending}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Quyền lợi
+                </label>
+                <RichTextEditor
+                  value={formData.benefits}
+                  onChange={(value) =>
+                    setFormData((prev) => ({ ...prev, benefits: value }))
+                  }
+                  placeholder="Nhập quyền lợi"
+                  disabled={isPending}
+                />
+              </div>
+            </div>
           </div>
         </div>
       </div>

@@ -34,11 +34,13 @@ import { formatSalary } from "../../utils/utils";
 import SelectDropdown from "../../components/ui/SelectDropdown";
 import { useAllDepartments } from "../../hooks/useDepartments";
 import LoadingContent from "../../components/ui/LoadingContent";
-import { PERMISSIONS } from "../../constants/permissions";
+import EmptyState from "../../components/ui/EmptyState";
+import { useAuth } from "../../context/AuthContext";
 
 export default function JobPositions() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedPosition, setSelectedPosition] = useState(null);
   const [isDetailFixed, setIsDetailFixed] = useState(false);
@@ -55,8 +57,20 @@ export default function JobPositions() {
   const [positionForCandidate, setPositionForCandidate] = useState(null);
   const [selectedDepartmentId, setSelectedDepartmentId] = useState(null);
 
-  // Fetch job positions from API
-  const { data, isLoading, isError, error } = useJobPositions();
+  // Determine effective department filter
+  const userDeptId = user?.department?.id;
+  const userDeptName = user?.department?.name || "";
+  const nameLower = userDeptName.toLowerCase();
+  const isHR = nameLower.includes("nhân sự") || nameLower.includes("human resources") || nameLower.includes("hr");
+  const shouldRestrictToUserDept = !!userDeptId && !isHR;
+  const effectiveDepartmentId = shouldRestrictToUserDept
+    ? userDeptId
+    : selectedDepartmentId ?? undefined;
+
+  // Fetch job positions from API with department filter when applicable
+  const { data, isLoading, isError, error } = useJobPositions(
+    effectiveDepartmentId ? { departmentId: effectiveDepartmentId } : {}
+  );
   const deleteMutation = useDeleteJobPosition();
   const updateMutation = useUpdateJobPosition();
 
@@ -64,25 +78,9 @@ export default function JobPositions() {
   const { data: departmentsData } = useAllDepartments();
   const departments = Array.isArray(departmentsData) ? departmentsData : [];
 
-  // Get positions from API response and map to UI format
-  const rawPositions = Array.isArray(data?.data?.result)
-    ? data.data.result
-    : [];
-
-  // Filter positions by department if selected
-  const filteredRawPositions = selectedDepartmentId
-    ? rawPositions.filter((pos) => {
-        const selectedDept = departments.find(
-          (d) => d.id === selectedDepartmentId
-        );
-        if (!selectedDept) return true;
-        return (
-          pos.departmentId === selectedDepartmentId ||
-          pos.department?.id === selectedDepartmentId ||
-          pos.departmentName === selectedDept.name
-        );
-      })
-    : rawPositions;
+  // Get positions from API response
+  const rawPositions = Array.isArray(data?.data?.result) ? data.data.result : [];
+  const filteredRawPositions = rawPositions;
 
   // Map API data to UI format
   const positions = filteredRawPositions.map((pos) => ({
@@ -129,139 +127,6 @@ export default function JobPositions() {
       toast.error(errorMessage);
     }
   }, [isError, error, t]);
-
-  // Commented out mock data for reference
-  /*
-  const [positions, setPositions] = useState([
-    {
-      id: "1",
-      jobCode: "ID YCTD: 01",
-      title: "Senior Backend Developer",
-      department: "Engineering",
-      location: "Hybrid",
-      type: "full-time",
-      level: "senior-level",
-      experience: "5+ năm kinh nghiệm",
-      salary: "đ 30 - 40 triệu",
-      applicants: 1,
-      status: "active",
-      postedDate: "2025-10-01",
-      icon: Code,
-      iconBg: "bg-lime-200",
-    },
-    {
-      id: "2",
-      jobCode: "ID YCTD: 02",
-      title: "Frontend Developer",
-      department: "Engineering",
-      location: "Remote",
-      type: "full-time",
-      level: "mid-level",
-      experience: "2-4 năm kinh nghiệm",
-      salary: "đ 18 - 25 triệu",
-      applicants: 4,
-      status: "draft",
-      postedDate: "2025-10-03",
-      iconBg: "bg-red-200",
-    },
-    {
-      id: "3",
-      jobCode: "ID YCTD: 03",
-      title: "Product Manager",
-      department: "Product",
-      location: "Hanoi",
-      type: "full-time",
-      level: "senior-level",
-      experience: "3-5 năm kinh nghiệm",
-      salary: "đ 30 - 40 triệu",
-      applicants: 4,
-      status: "active",
-      postedDate: "2025-09-28",
-      icon: Briefcase,
-      iconBg: "bg-green-300",
-    },
-    {
-      id: "4",
-      jobCode: "ID YCTD: 04",
-      title: "DevOps Engineer",
-      department: "DevOps",
-      location: "HCMC",
-      type: "full-time",
-      level: "mid-level",
-      experience: "3-5 năm kinh nghiệm",
-      salary: "đ 25 - 35 triệu",
-      applicants: 10,
-      status: "active",
-      postedDate: "2025-09-15",
-      icon: Building2,
-      iconBg: "bg-red-300",
-    },
-    {
-      id: "5",
-      jobCode: "ID YCTD: 05",
-      title: "UI/UX Designer",
-      department: "Design",
-      location: "Remote",
-      type: "full-time",
-      level: "mid-level",
-      experience: "2-3 năm kinh nghiệm",
-      salary: "đ 15 - 22 triệu",
-      applicants: 4,
-      status: "active",
-      postedDate: "2025-10-10",
-      icon: FileText,
-      iconBg: "bg-red-200",
-    },
-    {
-      id: "6",
-      jobCode: "ID YCTD: 06",
-      title: "Mobile Developer",
-      department: "Mobile",
-      location: "Hanoi",
-      type: "full-time",
-      level: "mid-level",
-      experience: "2-4 năm kinh nghiệm",
-      salary: "đ 20 - 28 triệu",
-      applicants: 4,
-      status: "active",
-      postedDate: "2025-09-20",
-      icon: Code,
-      iconBg: "bg-lime-200",
-    },
-    {
-      id: "7",
-      jobCode: "ID YCTD: 07",
-      title: "Data Analyst",
-      department: "Data",
-      location: "HCMC",
-      type: "full-time",
-      level: "mid-level",
-      experience: "1-3 năm kinh nghiệm",
-      salary: "đ 18 - 25 triệu",
-      applicants: 15,
-      status: "active",
-      postedDate: "2025-09-18",
-      icon: BarChart3,
-      iconBg: "bg-red-300",
-    },
-    {
-      id: "8",
-      jobCode: "ID YCTD: 08",
-      title: "QA Engineer",
-      department: "Quality Assurance",
-      location: "Remote",
-      type: "full-time",
-      level: "entry-level",
-      experience: "0-2 năm kinh nghiệm",
-      salary: "đ 12 - 18 triệu",
-      applicants: 15,
-      status: "closed",
-      postedDate: "2025-09-01",
-      icon: User,
-      iconBg: "bg-green-200",
-    },
-  ]);
-  */
 
   const itemsPerPage = 8;
   const totalPages = Math.ceil(positions.length / itemsPerPage);
@@ -405,25 +270,25 @@ export default function JobPositions() {
           title={t("listJobPosition")}
           actions={
             <div className="flex gap-4 items-center">
-              <SelectDropdown
-                value={selectedDepartmentId}
-                onChange={setSelectedDepartmentId}
-                options={[{ id: null, name: "Tất cả phòng ban" }, ...departments.map(d => ({ id: d.id, name: d.name }))]}
-                placeholder="Tất cả phòng ban"
-                hideLabel
-                compact
-                className="min-w-[200px]"
-              />
-              <Can permission={PERMISSIONS.JOB_POSITIONS_CREATE}>
-                <Button
-                  onClick={() => {
-                    navigate("/job-positions/new");
-                  }}
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  {t("createNewPosition")}
-                </Button>
-              </Can>
+              {isHR && (
+                <SelectDropdown
+                  value={selectedDepartmentId}
+                  onChange={setSelectedDepartmentId}
+                  options={[{ id: null, name: "Tất cả phòng ban" }, ...departments.map(d => ({ id: d.id, name: d.name }))]}
+                  placeholder="Tất cả phòng ban"
+                  hideLabel
+                  compact
+                  className="min-w-[200px]"
+                />
+              )}
+              <Button
+                onClick={() => {
+                  navigate("/job-positions/new");
+                }}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                {t("createNewPosition")}
+              </Button>
             </div>
           }
         />
@@ -440,25 +305,25 @@ export default function JobPositions() {
         title={t("listJobPosition")}
         actions={
           <div className="flex gap-4 items-center">
-            <SelectDropdown
-              value={selectedDepartmentId}
-              onChange={setSelectedDepartmentId}
-              options={[{ id: null, name: "Tất cả phòng ban" }, ...departments.map(d => ({ id: d.id, name: d.name }))]}
-              placeholder="Tất cả phòng ban"
-              hideLabel
-              compact
-              className="min-w-[200px]"
-            />
-            <Can permission={PERMISSIONS.JOB_POSITIONS_CREATE}>
-              <Button
-                onClick={() => {
-                  navigate("/job-positions/new");
-                }}
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                {t("createNewPosition")}
-              </Button>
-            </Can>
+            {isHR && (
+              <SelectDropdown
+                value={selectedDepartmentId}
+                onChange={setSelectedDepartmentId}
+                options={[{ id: null, name: "Tất cả phòng ban" }, ...departments.map(d => ({ id: d.id, name: d.name }))]}
+                placeholder="Tất cả phòng ban"
+                hideLabel
+                compact
+                className="min-w-[200px]"
+              />
+            )}
+            <Button
+              onClick={() => {
+                navigate("/job-positions/new");
+              }}
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              {t("createNewPosition")}
+            </Button>
           </div>
         }
       />
@@ -475,9 +340,8 @@ export default function JobPositions() {
         >
           <div className="flex-1 overflow-visible">
             {currentPositions.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-full text-gray-400 py-12">
-                <Briefcase className="h-16 w-16 mb-4" />
-                <p className="text-lg">{t("noPositionsFound")}</p>
+              <div className="py-12">
+                <EmptyState title={t("noPositionsFound", { defaultValue: "Không có vị trí tuyển dụng" })} icon={Briefcase}/>
               </div>
             ) : (
               <div
