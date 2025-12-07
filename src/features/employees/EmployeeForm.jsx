@@ -11,16 +11,14 @@ import { useAllDepartments } from "../../hooks/useDepartments";
 import { useAllPositions } from "../../hooks/usePositions";
 import FileUploader from "../../components/ui/FileUploader";
 import LoadingContent from "../../components/ui/LoadingContent";
-import Can from "../../components/Can";
-import { PERMISSIONS } from "../../constants/permissions";
-import { usePermission } from "../../hooks/usePermission";
+// Removed permission-based gating for buttons
 
 export default function EmployeeForm() {
   const { id } = useParams();
   const isEditPage = !!id;
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { can } = usePermission();
+  // Permission checks removed; all actions visible
   const { data: departmentsData = [] } = useAllDepartments();
   const { data: positionsData = [] } = useAllPositions();
   const createEmployee = useCreateEmployee();
@@ -179,7 +177,7 @@ export default function EmployeeForm() {
           actions={
             <>
               <Button variant="outline" onClick={() => navigate(-1)}>{t("cancel")}</Button>
-              {(isEditMode || !isEditPage) && can(isEditPage ? PERMISSIONS.EMPLOYEES_UPDATE : PERMISSIONS.EMPLOYEES_CREATE) && (
+              {(isEditMode || !isEditPage) && (
                 <Button onClick={() => formRef.current?.requestSubmit()}>{t("save")}</Button>
               )}
             </>
@@ -201,21 +199,15 @@ export default function EmployeeForm() {
             <Button variant="outline" onClick={() => navigate(-1)}>{t("cancel")}</Button>
             {isEditPage && !isEditMode ? (
               <>
-                {can(PERMISSIONS.EMPLOYEES_UPDATE) && (
-                  <Button variant="outline" onClick={() => setIsEditMode(true)}>{t("edit")}</Button>
-                )}
-                {can(PERMISSIONS.EMPLOYEES_DELETE) && (
-                  <Button variant="outline" onClick={handleDelete} disabled={deleteEmployee.isPending}>{t("delete")}</Button>
-                )}
+                <Button variant="outline" onClick={() => setIsEditMode(true)}>{t("edit")}</Button>
+                <Button variant="outline" onClick={handleDelete} disabled={deleteEmployee.isPending}>{t("delete")}</Button>
               </>
             ) : (
               <>
                 {isEditPage && (
                   <Button variant="outline" onClick={handleCancelEdit}>{t("cancel")}</Button>
                 )}
-                {can(isEditPage ? PERMISSIONS.EMPLOYEES_UPDATE : PERMISSIONS.EMPLOYEES_CREATE) && (
-                  <Button onClick={() => formRef.current?.requestSubmit()}>{t("save")}</Button>
-                )}
+                <Button onClick={() => formRef.current?.requestSubmit()}>{t("save")}</Button>
               </>
             )}
           </>

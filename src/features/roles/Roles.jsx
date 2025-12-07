@@ -6,8 +6,7 @@ import LoadingContent from "../../components/ui/LoadingContent";
 import { useAllRoles } from "../../hooks/useRoles";
 import Button from "../../components/ui/Button";
 import { Plus } from "lucide-react";
-import Can from "../../components/Can";
-import { PERMISSIONS } from "../../constants/permissions";
+import EmptyState from "../../components/ui/EmptyState";
 
 export default function Roles() {
   const { t } = useTranslation();
@@ -17,7 +16,7 @@ export default function Roles() {
   if (isLoading) {
     return (
       <div className="flex flex-col h-full">
-        <ContentHeader title={t("roleManagement", { defaultValue: "Role Management" })} actions={<Can permission={PERMISSIONS.ROLES_CREATE}><Button onClick={() => navigate("/roles/new")}><Plus className="h-4 w-4 mr-2" />{t("addRole", { defaultValue: "Add Role" })}</Button></Can>} />
+        <ContentHeader title={t("roleManagement", { defaultValue: "Role Management" })} actions={<Button onClick={() => navigate("/roles/new")}><Plus className="h-4 w-4 mr-2" />{t("addRole", { defaultValue: "Add Role" })}</Button>} />
         <div className="flex-1 flex items-center justify-center mt-4">
           <LoadingContent />
         </div>
@@ -27,7 +26,7 @@ export default function Roles() {
 
   return (
     <div className="flex flex-col h-full">
-      <ContentHeader title={t("roleManagement", { defaultValue: "Role Management" })} actions={<Can permission={PERMISSIONS.ROLES_CREATE}><Button onClick={() => navigate("/roles/new")}><Plus className="h-4 w-4 mr-2" />{t("addRole", { defaultValue: "Add Role" })}</Button></Can>} />
+      <ContentHeader title={t("roleManagement", { defaultValue: "Role Management" })} actions={<Button onClick={() => navigate("/roles/new")}><Plus className="h-4 w-4 mr-2" />{t("addRole", { defaultValue: "Add Role" })}</Button>} />
       <div className="flex-1 flex flex-col mt-4 min-h-0">
         <div className="flex-1 bg-white rounded-xl shadow overflow-hidden">
           <div className="overflow-auto">
@@ -42,7 +41,9 @@ export default function Roles() {
               <tbody className="divide-y divide-gray-200">
                 {roles.length === 0 ? (
                   <tr>
-                    <td colSpan="3" className="p-8 text-center text-gray-500">{t("noData")}</td>
+                    <td colSpan="3" className="p-8">
+                      <EmptyState title={t("noData", { defaultValue: "Không có dữ liệu" })} />
+                    </td>
                   </tr>
                 ) : (
                   roles.map((r) => (

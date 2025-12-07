@@ -2,14 +2,13 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import ContentHeader from "../../components/ui/ContentHeader";
 import Button from "../../components/ui/Button";
-import Can from "../../components/Can";
 import { Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import LoadingContent from "../../components/ui/LoadingContent";
 import { useUsers } from "../../hooks/useUsers";
 import Pagination from "../../components/ui/Pagination";
 import { toast } from "react-toastify";
-import { PERMISSIONS } from "../../constants/permissions";
+import EmptyState from "../../components/ui/EmptyState";
 
 export default function Users() {
   const { t } = useTranslation();
@@ -44,12 +43,10 @@ export default function Users() {
           title={t("accountManagement")}
           actions={
             <div className="flex gap-2 items-center">
-              <Can permission={PERMISSIONS.USERS_CREATE}>
-                <Button onClick={() => navigate("/users/new")}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  {t("addAccount")}
-                </Button>
-              </Can>
+              <Button onClick={() => navigate("/users/new")}>
+                <Plus className="h-4 w-4 mr-2" />
+                {t("addAccount")}
+              </Button>
             </div>
           }
         />
@@ -66,12 +63,10 @@ export default function Users() {
         title={t("accountManagement")}
         actions={
           <div className="flex gap-2 items-center">
-            <Can permission={PERMISSIONS.USERS_CREATE}>
-              <Button onClick={() => navigate("/users/new")}>
-                <Plus className="h-4 w-4 mr-2" />
-                {t("addAccount")}
-              </Button>
-            </Can>
+            <Button onClick={() => navigate("/users/new")}>
+              <Plus className="h-4 w-4 mr-2" />
+              {t("addAccount")}
+            </Button>
           </div>
         }
       />
@@ -93,7 +88,9 @@ export default function Users() {
               <tbody className="divide-y divide-gray-200">
                 {users.length === 0 ? (
                   <tr>
-                    <td colSpan="6" className="p-8 text-center text-gray-500">{t("noData")}</td>
+                    <td colSpan="6" className="p-8">
+                      <EmptyState title={t("noData", { defaultValue: "Không có dữ liệu" })} />
+                    </td>
                   </tr>
                 ) : (
                   users.map((u) => {

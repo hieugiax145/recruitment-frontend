@@ -8,15 +8,12 @@ import { useCreateRole, useRole, useUpdateRole } from "../../hooks/useRoles";
 import { toast } from "react-toastify";
 import { useAllPermissions } from "../../hooks/usePermissions";
 import LoadingContent from "../../components/ui/LoadingContent";
-import { PERMISSIONS } from "../../constants/permissions";
-import { usePermission } from "../../hooks/usePermission";
 
 export default function RoleForm() {
   const { id } = useParams();
   const isEditPage = !!id;
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { can } = usePermission();
   const createRole = useCreateRole();
   const updateRole = useUpdateRole();
   const { data: roleData, isLoading: roleLoading } = useRole(id, { enabled: isEditPage });
@@ -63,7 +60,6 @@ export default function RoleForm() {
 
         setIsEditMode(false);
       } catch (error) {
-        // Error handled by hooks
       }
     } else {
       createRole.mutate(
@@ -186,7 +182,7 @@ export default function RoleForm() {
           actions={
             <>
               <Button variant="outline" onClick={() => navigate(-1)}>{t("cancel")}</Button>
-              {(isEditMode || !isEditPage) && can(isEditPage ? PERMISSIONS.ROLES_UPDATE : PERMISSIONS.ROLES_CREATE) && (
+              {(isEditMode || !isEditPage) && (
                 <Button onClick={handleSubmit}>{t("save")}</Button>
               )}
             </>
@@ -207,17 +203,13 @@ export default function RoleForm() {
           <>
             <Button variant="outline" onClick={() => navigate(-1)}>{t("cancel")}</Button>
             {isEditPage && !isEditMode ? (
-              can(PERMISSIONS.ROLES_UPDATE) && (
-                <Button variant="outline" onClick={() => setIsEditMode(true)}>{t("edit")}</Button>
-              )
+              <Button variant="outline" onClick={() => setIsEditMode(true)}>{t("edit")}</Button>
             ) : (
               <>
                 {isEditPage && (
                   <Button variant="outline" onClick={handleCancelEdit}>{t("cancel")}</Button>
                 )}
-                {can(isEditPage ? PERMISSIONS.ROLES_UPDATE : PERMISSIONS.ROLES_CREATE) && (
-                  <Button onClick={handleSubmit}>{t("save")}</Button>
-                )}
+                <Button onClick={handleSubmit}>{t("save")}</Button>
               </>
             )}
           </>

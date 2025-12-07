@@ -11,8 +11,7 @@ import { useEmployees } from "../../hooks/useEmployees";
 import { useAllDepartments, useDepartments } from "../../hooks/useDepartments";
 import { usePositions } from "../../hooks/usePositions";
 import SelectDropdown from "../../components/ui/SelectDropdown";
-import Can from "../../components/Can";
-import { PERMISSIONS } from "../../constants/permissions";
+import EmptyState from "../../components/ui/EmptyState";
 
 export default function Employees() {
   const { t } = useTranslation();
@@ -107,12 +106,9 @@ export default function Employees() {
               compact
               className="min-w-[200px]"
             />
-            <Can permission={PERMISSIONS.EMPLOYEES_CREATE}>
-              <Button onClick={() => navigate("/employees/new")}>
-                {" "}
-                <Plus className="h-4 w-4 mr-2" /> {t("addEmployee")}
-              </Button>
-            </Can>
+            <Button onClick={() => navigate("/employees/new")}>
+              <Plus className="h-4 w-4 mr-2" /> {t("addEmployee")}
+            </Button>
           </div>
         }
       />
@@ -155,8 +151,8 @@ export default function Employees() {
               <tbody className="divide-y divide-gray-200">
                 {employees.length === 0 ? (
                   <tr>
-                    <td colSpan="9" className="p-8 text-center text-gray-500">
-                      {t("noData")}
+                    <td colSpan="9" className="p-8">
+                      <EmptyState title={t("noData", { defaultValue: "Không có dữ liệu" })} />
                     </td>
                   </tr>
                 ) : (
