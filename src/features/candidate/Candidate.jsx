@@ -10,17 +10,30 @@ import { useTranslation } from "react-i18next";
 import LoadingContent from "../../components/ui/LoadingContent";
 import SelectDropdown from "../../components/ui/SelectDropdown";
 import { useJobPositions } from "../job-positions/hooks/useJobPositions";
+import EmptyState from "../../components/ui/EmptyState";
+import { useAuth } from "../../context/AuthContext";
 
 export default function Candidate() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedJobPositionId, setSelectedJobPositionId] = useState(null);
   const [selectedStatus, setSelectedStatus] = useState(null);
   const itemsPerPage = 10;
 
-  // Fetch candidates
-  const { data, isLoading, isError, error, refetch } = useCandidates();
+  // Determine if user is HR or Director
+  const isHR = user?.department?.id === 2;
+  const isDirector = user?.department?.id === 1;
+  
+  // Prepare query params - filter by department if not HR or Director
+  const queryParams = {};
+  if (!isHR && !isDirector && user?.department?.id) {
+    queryParams.departmentId = user.department.id;
+  }
+
+  // Fetch candidates with department filtering
+  const { data, isLoading, isError, error, refetch } = useCandidates(queryParams);
 
   // Fetch job positions for filter
   const { data: jobPositionsData } = useJobPositions();
@@ -187,8 +200,8 @@ export default function Candidate() {
               <tbody className="divide-y divide-gray-200">
                 {currentCandidates.length === 0 ? (
                   <tr>
-                    <td colSpan="8" className="p-8 text-center text-gray-500">
-                      {t("noCandidatesFound")}
+                    <td colSpan="8" className="p-8">
+                      <EmptyState title={t("noCandidatesFound", { defaultValue: "Không có ứng viên" })} />
                     </td>
                   </tr>
                 ) : (

@@ -13,7 +13,6 @@ export default function NotificationsDropdown() {
   console.log("Unread count:", unreadCount);
   console.log("Is loading:", isLoading);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -32,7 +31,6 @@ export default function NotificationsDropdown() {
   };
 
   const handleNotificationClick = () => {
-    // Close dropdown when clicking on a notification
     setIsOpen(false);
   };
 
@@ -59,7 +57,6 @@ export default function NotificationsDropdown() {
       </button>
       {isOpen && (
         <div className="absolute right-0 mt-2 w-96 bg-white shadow-lg rounded-lg z-50 max-h-96 overflow-hidden border border-gray-200">
-          {/* Header */}
           <div className="px-4 py-3 bg-gray-50 border-b border-gray-200 rounded-t-lg">
             <h3 className="text-base font-semibold text-gray-900">Thông báo</h3>
             {unreadCount > 0 && (
@@ -67,7 +64,6 @@ export default function NotificationsDropdown() {
             )}
           </div>
 
-          {/* Content */}
           <div className="max-h-80 overflow-y-auto">
             {isLoading ? (
               <div className="px-4 py-6 text-center">
@@ -113,7 +109,6 @@ export default function NotificationsDropdown() {
             )}
           </div>
 
-          {/* Footer */}
           {notifications.length > 0 && (
             <div className="px-4 py-2 bg-gray-50 border-t border-gray-200 rounded-b-lg">
               <div className="flex items-center justify-between gap-3">

@@ -2,7 +2,6 @@ import { ChevronRight, X, AlertTriangle } from "lucide-react";
 import Button from "../../components/ui/Button";
 import ContentHeader from "../../components/ui/ContentHeader";
 import TextInput from "../../components/ui/TextInput";
-import CheckBoxOptions from "../../components/ui/CheckBoxOptions";
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import SelectDropdown from "../../components/ui/SelectDropdown";
@@ -44,22 +43,15 @@ export default function RecruitmentRequestAdd() {
   const [formData, setFormData] = useState({
     title: "",
     quantity: 1,
-    priorityLevel: "HIGH",
     reason: "",
-    description: "",
-    requirements: "",
-    benefits: "",
     isExceedBudget: false,
     salaryMin: null,
     salaryMax: null,
     currency: "VND",
-    location: "",
-    requesterId: user?.id || null,
+    requesterId: user?.userId || null,
     departmentId: user?.department?.id || null,
     workflowId: null,
   });
-
-  const [selectedValues, setSelectedValues] = useState([]);
 
   const {
     data: existingRequest,
@@ -75,37 +67,18 @@ export default function RecruitmentRequestAdd() {
 
   useEffect(() => {
     if (existingRequest && isViewMode) {
-      const locations = [
-        { id: 1, name: "Hà Nội" },
-        { id: 2, name: "Hải Phòng" },
-        { id: 3, name: "TP. Hồ Chí Minh" },
-      ];
-
       setFormData({
         title: existingRequest.title || "",
         quantity: existingRequest.quantity || 1,
-        priorityLevel: existingRequest.priorityLevel || "HIGH",
         reason: existingRequest.reason || "",
-        description: existingRequest.description || "",
-        requirements: existingRequest.requirements || "",
-        benefits: existingRequest.benefits || "",
         isExceedBudget: existingRequest.isExceedBudget || false,
         salaryMin: existingRequest.salaryMin || null,
         salaryMax: existingRequest.salaryMax || null,
         currency: existingRequest.currency || "VND",
-        location: existingRequest.location || "",
         requesterId: existingRequest.requesterId || user?.id || null,
         departmentId: existingRequest.department?.id || null,
         workflowId: existingRequest.workflowId || null,
       });
-
-      if (existingRequest.location) {
-        const locationNames = existingRequest.location.split(", ");
-        const selectedIds = locations
-          .filter((loc) => locationNames.includes(loc.name))
-          .map((loc) => loc.id);
-        setSelectedValues(selectedIds);
-      }
     }
   }, [existingRequest, isViewMode, user]);
 
@@ -115,7 +88,7 @@ export default function RecruitmentRequestAdd() {
   const selectedDepartmentId = formData.departmentId || user?.department?.id;
 
   const { data: workflowsData } = useWorkflows(
-    { departmentId: selectedDepartmentId, type: "RECRUITMENT", isActive: true },
+    {  type: "RECRUITMENT", isActive: true },
     { enabled: !!selectedDepartmentId }
   );
 
@@ -130,20 +103,7 @@ export default function RecruitmentRequestAdd() {
   const cancelMutation = useCancelRecruitmentRequest();
   const withdrawMutation = useWithdrawRecruitmentRequest();
 
-  const locations = [
-    {
-      id: 1,
-      name: "Hà Nội",
-    },
-    {
-      id: 2,
-      name: "Hải Phòng",
-    },
-    {
-      id: 3,
-      name: "TP. Hồ Chí Minh",
-    },
-  ];
+  // Removed workplace locations: temporarily not needed
 
   const isGeneralInfoField = (fieldName) => {
     const generalFields = [
@@ -167,26 +127,7 @@ export default function RecruitmentRequestAdd() {
     }));
   };
 
-  const handleSelectedValues = (value) => {
-    setSelectedValues((prev) => {
-      const newValues = prev.includes(value)
-        ? prev.filter((v) => v !== value)
-        : [...prev, value];
-
-      // Update formData.location with selected location names
-      const selectedNames = locations
-        .filter((loc) => newValues.includes(loc.id))
-        .map((loc) => loc.name)
-        .join(", ");
-
-      setFormData((prevData) => ({
-        ...prevData,
-        location: selectedNames,
-      }));
-
-      return newValues;
-    });
-  };
+  // Removed workplace selection handler: temporarily not needed
 
   const onSubmit = () => {
     if (!formData.title) {
@@ -226,9 +167,24 @@ export default function RecruitmentRequestAdd() {
       }
     }
 
+    const payload = {
+      title: formData.title,
+      quantity: formData.quantity,
+      reason: formData.reason,
+      isExceedBudget: formData.isExceedBudget,
+      ...(formData.isExceedBudget && {
+        salaryMin: formData.salaryMin,
+        salaryMax: formData.salaryMax,
+      }),
+      currency: formData.currency,
+      requesterId: formData.requesterId,
+      departmentId: formData.departmentId,
+      workflowId: formData.workflowId,
+    };
+
     if (isViewMode && isEditing) {
       updateMutation.mutate(
-        { id, data: formData },
+        { id, data: payload },
         {
           onSuccess: () => {
             setIsEditing(false);
@@ -243,7 +199,7 @@ export default function RecruitmentRequestAdd() {
         }
       );
     } else if (!isViewMode) {
-      createMutation.mutate(formData, {
+      createMutation.mutate(payload, {
         onSuccess: () => {
           navigate(-1);
         },
@@ -389,7 +345,6 @@ export default function RecruitmentRequestAdd() {
     cancelMutation.isPending ||
     withdrawMutation.isPending;
 
-  const isAdmin = user?.role?.name === "ADMIN";
   const isCEO = user?.role?.name === "CEO";
   const isManager = user?.role?.name === "MANAGER";
   const isDraft = existingRequest?.status === "DRAFT";
@@ -398,17 +353,23 @@ export default function RecruitmentRequestAdd() {
   const isRejected = existingRequest?.status === "REJECTED";
   const isReturned = existingRequest?.status === "RETURNED";
   
-  // Admin có thể làm tất cả
-  const isRequester = existingRequest?.requesterId === user?.id;
-  const canSubmit = isViewMode && (isRequester || isAdmin) && (isDraft || isReturned);
-  const canWithdraw = isViewMode && (isRequester || isAdmin) && isPendingStatus;
-  const canCancelRequest = isViewMode && (isRequester || isAdmin) && (isDraft || isPendingStatus || isReturned);
+  const isRequester = existingRequest?.requesterId === user?.userId;
   
-  const canApprove = isViewMode && (isAdmin) && isPendingStatus;
-  const canRejectRequest = isViewMode && (isAdmin) && isPendingStatus;
-  const canReturn = isViewMode && (isAdmin) && isPendingStatus;
+  // Check if current approval tracking action user is the logged-in user
+  const currentApprovalTracking = existingRequest?.workflowInfo?.approvalTrackings?.find(
+    (t) => t.stepId === existingRequest?.workflowInfo?.currentStepId
+  );
+  const isCurrentActionUser = currentApprovalTracking?.actionUserId === user?.userId;
   
-  const canEdit = isViewMode && (isRequester || isAdmin) && (isDraft || isReturned) && !isEditing;
+  const canSubmit = isViewMode && isRequester && (isDraft || isReturned);
+  const canWithdraw = isViewMode && isRequester && isPendingStatus;
+  const canCancelRequest = isViewMode && isRequester && (isDraft || isPendingStatus || isReturned);
+  
+  const canApprove = isViewMode && isPendingStatus && isCurrentActionUser;
+  const canRejectRequest = isViewMode && isPendingStatus && isCurrentActionUser;
+  const canReturn = isViewMode && isPendingStatus && isCurrentActionUser;
+  
+  const canEdit = isViewMode && isRequester && (isDraft || isReturned) && !isEditing;
 
   const getCurrentStatus = () => {
     if (!isViewMode) return "DRAFT";
@@ -573,7 +534,7 @@ export default function RecruitmentRequestAdd() {
                     <th className="p-4 text-left text-sm font-medium text-gray-600 whitespace-nowrap">Thứ tự</th>
                     <th className="p-4 text-left text-sm font-medium text-gray-600 whitespace-nowrap">Tên bước</th>
                     <th className="p-4 text-left text-sm font-medium text-gray-600 whitespace-nowrap">Trạng thái xử lý</th>
-                    <th className="p-4 text-left text-sm font-medium text-gray-600 whitespace-nowrap">Người thao tác</th>
+                    <th className="p-4 text-left text-sm font-medium text-gray-600 whitespace-nowrap">Người phụ trách</th>
                     <th className="p-4 text-left text-sm font-medium text-gray-600 whitespace-nowrap">Thời gian</th>
                     <th className="p-4 text-left text-sm font-medium text-gray-600 whitespace-nowrap">Ghi chú</th>
                   </tr>
@@ -684,21 +645,7 @@ export default function RecruitmentRequestAdd() {
                 disabled={isPending || (isViewMode ||isEditing)}
               />
 
-              <SelectDropdown
-                label={t("priorityLevel")}
-                placeholder={t("priorityPlaceholder")}
-                options={[
-                  { id: "HIGH", name: t("high") },
-                  { id: "MEDIUM", name: t("medium") },
-                  { id: "LOW", name: t("low") },
-                ]}
-                value={formData.priorityLevel}
-                onChange={(value) => {
-                  setFormData((prev) => ({ ...prev, priorityLevel: value }));
-                }}
-                required={true}
-                disabled={isPending || (isViewMode ||isEditing)}
-              />
+              {/* Priority removed temporarily */}
 
               <SelectDropdown
                 label={t("workflow", { defaultValue: "Luồng phê duyệt" })}
@@ -709,7 +656,7 @@ export default function RecruitmentRequestAdd() {
                   setFormData((prev) => ({ ...prev, workflowId: value }));
                 }}
                 required={true}
-                disabled={!selectedDepartmentId || isPending || (isViewMode && !isEditing)}
+                disabled={!selectedDepartmentId || isPending || (isViewMode ||isEditing)}
               />
             </div>
           </div>
@@ -728,15 +675,7 @@ export default function RecruitmentRequestAdd() {
                 disabled={isPending || (isViewMode && !isEditing)}
               />
 
-              <CheckBoxOptions
-                isRow={true}
-                label={t("workplace")}
-                required={true}
-                options={locations}
-                selectedValues={selectedValues}
-                onChange={handleSelectedValues}
-                disabled={isViewMode && !isEditing}
-              />
+              {/* Workplace removed temporarily */}
 
               <TextInput
                 isRow={true}
@@ -803,46 +742,7 @@ export default function RecruitmentRequestAdd() {
               )}
             </div>
           </div>
-          {/* justification */}
-          <div className="rounded-md border border-gray-300 p-4 gap-4 flex flex-col">
-            <h2>{t("jobDescriptionSection")}</h2>
-            <textarea
-              placeholder={t("jobDescriptionPlaceholder")}
-              className="border border-gray-300 p-2 rounded-md text-gray-700
-              focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent
-              disabled:opacity-50 disabled:cursor-not-allowed
-              min-h-[100px] resize-y
-              "
-              value={formData.description}
-              name="description"
-              onChange={handleChange}
-              disabled={isPending || (isViewMode && !isEditing)}
-            />
-            <textarea
-              placeholder={t("requirementsPlaceholder")}
-              className="border border-gray-300 p-2 rounded-md text-gray-700
-              focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent
-              disabled:opacity-50 disabled:cursor-not-allowed
-              min-h-[100px] resize-y
-              "
-              value={formData.requirements}
-              name="requirements"
-              onChange={handleChange}
-              disabled={isPending || (isViewMode && !isEditing)}
-            />
-            <textarea
-              placeholder={t("benefitsPlaceholder")}
-              className="border border-gray-300 p-2 rounded-md text-gray-700
-              focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent
-              disabled:opacity-50 disabled:cursor-not-allowed
-              min-h-[100px] resize-y
-              "
-              value={formData.benefits}
-              name="benefits"
-              onChange={handleChange}
-              disabled={isPending || (isViewMode && !isEditing)}
-            />
-          </div>
+          {/* Job description section removed temporarily */}
         </div>
       </div>
 

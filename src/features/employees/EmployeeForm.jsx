@@ -11,14 +11,12 @@ import { useAllDepartments } from "../../hooks/useDepartments";
 import { useAllPositions } from "../../hooks/usePositions";
 import FileUploader from "../../components/ui/FileUploader";
 import LoadingContent from "../../components/ui/LoadingContent";
-// Removed permission-based gating for buttons
 
 export default function EmployeeForm() {
   const { id } = useParams();
   const isEditPage = !!id;
   const { t } = useTranslation();
   const navigate = useNavigate();
-  // Permission checks removed; all actions visible
   const { data: departmentsData = [] } = useAllDepartments();
   const { data: positionsData = [] } = useAllPositions();
   const createEmployee = useCreateEmployee();

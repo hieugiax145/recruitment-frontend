@@ -14,12 +14,14 @@ import { Calendar, Mail } from "lucide-react";
 import LoadingContent from "../../components/ui/LoadingContent";
 import { useState } from "react";
 import SendEmailModal from "./components/SendEmailModal";
+import CreateEventModal from "../calendar/components/CreateEventModal";
 
 export default function CandidateDetail() {
   const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const [showEmailModal, setShowEmailModal] = useState(false);
+  const [showCreateEventModal, setShowCreateEventModal] = useState(false);
   // Always fetch candidate detail by ID
   const { data, isLoading, isError, error } = useCandidate(id);
   const addComment = useAddCandidateComment();
@@ -98,18 +100,7 @@ export default function CandidateDetail() {
               <Mail className="h-4 w-4 mr-2" />
               Gửi email
             </Button>
-            <Button
-              onClick={() =>
-                navigate("/calendar", {
-                  state: {
-                    createSchedule: true,
-                    candidateId: candidate.id,
-                    candidateName: displayName,
-                    candidateEmail: displayEmail,
-                  },
-                })
-              }
-            >
+            <Button onClick={() => setShowCreateEventModal(true)}>
               <Calendar className="h-4 w-4 mr-2" />
               Tạo lịch
             </Button>
@@ -168,6 +159,17 @@ export default function CandidateDetail() {
         onClose={() => setShowEmailModal(false)}
         recipientEmail={displayEmail}
         recipientName={displayName}
+      />
+
+      {/* Create Event Modal */}
+      <CreateEventModal
+        isOpen={showCreateEventModal}
+        onClose={() => setShowCreateEventModal(false)}
+        defaultCandidate={{
+          id: candidate.id,
+          name: displayName,
+          departmentId: candidate.jobPosition?.departmentId,
+        }}
       />
     </div>
   );

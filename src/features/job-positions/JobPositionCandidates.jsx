@@ -26,53 +26,51 @@ import LoadingOverlay from "../../components/ui/LoadingOverlay";
 import AddCandidateModal from "../candidate/components/AddCandidateModal";
 import LoadingContent from "../../components/ui/LoadingContent";
 
-// Candidate status columns configuration
 const CANDIDATE_STATUSES = [
   {
     id: "SUBMITTED",
     label: "Đã nộp",
-    color: "#3B82F6", // Blue
+    color: "#3B82F6",
     bgColor: "#EFF6FF",
   },
   {
     id: "REVIEWING",
     label: "Đang xem xét",
-    color: "#6366F1", // Indigo
+    color: "#6366F1",
     bgColor: "#EEF2FF",
   },
   {
     id: "INTERVIEW",
     label: "Phỏng vấn",
-    color: "#F59E0B", // Amber
+    color: "#F59E0B",
     bgColor: "#FEF3C7",
   },
   {
     id: "OFFER",
     label: "Offer",
-    color: "#8B5CF6", // Purple
+    color: "#8B5CF6",
     bgColor: "#F5F3FF",
   },
   {
     id: "HIRED",
     label: "Tuyển",
-    color: "#10B981", // Green
+    color: "#10B981",
     bgColor: "#D1FAE5",
   },
   {
     id: "REJECTED",
     label: "Từ chối",
-    color: "#EF4444", // Red
+    color: "#EF4444",
     bgColor: "#FEE2E2",
   },
   {
     id: "ARCHIVED",
     label: "Lưu trữ",
-    color: "#6B7280", // Gray
+    color: "#6B7280",
     bgColor: "#F3F4F6",
   },
 ];
 
-// Main Component
 export default function JobPositionCandidates() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -81,10 +79,8 @@ export default function JobPositionCandidates() {
   const [activeCandidate, setActiveCandidate] = useState(null);
   const [showAddCandidateModal, setShowAddCandidateModal] = useState(false);
 
-  // Fetch job position data
   const { data: jobPosition } = useJobPosition(id);
 
-  // Fetch candidates for this job position
   const {
     data: candidatesData,
     isLoading,
@@ -94,7 +90,6 @@ export default function JobPositionCandidates() {
   });
   const changeStageMutation = useChangeStageCandidate();
 
-  // Extract candidates array from response - handle nested structure
   const candidatesArray = Array.isArray(candidatesData?.data?.result)
     ? candidatesData.data.result
     : Array.isArray(candidatesData?.result)
@@ -103,7 +98,6 @@ export default function JobPositionCandidates() {
     ? candidatesData
     : [];
 
-  // Normalize all candidates to match API response structure
   const candidates = candidatesArray.map((candidate) => ({
     id: candidate.id,
     name: candidate.fullName || candidate.name || "",
@@ -125,29 +119,25 @@ export default function JobPositionCandidates() {
     education: candidate.education || "Chưa cập nhật",
   }));
 
-  // Normalize candidates data - handle both 'name' and 'fullName' fields
   const normalizeCandidate = (candidate) => ({
     ...candidate,
     name: candidate.name || candidate.fullName || "",
   });
 
-  // Configure drag sensors
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 8, // 8px movement required to start drag
+        distance: 8,
       },
     })
   );
 
-  // Group candidates by status
   const candidatesByStatus = CANDIDATE_STATUSES.reduce((acc, status) => {
     acc[status.id] = candidates.filter((c) => c.status === status.id);
     return acc;
   }, {});
 
   const handleCandidateClick = (candidate) => {
-    // Normalize candidate data before setting it
     setSelectedCandidate(normalizeCandidate(candidate));
   };
 
@@ -172,8 +162,6 @@ export default function JobPositionCandidates() {
   };
 
   const handleDragOver = (event) => {
-    // This handler is kept for visual feedback during drag
-    // The actual status update happens in handleDragEnd
   };
 
   const handleDragEnd = async (event) => {
@@ -187,7 +175,6 @@ export default function JobPositionCandidates() {
 
     console.log("Drag end:", { activeId, overId });
 
-    // Find the candidate
     const candidate = candidates.find((c) => c.id === activeId);
     if (!candidate) {
       console.log("Candidate not found:", activeId);
@@ -196,7 +183,6 @@ export default function JobPositionCandidates() {
 
     console.log("Found candidate:", candidate);
 
-    // Determine target status
     let targetStatus = null;
     if (CANDIDATE_STATUSES.find((s) => s.id === overId)) {
       targetStatus = overId;
@@ -212,14 +198,12 @@ export default function JobPositionCandidates() {
     console.log("Target status:", targetStatus, "Current status:", candidate.status);
 
     if (targetStatus && candidate.status !== targetStatus) {
-      // Get status label for toast
       const statusLabel = CANDIDATE_STATUSES.find(
         (s) => s.id === targetStatus
       )?.label;
 
       console.log("Calling changeStage API with:", { id: candidate.id, stage: targetStatus });
 
-      // Change candidate stage via API
       try {
         await changeStageMutation.mutateAsync({
           id: candidate.id,
@@ -229,7 +213,6 @@ export default function JobPositionCandidates() {
           `Đã chuyển ${candidate.name} sang ${statusLabel || targetStatus}`
         );
       } catch (error) {
-        // Error is already handled by the mutation's onError
         console.error("Failed to change candidate stage:", error);
       }
     }
@@ -267,9 +250,8 @@ export default function JobPositionCandidates() {
   }
 
   return (
-    //đang bị lệch 
     <div className="flex flex-col h-full">
-      {/* Header */}
+      
       <ContentHeader
         title={
           <div className="flex items-center gap-3">
@@ -292,7 +274,7 @@ export default function JobPositionCandidates() {
         }
       />
 
-      {/* Error State */}
+      
       {error && (
         <div className="flex-1 flex items-center justify-center">
           <div className="text-red-500">
@@ -301,7 +283,7 @@ export default function JobPositionCandidates() {
         </div>
       )}
 
-      {/* Kanban Board with Drag & Drop */}
+      
       {!error && (
         <DndContext
           sensors={sensors}
@@ -325,11 +307,11 @@ export default function JobPositionCandidates() {
                 ))}
               </SortableContext>
             </div>
-            {/* Loading Overlay */}
-            {/* <LoadingOverlay show={isLoading} /> */}
+            
+            
           </div>
 
-          {/* Drag Overlay */}
+          
           <DragOverlay>
             {activeCandidate ? (
               <div className="rotate-3 scale-105">
@@ -340,7 +322,7 @@ export default function JobPositionCandidates() {
         </DndContext>
       )}
 
-      {/* Candidate Detail Modal */}
+      
       {selectedCandidate && (
         <div
           className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] flex items-center justify-center p-4"
@@ -350,7 +332,7 @@ export default function JobPositionCandidates() {
             className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-gray-200"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Header */}
+            
             <div className="p-6 pb-4 border-b border-gray-100">
               <div className="flex items-start gap-4">
                 <div className="flex-shrink-0 w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg">
@@ -372,7 +354,7 @@ export default function JobPositionCandidates() {
               </div>
             </div>
 
-            {/* Content */}
+            
             <div className="p-6">
               <div className="space-y-4">
                 <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
@@ -418,7 +400,7 @@ export default function JobPositionCandidates() {
               </div>
             </div>
 
-            {/* Footer */}
+            
             <div className="p-6 pt-4 border-t border-gray-100 flex gap-3">
               <Button
                 variant="outline"
@@ -433,20 +415,19 @@ export default function JobPositionCandidates() {
         </div>
       )}
 
-      {/* Add Candidate Modal */}
+      
       <AddCandidateModal
         isOpen={showAddCandidateModal}
         onClose={() => setShowAddCandidateModal(false)}
         jobPosition={jobPosition || null}
         onSuccess={() => {
-          // Refresh candidates list after successful addition
           queryClient.invalidateQueries({
             queryKey: candidateKeys.list({ jobPositionId: id }),
           });
         }}
       />
 
-      {/* Custom scrollbar styles */}
+      
       <style jsx>{`
         .custom-scrollbar::-webkit-scrollbar {
           width: 8px;

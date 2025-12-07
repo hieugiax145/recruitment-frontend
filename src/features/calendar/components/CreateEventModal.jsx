@@ -1,145 +1,17 @@
-import { useState, useRef, useEffect, useMemo } from "react";
-import { X, Calendar, ChevronDown } from "lucide-react";
+import { useState, useEffect, useMemo, useCallback } from "react";
+import { X, Calendar } from "lucide-react";
 import Modal from "../../../components/ui/Modal";
 import Button from "../../../components/ui/Button";
 import TextInput from "../../../components/ui/TextInput";
 import SelectDropdown from "../../../components/ui/SelectDropdown";
+import MultiSelectDropdown from "../../../components/ui/MultiSelectDropdown";
 import LoadingOverlay from "../../../components/ui/LoadingOverlay";
 import { toast } from "react-toastify";
 import { useCreateSchedule } from "../hooks/useCalendar";
 import { useCandidates } from "../../candidate/hooks/useCandidates";
 import { useUsers } from "../../../hooks/useUsers";
 
-// Multi-Select Dropdown Component
-function MultiSelectDropdown({
-  label,
-  options = [],
-  selectedValues = [],
-  onChange,
-  placeholder = "Chọn",
-  required = false,
-  disabled = false,
-}) {
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
-  const handleToggle = (optionId) => {
-    if (disabled) return;
-    const isSelected = selectedValues.includes(optionId);
-    const newValues = isSelected
-      ? selectedValues.filter((id) => id !== optionId)
-      : [...selectedValues, optionId];
-    onChange(newValues);
-  };
-
-  const handleRemove = (optionId) => {
-    if (disabled) return;
-    onChange(selectedValues.filter((id) => id !== optionId));
-  };
-
-  const selectedOptions = options.filter((opt) =>
-    selectedValues.includes(opt.id)
-  );
-
-  return (
-    <div className="flex flex-col gap-2">
-      <label className="block text-gray-700">
-        {label}
-        {required && <span className="text-red-500"> *</span>}
-      </label>
-      <div className="relative" ref={dropdownRef}>
-        {/* Dropdown Button */}
-        <div
-          onClick={() => !disabled && setIsOpen(!isOpen)}
-          className={`border border-gray-300 p-2 rounded-md text-gray-700
-            focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent
-            cursor-pointer flex items-center justify-between bg-white hover:bg-gray-50 transition-colors
-            ${disabled ? "opacity-50 cursor-not-allowed bg-gray-100" : ""}`}
-        >
-          <span
-            className={
-              selectedValues.length > 0 ? "text-gray-700" : "text-gray-400"
-            }
-          >
-            {selectedValues.length > 0
-              ? `Đã chọn ${selectedValues.length} ${
-                  selectedValues.length === 1 ? "người" : "người"
-                }`
-              : placeholder}
-          </span>
-          <ChevronDown
-            className={`h-4 w-4 text-gray-400 transition-transform duration-200 ${
-              isOpen ? "rotate-180" : ""
-            }`}
-          />
-        </div>
-
-        {/* Dropdown Menu */}
-        {isOpen && !disabled && (
-          <ul className="absolute z-50 mt-1 w-full max-h-60 overflow-y-auto rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5">
-            {options.map((option) => (
-              <li
-                key={option.id}
-                onClick={() => handleToggle(option.id)}
-                className="relative cursor-pointer select-none px-3 py-2 text-sm hover:bg-gray-50 flex items-center gap-3"
-              >
-                <input
-                  type="checkbox"
-                  checked={selectedValues.includes(option.id)}
-                  onChange={() => {}}
-                  className="h-4 w-4 text-red-600 rounded border-gray-300 focus:ring-red-500"
-                />
-                <div className="flex-1">
-                  <div className="text-sm font-medium text-gray-900">
-                    {option.name}
-                  </div>
-                  {option.role && (
-                    <div className="text-xs text-gray-500">{option.role}</div>
-                  )}
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
-
-        {/* Selected Tags */}
-        {selectedOptions.length > 0 && (
-          <div className="flex flex-wrap gap-2 mt-2">
-            {selectedOptions.map((option) => (
-              <div
-                key={option.id}
-                className="inline-flex items-center gap-1 px-2 py-1 bg-red-50 text-red-700 rounded-md text-xs"
-              >
-                <span>{option.name}</span>
-                {!disabled && (
-                  <button
-                    type="button"
-                    onClick={() => handleRemove(option.id)}
-                    className="hover:bg-red-100 rounded-full p-0.5 transition-colors"
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
+// moved to components/ui/MultiSelectDropdown.jsx
 
 export default function CreateEventModal({ isOpen, onClose, defaultDate }) {
   const createSchedule = useCreateSchedule();
@@ -176,7 +48,7 @@ export default function CreateEventModal({ isOpen, onClose, defaultDate }) {
       : [];
     return list.map((c) => ({
       id: c.id,
-      name: `${c.fullName} - ${c.jobPositionTitle || ""}`.trim(),
+      name: c.fullName || "",
       departmentId: c.departmentId,
     }));
   }, [candidateData]);
@@ -220,34 +92,26 @@ export default function CreateEventModal({ isOpen, onClose, defaultDate }) {
 
   // Handle change for SelectDropdown (receives value only)
   const handleSelectChange = (name) => (value) => {
-    // If selecting candidate, reset participants and load users
     if (name === "candidate") {
       setFormData((prev) => ({
         ...prev,
         [name]: value,
-        participants: [], // Reset participants when candidate changes
+        participants: [],
       }));
 
       if (value) {
-        const selectedCandidate = availableCandidates.find(
-          (c) => c.id === value
-        );
-        if (selectedCandidate?.departmentId) {
-          setSelectedDepartmentId(selectedCandidate.departmentId);
-        } else {
-          setAvailableParticipants([]);
-          setSelectedDepartmentId(null);
-        }
+        const selectedCandidate = availableCandidates.find((c) => c.id === value);
+        setSelectedDepartmentId(selectedCandidate?.departmentId || null);
       } else {
-        setAvailableParticipants([]);
         setSelectedDepartmentId(null);
+        setAvailableParticipants([]);
       }
-    } else {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: value,
-      }));
+      return;
     }
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   // Load users by department via hook
@@ -256,12 +120,32 @@ export default function CreateEventModal({ isOpen, onClose, defaultDate }) {
     isLoading: isLoadingParticipants,
     isError: isUsersError,
     error: usersError,
+    refetch: refetchUsers,
   } = useUsers(
-    { departmentId: selectedDepartmentId },
+    (() => {
+      if (!selectedDepartmentId) return {};
+      const ids = [1, 2, selectedDepartmentId]
+        .map((v) => Number(v))
+        .filter((v, i, arr) => !Number.isNaN(v) && arr.indexOf(v) === i);
+      return { departmentIds: ids.join(",") };
+    })(),
     { enabled: !!selectedDepartmentId }
   );
 
+  // Refetch attendees every time a candidate is selected/changed
   useEffect(() => {
+    if (selectedDepartmentId) {
+      refetchUsers();
+    }
+    // We depend on formData.candidate to refetch even if the department is the same
+  }, [selectedDepartmentId, formData.candidate, refetchUsers]);
+
+  useEffect(() => {
+    if (!formData.candidate) {
+      setAvailableParticipants([]);
+      return;
+    }
+
     if (isUsersError) {
       const message =
         usersError?.response?.data?.message ||
@@ -270,21 +154,27 @@ export default function CreateEventModal({ isOpen, onClose, defaultDate }) {
       setAvailableParticipants([]);
       return;
     }
-    const list = Array.isArray(usersData?.data.result)
+    // Normalize response: prefer root `data` array from API payload
+    const list = Array.isArray(usersData?.data)
+      ? usersData.data
+      : Array.isArray(usersData)
+      ? usersData
+      : Array.isArray(usersData?.data?.result)
       ? usersData.data.result
-      : usersData?.data?.result;
+      : Array.isArray(usersData?.result)
+      ? usersData.result
+      : undefined;
+
     if (Array.isArray(list)) {
       setAvailableParticipants(
         list.map((u) => ({
           id: u.id,
-          name: u.fullName || u.name || "",
-          role: (u.role && (u.role.name || u.role)) || u.position || "",
+          name: (u.employee && (u.employee.name || u.employee.fullName)) || u.name || "",
+          role: "",
         }))
       );
-    } else if (!selectedDepartmentId) {
-      setAvailableParticipants([]);
     }
-  }, [usersData, isUsersError, usersError, selectedDepartmentId]);
+  }, [usersData, isUsersError, usersError, formData.candidate]);
 
   // Handle change for MultiSelectDropdown (receives array of values)
   const handleMultiSelectChange = (name) => (values) => {
@@ -442,17 +332,15 @@ export default function CreateEventModal({ isOpen, onClose, defaultDate }) {
                   selectedValues={formData.participants}
                   onChange={handleMultiSelectChange("participants")}
                   placeholder={
-                    isLoadingParticipants
-                      ? "Đang tải..."
-                      : availableParticipants.length === 0 &&
-                        !formData.candidate
+                    !formData.candidate
                       ? "Chọn ứng viên trước"
+                      : isLoadingParticipants
+                      ? "Đang tải..."
+                      : availableParticipants.length === 0
+                      ? "Không có người tham dự trong phòng này"
                       : "Chọn người tham dự"
                   }
-                  disabled={
-                    isLoadingParticipants ||
-                    (!formData.candidate && availableParticipants.length === 0)
-                  }
+                  disabled={!formData.candidate || isLoadingParticipants}
                 />
               </div>
 

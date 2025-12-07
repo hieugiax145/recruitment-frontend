@@ -36,6 +36,12 @@ export const PERMISSIONS = {
   USERS_UPDATE: 'user-service:users:update',
   USERS_DELETE: 'user-service:users:delete',
 
+  // User Service - Workflows
+  WORKFLOWS_READ: 'user-service:workflows:read',
+  WORKFLOWS_CREATE: 'user-service:workflows:create',
+  WORKFLOWS_UPDATE: 'user-service:workflows:update',
+  WORKFLOWS_DELETE: 'user-service:workflows:delete',
+
   // Job Service - Job Positions
   JOB_POSITIONS_READ: 'job-service:job-positions:read',
   JOB_POSITIONS_CREATE: 'job-service:job-positions:create',

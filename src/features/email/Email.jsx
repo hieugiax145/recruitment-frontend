@@ -6,41 +6,15 @@ import TextInput from "../../components/ui/TextInput";
 import TextArea from "../../components/ui/TextArea";
 import Button from "../../components/ui/Button";
 import LoadingContent from "../../components/ui/LoadingContent";
-import { useSendEmail } from "../../hooks/useEmail";
+import EmptyState from "../../components/ui/EmptyState";
+import { useSendEmail, useInboxEmails, useSentEmails } from "../../hooks/useEmail";
+import { formatDateTime } from "../../utils/utils";
 import { toast } from "react-toastify";
-
-// Mock data for email list
-const mockEmails = [
-  {
-    id: 1,
-    from: "nguyenmanh@gmail.com",
-    subject: "Cảm ơn bạn đã phỏng vấn",
-    preview: "Kính gửi anh/chị. Cảm ơn anh/chị đã dành thời gian tham gia vào cuộc...",
-    date: "2025-10-12",
-    starred: true,
-  },
-  {
-    id: 2,
-    from: "tranthien@gmail.com",
-    subject: "Thích vị trí ứng viên Thiết kế UX",
-    preview: "Xin chào, Tôi viết email này để thảo luận về tin tuyển dụng vị...",
-    date: "2025-10-11",
-    starred: false,
-  },
-  {
-    id: 3,
-    from: "phamthuha@gmail.com",
-    subject: "Đơn xin tuyển vị trí Sr product mô hình giá cả",
-    preview: "Kính gửi các phòng ban tuyển dụng. Tôi rất vui khi gửi đơn ứng v...",
-    date: "2025-10-10",
-    starred: true,
-  },
-];
 
 export default function Email() {
   const { t } = useTranslation();
   const formRef = useRef(null);
-  const [selectedTab, setSelectedTab] = useState("inbox"); // inbox, sent, drafts
+  const [selectedTab, setSelectedTab] = useState("inbox");
   const [selectedEmail, setSelectedEmail] = useState(null);
   const [form, setForm] = useState({
     toEmail: "",
@@ -49,6 +23,16 @@ export default function Email() {
   });
 
   const sendEmail = useSendEmail();
+  const {
+    data: inboxEmails = [],
+    isLoading: inboxLoading,
+    isError: inboxError,
+  } = useInboxEmails();
+  const {
+    data: sentEmails = [],
+    isLoading: sentLoading,
+    isError: sentError,
+  } = useSentEmails();
 
   const onChange = (field) => (e) => {
     const value = e?.target ? e.target.value : e;
@@ -72,7 +56,7 @@ export default function Email() {
       }
     }
 
-    // Validate email format
+    
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(form.toEmail)) {
       toast.error(t("invalidEmail", { defaultValue: "Email không hợp lệ" }));
@@ -126,9 +110,7 @@ export default function Email() {
       />
 
       <div className="flex-1 flex gap-4 mt-4 min-h-0">
-        {/* Left Sidebar */}
         <div className="w-80 flex-shrink-0 bg-white rounded-xl shadow overflow-hidden flex flex-col">
-          {/* Tabs */}
           <div className="p-3 border-b border-gray-200">
             <div className="flex gap-1 bg-gray-100 rounded-lg p-1">
               <div
@@ -173,7 +155,6 @@ export default function Email() {
             </div>
           </div>
 
-          {/* Search */}
           <div className="p-3 border-b border-gray-200">
             <div className="relative">
               <input
@@ -185,34 +166,73 @@ export default function Email() {
             </div>
           </div>
 
-          {/* Email List */}
           <div className="flex-1 overflow-y-auto">
-            {mockEmails.map((email) => (
-              <div
-                key={email.id}
-                onClick={() => setSelectedEmail(email)}
-                className={`p-4 border-b border-gray-100 cursor-pointer hover:bg-gray-50 transition-colors ${
-                  selectedEmail?.id === email.id ? "bg-blue-50" : ""
-                }`}
-              >
-                <div className="flex items-start justify-between mb-1">
-                  <span className="text-sm font-medium text-gray-900">{email.from}</span>
-                  {email.starred && <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />}
-                </div>
-                <p className="text-sm font-medium text-gray-800 mb-1 truncate">
-                  {email.subject}
-                </p>
-                <p className="text-xs text-gray-600 line-clamp-2 mb-1">{email.preview}</p>
-                <span className="text-xs text-gray-500">{email.date}</span>
-              </div>
-            ))}
+            {(() => {
+              const loading = selectedTab === "inbox" ? inboxLoading : sentLoading;
+              const error = selectedTab === "inbox" ? inboxError : sentError;
+              const emails = selectedTab === "inbox" ? inboxEmails : sentEmails;
+
+              if (loading) {
+                return (
+                  <div className="p-4">
+                    <LoadingContent />
+                  </div>
+                );
+              }
+
+              if (error) {
+                return (
+                  <div className="p-4 text-sm text-red-600">
+                    {t("failedToLoadEmails", { defaultValue: "Tải email thất bại" })}
+                  </div>
+                );
+              }
+
+              if (!emails || emails.length === 0) {
+                return (
+                  <div className="p-4">
+                    <EmptyState title={t("noEmails", { defaultValue: "Không có email" })} />
+                  </div>
+                );
+              }
+
+              return emails.map((email) => {
+                const id = email.id || email._id || email.uuid || `${email.subject}-${email.createdAt || email.date || email.sentAt || email.receivedAt}`;
+                const from = email.fromEmail || email.from || email.sender || email.userFrom || "";
+                const to = email.toEmail || email.to || email.receiver || email.userTo || "";
+                const subject = email.subject || email.title || "(Không có tiêu đề)";
+                const preview = email.preview || email.content || email.body || "";
+                const date = email.createdAt || email.date || email.sentAt || email.receivedAt || "";
+                const starred = email.starred || false;
+
+                const item = { id, from, to, subject, preview, date, starred };
+
+                return (
+                  <div
+                    key={item.id}
+                    onClick={() => setSelectedEmail(item)}
+                    className={`p-4 border-b border-gray-100 cursor-pointer hover:bg-gray-50 transition-colors ${
+                      selectedEmail?.id === item.id ? "bg-blue-50" : ""
+                    }`}
+                  >
+                    <div className="flex items-start justify-between mb-1">
+                      <span className="text-sm font-medium text-gray-900">{item.from || item.to}</span>
+                      {item.starred && (
+                        <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                      )}
+                    </div>
+                    <p className="text-sm font-medium text-gray-800 mb-1 truncate">{item.subject}</p>
+                    <p className="text-xs text-gray-600 line-clamp-2 mb-1">{item.preview}</p>
+                    <span className="text-xs text-gray-500">{formatDateTime(item.date)}</span>
+                  </div>
+                );
+              });
+            })()}
           </div>
         </div>
 
-        {/* Right Content */}
         <div className="flex-1 bg-white rounded-xl shadow overflow-auto">
           {selectedTab === "inbox" && !selectedEmail ? (
-            // Compose Email Form
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-semibold text-gray-900">
@@ -270,7 +290,6 @@ export default function Email() {
               )}
             </div>
           ) : selectedEmail ? (
-            // Email Detail View
             <div>
               <div className="p-6 border-b border-gray-200">
                 <div className="flex items-start justify-between mb-4">
@@ -281,7 +300,7 @@ export default function Email() {
                     <div className="flex items-center gap-2 text-sm text-gray-600">
                       <span className="font-medium">{selectedEmail.from}</span>
                       <span>•</span>
-                      <span>{selectedEmail.date}</span>
+                      <span>{formatDateTime(selectedEmail.date)}</span>
                     </div>
                   </div>
                   <div className="flex gap-2">
@@ -308,7 +327,6 @@ export default function Email() {
               </div>
             </div>
           ) : selectedTab === "compose" ? (
-            // Compose Email Form
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-semibold text-gray-900">
@@ -381,7 +399,7 @@ export default function Email() {
               )}
             </div>
           ) : (
-            // Empty state for other tabs
+            
             <div className="flex-1 flex items-center justify-center">
               <div className="text-center text-gray-500">
                 <FileText className="h-12 w-12 mx-auto mb-2 text-gray-400" />

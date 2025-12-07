@@ -1,10 +1,359 @@
-import { toast } from "react-toastify";
-import { userServices } from "../../services/userServices";
+import { useEffect, useState } from "react";
+import ContentHeader from "../../components/ui/ContentHeader";
+import Card from "../../components/ui/Card";
+import { Colors } from "../../constants/Colors";
 
 export default function Home() {
+  const [stats, setStats] = useState({
+    applications: 56,
+    hired: 8,
+    interviews: 14,
+    rejected: 3,
+  });
+
+  const [weeklyData] = useState([
+    { day: "T2", applications: 200, interviews: 180 },
+    { day: "T3", applications: 250, interviews: 220 },
+    { day: "T4", applications: 400, interviews: 350 },
+    { day: "T5", applications: 250, interviews: 230 },
+    { day: "T6", applications: 220, interviews: 200 },
+    { day: "T7", applications: 268, interviews: 240 },
+    { day: "CN", applications: 340, interviews: 310 },
+  ]);
+
+  const [jobPositions] = useState([
+    {
+      title: "Giáo Viên ĐA",
+      type: "Full-time",
+      level: "On-site",
+      applications: 1,
+      range: "25 triệu",
+      color: "#8B5CF6",
+    },
+    {
+      title: "Giáo Viên Sơ Cấp",
+      type: "Part-time",
+      level: "Hybrid",
+      applications: 10,
+      range: "150 - 300 nghìn",
+      color: "#84CC16",
+    },
+    {
+      title: "Marketing Executive",
+      type: "Full-time",
+      level: "On-site",
+      applications: 4,
+      range: "8 - 10 triệu",
+      color: "#EC4899",
+    },
+    {
+      title: "Chuyên Viên Tuyển Sinh",
+      type: "Full-time",
+      level: "On-site",
+      applications: 4,
+      range: "6 - 8 triệu",
+      color: "#84CC16",
+    },
+  ]);
+
+  const [applicationsByPosition] = useState([
+    { position: "Giáo Viên Kaiwa", percentage: 12.5, applications: 2 },
+    { position: "Kế Toán", percentage: 31.25, applications: 5 },
+    { position: "Giáo Viên Tiếng Anh", percentage: 12.5, applications: 2 },
+    { position: "Thực Tập Sinh Kế Toán", percentage: 43.75, applications: 7 },
+  ]);
+
+  const [upcomingEvents] = useState([
+    {
+      time: "09:00 AM",
+      title: "Marketing Executive - Trần Quang Huy",
+      type: "Phỏng vấn",
+      color: "#FBBF24",
+    },
+    {
+      time: "10:30 AM",
+      title: "Giáo Viên FE - Nguyễn Huy Hoàng",
+      type: "Phỏng vấn",
+      color: "#86EFAC",
+    },
+    {
+      time: "2:00PM",
+      title: "Giáo Viên Kaiwa - Trương Lê Kim Ngân",
+      type: "Phỏng vấn",
+      color: "#C4B5FD",
+    },
+    {
+      time: "4:00PM",
+      title: "Giáo Viên Sơ Cấp - Trần Thảo Minh",
+      type: "Phỏng vấn",
+      color: "#FCD34D",
+    },
+  ]);
+
+  useEffect(() => {
+    // TODO: Fetch data from API
+  }, []);
+
+  const StatCard = ({ label, value, iconBg, iconType, trend, subtitle }) => (
+    <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow">
+      <div className="flex items-start justify-between">
+        <div className="flex-1">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ backgroundColor: iconBg + "15" }}>
+              {iconType === 'users' && (
+                <svg className="w-6 h-6" style={{ color: iconBg }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+              )}
+              {iconType === 'briefcase' && (
+                <svg className="w-6 h-6" style={{ color: iconBg }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+              )}
+              {iconType === 'star' && (
+                <svg className="w-6 h-6" style={{ color: iconBg }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                </svg>
+              )}
+              {iconType === 'x' && (
+                <svg className="w-6 h-6" style={{ color: iconBg }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              )}
+            </div>
+            <p className="text-gray-600 text-sm font-medium">{label}</p>
+          </div>
+          <p className="text-3xl font-bold text-gray-900 mb-2">{value}</p>
+          <div className="flex items-center gap-2">
+            {trend && (
+              <span className="text-green-500 text-sm font-medium flex items-center gap-1">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                </svg>
+                {trend}
+              </span>
+            )}
+            <span className="text-gray-500 text-xs">{subtitle}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const JobPositionCard = ({ position }) => (
+    <div className="flex items-center justify-between p-4 hover:bg-gray-50 rounded-lg transition-colors border-b border-gray-100 last:border-0">
+      <div className="flex items-center gap-3 flex-1">
+        <div
+          className="w-12 h-12 rounded-xl flex items-center justify-center"
+          style={{ backgroundColor: position.color + "15" }}
+        >
+          <div className="w-6 h-6 rounded-full" style={{ backgroundColor: position.color }}></div>
+        </div>
+        <div className="flex-1">
+          <h3 className="font-semibold text-gray-900 mb-1">{position.title}</h3>
+          <div className="flex items-center gap-2">
+            <span className="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded-md">
+              {position.type}
+            </span>
+            <span className="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded-md">
+              {position.level}
+            </span>
+          </div>
+        </div>
+      </div>
+      <div className="text-right">
+        <p className="text-xs text-gray-500 mb-1">
+          <svg className="w-3 h-3 inline mr-1" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
+          </svg>
+          {position.applications} ứng viên
+        </p>
+        <p className="text-sm font-semibold text-gray-900">{position.range}</p>
+      </div>
+    </div>
+  );
+
+  const EventCard = ({ event }) => (
+    <div className="flex items-start gap-3 p-4 rounded-lg" style={{ backgroundColor: event.color + "20", borderLeft: `4px solid ${event.color}` }}>
+      <div className="flex-1">
+        <p className="text-xs font-medium" style={{ color: event.color }}>{event.time}</p>
+        <p className="text-sm font-semibold text-gray-900 mt-1">{event.title}</p>
+        <p className="text-xs text-gray-500 mt-1">{event.type}</p>
+      </div>
+    </div>
+  );
+
+  const maxValue = Math.max(
+    ...weeklyData.map((d) => Math.max(d.applications, d.interviews))
+  );
+
   return (
-    <div>
-      Home<button onClick={() => userServices.getCurrentUser()}></button>
+    <div className="flex flex-col h-full">
+      
+      {/* <div className="flex-1 overflow-auto bg-white rounded-xl shadow p-6"> */}
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+          <StatCard
+            label="Hồ sơ ứng tuyển"
+            value={stats.applications}
+            iconBg="#3B82F6"
+            iconType="users"
+            subtitle="So với tuần trước"
+          />
+          <StatCard
+            label="Tuyển"
+            value={`0${stats.hired}`}
+            iconBg="#10B981"
+            iconType="briefcase"
+            subtitle="So với tuần trước"
+          />
+          <StatCard
+            label="Phỏng vấn"
+            value={stats.interviews}
+            iconBg="#8B5CF6"
+            iconType="star"
+            trend="0.82%"
+            subtitle="So với tuần trước"
+          />
+          <StatCard
+            label="Từ chối"
+            value={`0${stats.rejected}`}
+            iconBg="#EF4444"
+            iconType="x"
+            subtitle="So với tuần trước"
+          />
+        </div>
+
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          {/* Left Column - Job Positions */}
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-lg font-semibold text-gray-900">
+                  Vị trí tuyển dụng ({jobPositions.length * 10})
+                </h2>
+                <button className="text-sm text-blue-600 hover:text-blue-700 font-medium">
+                  Tất cả
+                </button>
+              </div>
+              <div className="space-y-2">
+                {jobPositions.map((position, index) => (
+                  <JobPositionCard key={index} position={position} />
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Middle Column - Charts */}
+          <div className="lg:col-span-2 space-y-4">
+            {/* Weekly Applications Chart */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-lg font-semibold text-gray-900">
+                  Hồ sơ ứng tuyển
+                </h2>
+                <select className="text-sm border border-gray-300 rounded-lg px-3 py-1.5">
+                  <option>7 tháng này</option>
+                  <option>30 ngày qua</option>
+                  <option>90 ngày qua</option>
+                </select>
+              </div>
+
+              {/* Bar Chart */}
+              <div className="relative h-64">
+                <div className="absolute inset-0 flex items-end justify-between gap-2">
+                  {weeklyData.map((data, index) => (
+                    <div key={index} className="flex-1 flex flex-col items-center">
+                      <div className="w-full relative" style={{ height: "100%" }}>
+                        {/* Applications Bar */}
+                        <div
+                          className="absolute bottom-0 w-full bg-gradient-to-t from-purple-500 to-purple-400 rounded-t-lg"
+                          style={{
+                            height: `${(data.applications / maxValue) * 100}%`,
+                          }}
+                        ></div>
+                        {/* Interviews Line Point */}
+                        <div
+                          className="absolute w-3 h-3 bg-green-400 rounded-full left-1/2 transform -translate-x-1/2"
+                          style={{
+                            bottom: `${(data.interviews / maxValue) * 100}%`,
+                          }}
+                        ></div>
+                      </div>
+                      <span className="text-xs text-gray-600 mt-2">
+                        {data.day}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom Row */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Applications by Position */}
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-lg font-semibold text-gray-900">
+                    Hồ sơ theo vị trí tuyển dụng
+                  </h2>
+                  <button className="text-sm text-blue-600 hover:text-blue-700">
+                    Xem
+                  </button>
+                </div>
+                <div className="space-y-4">
+                  {applicationsByPosition.map((item, index) => (
+                    <div key={index}>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm text-gray-700">
+                          {item.position} ({item.percentage}%)
+                        </span>
+                        <span className="text-sm font-medium text-gray-900">
+                          {item.applications} hồ sơ ứng tuyển
+                        </span>
+                      </div>
+                      <div className="w-full bg-gray-100 rounded-full h-2">
+                        <div
+                          className="h-2 rounded-full"
+                          style={{
+                            width: `${item.percentage}%`,
+                            backgroundColor:
+                              index === 0
+                                ? "#8B5CF6"
+                                : index === 1
+                                ? "#EC4899"
+                                : index === 2
+                                ? "#F59E0B"
+                                : "#10B981",
+                          }}
+                        ></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Upcoming Events */}
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-lg font-semibold text-gray-900">
+                    Lịch sắp tới
+                  </h2>
+                  <button className="text-sm text-blue-600 hover:text-blue-700">
+                    Xem tất cả
+                  </button>
+                </div>
+                <div className="space-y-3">
+                  {upcomingEvents.map((event, index) => (
+                    <EventCard key={index} event={event} />
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      {/* </div> */}
     </div>
   );
 }
