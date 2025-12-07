@@ -22,6 +22,8 @@ import Roles from "../../features/roles/Roles";
 import RoleForm from "../../features/roles/RoleForm";
 import Workflows from "../../features/workflows/Workflows";
 import WorkflowForm from "../../features/workflows/WorkflowForm";
+import Offers from "../../features/offers/Offers";
+import OfferForm from "../../features/offers/OfferForm";
 
 export const router = createBrowserRouter([
   {
@@ -217,6 +219,30 @@ export const router = createBrowserRouter([
         element: (
           <RoleBasedGuard requiredRoles={["ADMIN", "CEO", "MANAGER", "STAFF"]}>
             <Email />
+          </RoleBasedGuard>
+        ),
+      },
+      {
+        path: "/offers",
+        element: (
+          <RoleBasedGuard requiredRoles={["ADMIN", "CEO", "MANAGER", "STAFF"]}>
+            <Offers />
+          </RoleBasedGuard>
+        ),
+      },
+      {
+        path: "/offers/new",
+        element: (
+          <RoleBasedGuard requiredRoles={["ADMIN", "CEO", "MANAGER", "STAFF"]}>
+            <OfferForm />
+          </RoleBasedGuard>
+        ),
+      },
+      {
+        path: "/offers/:id",
+        element: (
+          <RoleBasedGuard requiredRoles={["ADMIN", "CEO", "MANAGER", "STAFF"]}>
+            <OfferForm />
           </RoleBasedGuard>
         ),
       },
