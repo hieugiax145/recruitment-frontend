@@ -18,7 +18,11 @@ const LEVEL_OPTIONS = [
   { id: "Senior", name: "Senior" },
   { id: "Junior", name: "Junior" },
   { id: "Intern", name: "Intern" },
-  { id: "Admin", name: "Admin" },
+];
+
+const TYPE_OPTIONS = [
+  { id: "RECRUITMENT", name: "Tuyển dụng" },
+  { id: "REPLACEMENT", name: "Thay thế" },
 ];
 
 export default function WorkflowForm() {
@@ -37,6 +41,7 @@ export default function WorkflowForm() {
     applyConditions: {
       department_id: null,
       level: null,
+      isReplacement: false,
     },
     steps: [],
   });
@@ -59,6 +64,7 @@ export default function WorkflowForm() {
         applyConditions: {
           department_id: workflowData.applyConditions?.department_id || null,
           level: workflowData.applyConditions?.level || null,
+          isReplacement: workflowData.applyConditions?.type === "REPLACEMENT",
         },
         steps: workflowData.steps
           ? workflowData.steps.map((s) => ({
@@ -158,10 +164,10 @@ export default function WorkflowForm() {
 
     for (let i = 0; i < form.steps.length; i++) {
       const step = form.steps[i];
-      if (!step.stepName || !step.approverPositionId) {
+      if (!step.approverPositionId) {
         toast.error(
-          `${t("step", { defaultValue: "Bước" })} ${i + 1}: ${t("stepNameAndApproverRequired", {
-            defaultValue: "Tên bước và người phê duyệt là bắt buộc",
+          `${t("step", { defaultValue: "Bước" })} ${i + 1}: ${t("approverRequired", {
+            defaultValue: "Người phê duyệt là bắt buộc",
           })}`
         );
         return;
@@ -177,10 +183,10 @@ export default function WorkflowForm() {
           department_id: Number(form.applyConditions.department_id),
         }),
         ...(form.applyConditions.level && { level: form.applyConditions.level }),
+        ...(form.applyConditions.isReplacement && { isReplacement: form.applyConditions.isReplacement }),
       },
       steps: form.steps.map((s) => ({
         stepOrder: s.stepOrder,
-        stepName: s.stepName,
         approverPositionId: Number(s.approverPositionId),
       })),
     };
@@ -239,6 +245,7 @@ export default function WorkflowForm() {
                           applyConditions: {
                             department_id: workflowData.applyConditions?.department_id || null,
                             level: workflowData.applyConditions?.level || null,
+                            isReplacement: workflowData.applyConditions?.type === "REPLACEMENT",
                           },
                           steps: workflowData.steps
                             ? workflowData.steps.map((s) => ({
@@ -378,13 +385,26 @@ export default function WorkflowForm() {
                 <h3 className="text-lg font-semibold text-gray-900">
                   {t("applyConditions", { defaultValue: "Điều kiện áp dụng" })}
                 </h3>
+                <div className="flex items-center gap-2 mb-4">
+                  <input
+                    type="checkbox"
+                    id="isReplacement"
+                    checked={form.applyConditions.isReplacement}
+                    onChange={(e) => onConditionChange("isReplacement")(e.target.checked)}
+                    disabled={!isEditMode}
+                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  />
+                  <label htmlFor="isReplacement" className="text-sm text-gray-700">
+                    {t("isReplacement", { defaultValue: "Áp dụng cho tuyển dụng thay thế" })}
+                  </label>
+                </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <SelectDropdown
                     label={t("department", { defaultValue: "Phòng ban" })}
-                    options={departmentsData.map((d) => ({ id: d.id, name: d.name }))}
+                    options={[{ id: null, name: t("allDepartments", { defaultValue: "Tất cả phòng ban" }) }, ...departmentsData.map((d) => ({ id: d.id, name: d.name }))]}
                     value={form.applyConditions.department_id}
                     onChange={onConditionChange("department_id")}
-                    placeholder={t("selectDepartment", { defaultValue: "Chọn phòng ban" })}
+                    placeholder={t("allDepartments", { defaultValue: "Tất cả phòng ban" })}
                     disabled={!isEditMode}
                   />
                   <SelectDropdown
@@ -425,9 +445,6 @@ export default function WorkflowForm() {
                             {t("order", { defaultValue: "Thứ tự" })}
                           </th>
                           <th className="p-3 text-left text-sm font-medium text-gray-600">
-                            {t("stepName", { defaultValue: "Tên bước" })}
-                          </th>
-                          <th className="p-3 text-left text-sm font-medium text-gray-600">
                             {t("approver", { defaultValue: "Người phê duyệt (Chức vụ)" })}
                           </th>
                           {isEditMode && (
@@ -444,21 +461,6 @@ export default function WorkflowForm() {
                               <div className="w-8 h-8 bg-blue-100 text-blue-800 rounded-full flex items-center justify-center font-semibold text-sm">
                                 {step.stepOrder}
                               </div>
-                            </td>
-                            <td className="p-3">
-                              {isEditMode ? (
-                                <input
-                                  type="text"
-                                  value={step.stepName}
-                                  onChange={onStepChange(index, "stepName")}
-                                  placeholder={t("stepNamePlaceholder", {
-                                    defaultValue: "VD: Trưởng phòng duyệt",
-                                  })}
-                                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                              ) : (
-                                <span className="text-sm text-gray-900">{step.stepName || "-"}</span>
-                              )}
                             </td>
                             <td className="p-3">
                               {isEditMode ? (

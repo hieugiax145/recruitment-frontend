@@ -6,13 +6,12 @@ import ContentHeader from "../../components/ui/ContentHeader";
 import Button from "../../components/ui/Button";
 import LoadingContent from "../../components/ui/LoadingContent";
 import Pagination from "../../components/ui/Pagination";
+import EmptyState from "../../components/ui/EmptyState";
 import { useWorkflows, useDeleteWorkflow } from "../../hooks/useWorkflows";
 import { toast } from "react-toastify";
 import useConfirmDialog from "../../hooks/useConfirmDialog";
 import SelectDropdown from "../../components/ui/SelectDropdown";
 import { useAllDepartments } from "../../hooks/useDepartments";
-import Can from "../../components/Can";
-import { PERMISSIONS } from "../../constants/permissions";
 
 export default function Workflows() {
   const { t } = useTranslation();
@@ -86,12 +85,10 @@ export default function Workflows() {
                 compact
                 className="min-w-[200px]"
               />
-              <Can permission={PERMISSIONS.RECRUITMENT_REQUESTS_CREATE}>
-                <Button onClick={() => navigate("/workflows/new")}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  {t("addWorkflow", { defaultValue: "Thêm luồng phê duyệt" })}
-                </Button>
-              </Can>
+              <Button onClick={() => navigate("/workflows/new")}>
+                <Plus className="h-4 w-4 mr-2" />
+                {t("addWorkflow", { defaultValue: "Thêm luồng phê duyệt" })}
+              </Button>
             </div>
           }
         />
@@ -120,12 +117,10 @@ export default function Workflows() {
               compact
               className="min-w-[200px]"
             />
-            <Can permission={PERMISSIONS.RECRUITMENT_REQUESTS_CREATE}>
-              <Button onClick={() => navigate("/workflows/new")}>
-                <Plus className="h-4 w-4 mr-2" />
-                {t("addWorkflow", { defaultValue: "Thêm luồng phê duyệt" })}
-              </Button>
-            </Can>
+            <Button onClick={() => navigate("/workflows/new")}>
+              <Plus className="h-4 w-4 mr-2" />
+              {t("addWorkflow", { defaultValue: "Thêm luồng phê duyệt" })}
+            </Button>
           </div>
         }
       />
@@ -162,8 +157,8 @@ export default function Workflows() {
               <tbody className="divide-y divide-gray-200">
                 {workflows.length === 0 ? (
                   <tr>
-                    <td colSpan="7" className="p-8 text-center text-gray-500">
-                      {t("noData", { defaultValue: "Không có dữ liệu" })}
+                    <td colSpan="7" className="p-8">
+                      <EmptyState title={t("noData", { defaultValue: "Không có dữ liệu" })} />
                     </td>
                   </tr>
                 ) : (
