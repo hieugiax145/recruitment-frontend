@@ -43,3 +43,63 @@ export function formatDateTime(input, options) {
     return "";
   }
 }
+
+// Lightweight markdown-like parser used for rich text fields
+export const parseMarkdown = (content) => {
+  if (!content) return "";
+
+  let html = String(content)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+
+  html = html
+    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+    .replace(/_(.+?)_/g, "<em>$1</em>");
+
+  const lines = html.split("\n");
+  let result = "";
+  let inUL = false;
+  let inOL = false;
+
+  const closeLists = () => {
+    if (inUL) {
+      result += "</ul>";
+      inUL = false;
+    }
+    if (inOL) {
+      result += "</ol>";
+      inOL = false;
+    }
+  };
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line) {
+      closeLists();
+      continue;
+    }
+
+    if (line.startsWith("•")) {
+      if (!inUL) {
+        closeLists();
+        result += "<ul class='list-disc list-inside ml-4 my-2'>";
+        inUL = true;
+      }
+      result += "<li>" + line.substring(1).trim() + "</li>";
+    } else if (/^\d+\./.test(line)) {
+      if (!inOL) {
+        closeLists();
+        result += "<ol class='list-decimal list-inside ml-4 my-2'>";
+        inOL = true;
+      }
+      result += "<li>" + line.replace(/^\d+\.\s*/, "") + "</li>";
+    } else {
+      closeLists();
+      result += "<p class='my-2'>" + line + "</p>";
+    }
+  }
+
+  closeLists();
+  return result;
+};
