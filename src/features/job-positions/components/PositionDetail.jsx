@@ -1,5 +1,6 @@
 import { Users } from "lucide-react";
 import { forwardRef } from "react";
+import { parseMarkdown } from "../../../utils/utils";
 import Button from "../../../components/ui/Button";
 import { useTranslation } from "react-i18next";
 
@@ -131,9 +132,10 @@ const PositionDetail = forwardRef(
               <h3 className="text-sm font-medium text-gray-500 mb-2">
                 {t("jobDescription")}
               </h3>
-              <p className="text-gray-900 whitespace-pre-line">
-                {position.description}
-              </p>
+              <div 
+                className="text-gray-900"
+                dangerouslySetInnerHTML={{ __html: parseMarkdown(position.description) }}
+              />
             </div>
           )}
 
@@ -143,9 +145,10 @@ const PositionDetail = forwardRef(
               <h3 className="text-sm font-medium text-gray-500 mb-2">
                 {t("responsibilities")}
               </h3>
-              <p className="text-gray-900 whitespace-pre-line">
-                {position.responsibilities}
-              </p>
+              <div 
+                className="text-gray-900"
+                dangerouslySetInnerHTML={{ __html: parseMarkdown(position.responsibilities) }}
+              />
             </div>
           )}
 
@@ -155,9 +158,10 @@ const PositionDetail = forwardRef(
               <h3 className="text-sm font-medium text-gray-500 mb-2">
                 {t("requirements")}
               </h3>
-              <p className="text-gray-900 whitespace-pre-line">
-                {position.requirements}
-              </p>
+              <div 
+                className="text-gray-900"
+                dangerouslySetInnerHTML={{ __html: parseMarkdown(position.requirements) }}
+              />
             </div>
           )}
 
@@ -167,9 +171,10 @@ const PositionDetail = forwardRef(
               <h3 className="text-sm font-medium text-gray-500 mb-2">
                 {t("preferredQualifications")}
               </h3>
-              <p className="text-gray-900 whitespace-pre-line">
-                {position.preferredQualifications}
-              </p>
+              <div 
+                className="text-gray-900"
+                dangerouslySetInnerHTML={{ __html: parseMarkdown(position.preferredQualifications) }}
+              />
             </div>
           )}
 
@@ -179,9 +184,10 @@ const PositionDetail = forwardRef(
               <h3 className="text-sm font-medium text-gray-500 mb-2">
                 {t("benefits")}
               </h3>
-              <p className="text-gray-900 whitespace-pre-line">
-                {position.benefits}
-              </p>
+              <div 
+                className="text-gray-900"
+                dangerouslySetInnerHTML={{ __html: parseMarkdown(position.benefits) }}
+              />
             </div>
           )}
 
