@@ -21,3 +21,25 @@ export function formatSalary(amount) {
     return `${amount} đ`;
   }
 }
+
+// Format ISO date/time to a readable string
+// Default: vi-VN locale, e.g., 21/11/2025, 10:50
+export function formatDateTime(input, options) {
+  if (!input) return "";
+  try {
+    const date = typeof input === "string" || typeof input === "number" ? new Date(input) : input;
+    if (isNaN(date.getTime())) return "";
+    const fmt = new Intl.DateTimeFormat("vi-VN", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+      ...options,
+    });
+    return fmt.format(date);
+  } catch (e) {
+    return "";
+  }
+}
