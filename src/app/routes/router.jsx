@@ -14,6 +14,7 @@ import EmployeeForm from "../../features/employees/EmployeeForm";
 import RecruitmentRequestAdd from "../../features/recruitment-requests/RecruitmentRequestAdd";
 import RedirectIfAuth from "../../components/RedirectIfAuth";
 import ProtectedRoute from "../../components/ProtectedRoute";
+import RoleBasedGuard from "../../components/RoleBasedGuard";
 import JobPositionsAdd from "../../features/job-positions/JobPositionAdd";
 import JobPositionCandidates from "../../features/job-positions/JobPositionCandidates";
 import Home from "../../features/dashboard/Home";
@@ -45,96 +46,180 @@ export const router = createBrowserRouter([
       },
       {
         path: "/users",
-        element: <Users />,
+        element: (
+          <RoleBasedGuard requiredRoles={["ADMIN"]}>
+            <Users />
+          </RoleBasedGuard>
+        ),
       },
       {
         path: "/users/new",
-        element: <UserForm />,
+        element: (
+          <RoleBasedGuard requiredRoles={["ADMIN"]}>
+            <UserForm />
+          </RoleBasedGuard>
+        ),
       },
       {
         path: "/users/:id",
-        element: <UserForm />,
+        element: (
+          <RoleBasedGuard requiredRoles={["ADMIN"]}>
+            <UserForm />
+          </RoleBasedGuard>
+        ),
       },
       {
         path: "/roles",
-        element: <Roles />,
+        element: (
+          <RoleBasedGuard requiredRoles={["ADMIN"]}>
+            <Roles />
+          </RoleBasedGuard>
+        ),
       },
       {
         path: "/roles/new",
-        element: <RoleForm />,
+        element: (
+          <RoleBasedGuard requiredRoles={["ADMIN"]}>
+            <RoleForm />
+          </RoleBasedGuard>
+        ),
       },
       {
         path: "/roles/:id",
-        element: <RoleForm />,
+        element: (
+          <RoleBasedGuard requiredRoles={["ADMIN"]}>
+            <RoleForm />
+          </RoleBasedGuard>
+        ),
       },
       {
         path: "/workflows",
-        element: <Workflows />,
+        element: (
+          <RoleBasedGuard requiredRoles={["ADMIN"]}>
+            <Workflows />
+          </RoleBasedGuard>
+        ),
       },
       {
         path: "/workflows/new",
-        element: <WorkflowForm />,
+        element: (
+          <RoleBasedGuard requiredRoles={["ADMIN"]}>
+            <WorkflowForm />
+          </RoleBasedGuard>
+        ),
       },
       {
         path: "/workflows/:id",
-        element: <WorkflowForm />,
+        element: (
+          <RoleBasedGuard requiredRoles={["ADMIN"]}>
+            <WorkflowForm />
+          </RoleBasedGuard>
+        ),
       },
       {
         path: "/employees",
-        element: <Employees />,
+        element: (
+          <RoleBasedGuard requiredRoles={["ADMIN", "CEO", "MANAGER", "STAFF"]}>
+            <Employees />
+          </RoleBasedGuard>
+        ),
       },
       {
         path: "/employees/new",
-        element: <EmployeeForm />,
+        element: (
+          <RoleBasedGuard requiredRoles={["ADMIN", "CEO", "MANAGER", "STAFF"]}>
+            <EmployeeForm />
+          </RoleBasedGuard>
+        ),
       },
       {
         path: "/employees/:id",
-        element: <EmployeeForm />,
+        element: (
+          <RoleBasedGuard requiredRoles={["ADMIN", "CEO", "MANAGER", "STAFF"]}>
+            <EmployeeForm />
+          </RoleBasedGuard>
+        ),
       },
       {
         path: "/recruitment-requests",
-        element: <RecruitmentRequests />,
+        element: (
+          <RoleBasedGuard requiredRoles={["ADMIN", "CEO", "MANAGER", "STAFF"]}>
+            <RecruitmentRequests />
+          </RoleBasedGuard>
+        ),
       },
       {
         path: "/recruitment-requests/new",
-        element: <RecruitmentRequestAdd />,
+        element: (
+          <RoleBasedGuard requiredRoles={["ADMIN", "CEO", "MANAGER", "STAFF"]}>
+            <RecruitmentRequestAdd />
+          </RoleBasedGuard>
+        ),
       },
       {
         path: "/recruitment-requests/:id",
-        element: <RecruitmentRequestAdd />,
+        element: (
+          <RoleBasedGuard requiredRoles={["ADMIN", "CEO", "MANAGER", "STAFF"]}>
+            <RecruitmentRequestAdd />
+          </RoleBasedGuard>
+        ),
       },
       {
         path: "/job-positions",
-        element: <JobPositions />,
+        element: (
+          <RoleBasedGuard requiredRoles={["ADMIN", "CEO", "MANAGER", "STAFF"]}>
+            <JobPositions />
+          </RoleBasedGuard>
+        ),
       },
       {
         path: "/job-positions/new",
-        element: <JobPositionsAdd />,
+        element: (
+          <RoleBasedGuard requiredRoles={["ADMIN", "CEO", "MANAGER", "STAFF"]}>
+            <JobPositionsAdd />
+          </RoleBasedGuard>
+        ),
       },
       {
         path: "/job-positions/:id/candidates",
-        element: <JobPositionCandidates />,
+        element: (
+          <RoleBasedGuard requiredRoles={["ADMIN", "CEO", "MANAGER", "STAFF"]}>
+            <JobPositionCandidates />
+          </RoleBasedGuard>
+        ),
       },
       {
         path: "/calendar",
-        element: <Calendar />,
+        element: (
+          <RoleBasedGuard requiredRoles={["ADMIN", "CEO", "MANAGER", "STAFF"]}>
+            <Calendar />
+          </RoleBasedGuard>
+        ),
       },
       {
         path: "/candidates",
-        element: <Candidate />,
+        element: (
+          <RoleBasedGuard requiredRoles={["ADMIN", "CEO", "MANAGER", "STAFF"]}>
+            <Candidate />
+          </RoleBasedGuard>
+        ),
       },
       {
         path: "/candidates/:id",
-        element: <CandidateDetail />,
+        element: (
+          <RoleBasedGuard requiredRoles={["ADMIN", "CEO", "MANAGER", "STAFF"]}>
+            <CandidateDetail />
+          </RoleBasedGuard>
+        ),
       },
       {
         path: "/email",
-        element: <Email />,
+        element: (
+          <RoleBasedGuard requiredRoles={["ADMIN", "CEO", "MANAGER", "STAFF"]}>
+            <Email />
+          </RoleBasedGuard>
+        ),
       },
     ],
-  },
-  {
-    path: "/about",
-    element: <div>About Page</div>,
   },
 ]);
