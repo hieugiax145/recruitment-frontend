@@ -1,15 +1,13 @@
 import { useEffect, useState } from "react";
 import ContentHeader from "../../components/ui/ContentHeader";
 import Card from "../../components/ui/Card";
-import { Colors } from "../../constants/Colors";
+import { useSummaryStatistics, useUpcomingSchedules, useJobOpenings } from "../../hooks/useStatistics";
+import LoadingSpinner from "../../components/ui/LoadingSpinner";
 
 export default function Home() {
-  const [stats, setStats] = useState({
-    applications: 56,
-    hired: 8,
-    interviews: 14,
-    rejected: 3,
-  });
+  const { data: summaryData, isLoading: isLoadingSummary } = useSummaryStatistics();
+  const { data: schedulesData, isLoading: isLoadingSchedules } = useUpcomingSchedules();
+  const { data: jobOpeningsData, isLoading: isLoadingJobOpenings } = useJobOpenings();
 
   const [weeklyData] = useState([
     { day: "T2", applications: 200, interviews: 180 },
@@ -21,40 +19,26 @@ export default function Home() {
     { day: "CN", applications: 340, interviews: 310 },
   ]);
 
-  const [jobPositions] = useState([
-    {
-      title: "Giáo Viên ĐA",
-      type: "Full-time",
-      level: "On-site",
-      applications: 1,
-      range: "25 triệu",
-      color: "#8B5CF6",
-    },
-    {
-      title: "Giáo Viên Sơ Cấp",
-      type: "Part-time",
-      level: "Hybrid",
-      applications: 10,
-      range: "150 - 300 nghìn",
-      color: "#84CC16",
-    },
-    {
-      title: "Marketing Executive",
-      type: "Full-time",
-      level: "On-site",
-      applications: 4,
-      range: "8 - 10 triệu",
-      color: "#EC4899",
-    },
-    {
-      title: "Chuyên Viên Tuyển Sinh",
-      type: "Full-time",
-      level: "On-site",
-      applications: 4,
-      range: "6 - 8 triệu",
-      color: "#84CC16",
-    },
-  ]);
+  const colorMap = {
+    purple: "#8B5CF6",
+    green: "#84CC16",
+    pink: "#EC4899",
+    darkgreen: "#10B981",
+    blue: "#3B82F6",
+    red: "#EF4444",
+    yellow: "#F59E0B",
+    orange: "#F97316",
+  };
+
+  const jobPositions = (jobOpeningsData?.data || []).map(job => ({
+    id: job.id,
+    title: job.title,
+    type: job.employmentType,
+    level: job.workLocation,
+    applications: job.applicantCount,
+    range: job.salaryDisplay,
+    color: colorMap[job.iconColor] || "#8B5CF6",
+  }));
 
   const [applicationsByPosition] = useState([
     { position: "Giáo Viên Kaiwa", percentage: 12.5, applications: 2 },
@@ -63,38 +47,16 @@ export default function Home() {
     { position: "Thực Tập Sinh Kế Toán", percentage: 43.75, applications: 7 },
   ]);
 
-  const [upcomingEvents] = useState([
-    {
-      time: "09:00 AM",
-      title: "Marketing Executive - Trần Quang Huy",
-      type: "Phỏng vấn",
-      color: "#FBBF24",
-    },
-    {
-      time: "10:30 AM",
-      title: "Giáo Viên FE - Nguyễn Huy Hoàng",
-      type: "Phỏng vấn",
-      color: "#86EFAC",
-    },
-    {
-      time: "2:00PM",
-      title: "Giáo Viên Kaiwa - Trương Lê Kim Ngân",
-      type: "Phỏng vấn",
-      color: "#C4B5FD",
-    },
-    {
-      time: "4:00PM",
-      title: "Giáo Viên Sơ Cấp - Trần Thảo Minh",
-      type: "Phỏng vấn",
-      color: "#FCD34D",
-    },
-  ]);
+  const upcomingEvents = schedulesData?.data || [];
 
-  useEffect(() => {
-    // TODO: Fetch data from API
-  }, []);
+  const stats = {
+    applications: summaryData?.data?.applications || { value: 0, changePercent: 0, isIncrease: null, changeText: "So với tuần trước" },
+    hired: summaryData?.data?.hired || { value: 0, changePercent: 0, isIncrease: null, changeText: "So với tuần trước" },
+    interviews: summaryData?.data?.interviews || { value: 0, changePercent: 0, isIncrease: null, changeText: "So với tuần trước" },
+    rejected: summaryData?.data?.rejected || { value: 0, changePercent: 0, isIncrease: null, changeText: "So với tuần trước" },
+  };
 
-  const StatCard = ({ label, value, iconBg, iconType, trend, subtitle }) => (
+  const StatCard = ({ label, value, iconBg, iconType, change, isIncrease, subtitle }) => (
     <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow">
       <div className="flex items-start justify-between">
         <div className="flex-1">
@@ -125,12 +87,16 @@ export default function Home() {
           </div>
           <p className="text-3xl font-bold text-gray-900 mb-2">{value}</p>
           <div className="flex items-center gap-2">
-            {trend && (
-              <span className="text-green-500 text-sm font-medium flex items-center gap-1">
+            {change !== undefined && change !== 0 && isIncrease !== null && (
+              <span className={`text-sm font-medium flex items-center gap-1 ${isIncrease ? 'text-green-500' : 'text-red-500'}`}>
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                  {isIncrease ? (
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                  ) : (
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6" />
+                  )}
                 </svg>
-                {trend}
+                {change}%
               </span>
             )}
             <span className="text-gray-500 text-xs">{subtitle}</span>
@@ -187,6 +153,14 @@ export default function Home() {
     ...weeklyData.map((d) => Math.max(d.applications, d.interviews))
   );
 
+  if (isLoadingSummary) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col h-full">
       
@@ -195,32 +169,39 @@ export default function Home() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
           <StatCard
             label="Hồ sơ ứng tuyển"
-            value={stats.applications}
+            value={stats.applications.value}
             iconBg="#3B82F6"
             iconType="users"
-            subtitle="So với tuần trước"
+            change={stats.applications.changePercent}
+            isIncrease={stats.applications.isIncrease}
+            subtitle={stats.applications.changeText}
           />
           <StatCard
             label="Tuyển"
-            value={`0${stats.hired}`}
+            value={stats.hired.value}
             iconBg="#10B981"
             iconType="briefcase"
-            subtitle="So với tuần trước"
+            change={stats.hired.changePercent}
+            isIncrease={stats.hired.isIncrease}
+            subtitle={stats.hired.changeText}
           />
           <StatCard
             label="Phỏng vấn"
-            value={stats.interviews}
+            value={stats.interviews.value}
             iconBg="#8B5CF6"
             iconType="star"
-            trend="0.82%"
-            subtitle="So với tuần trước"
+            change={stats.interviews.changePercent}
+            isIncrease={stats.interviews.isIncrease}
+            subtitle={stats.interviews.changeText}
           />
           <StatCard
             label="Từ chối"
-            value={`0${stats.rejected}`}
+            value={stats.rejected.value}
             iconBg="#EF4444"
             iconType="x"
-            subtitle="So với tuần trước"
+            change={stats.rejected.changePercent}
+            isIncrease={stats.rejected.isIncrease}
+            subtitle={stats.rejected.changeText}
           />
         </div>
 
@@ -231,15 +212,15 @@ export default function Home() {
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-lg font-semibold text-gray-900">
-                  Vị trí tuyển dụng ({jobPositions.length * 10})
+                  Vị trí tuyển dụng ({jobPositions.length})
                 </h2>
                 <button className="text-sm text-blue-600 hover:text-blue-700 font-medium">
                   Tất cả
                 </button>
               </div>
               <div className="space-y-2">
-                {jobPositions.map((position, index) => (
-                  <JobPositionCard key={index} position={position} />
+                {jobPositions.map((position) => (
+                  <JobPositionCard key={position.id} position={position} />
                 ))}
               </div>
             </div>
