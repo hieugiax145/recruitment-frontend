@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "../../context/AuthContext";
 import ContentHeader from "../../components/ui/ContentHeader";
 import { ArrowLeft, User, Mail, Calendar, FileText, Phone } from "lucide-react";
 import Button from "../../components/ui/Button";
@@ -75,6 +76,8 @@ export default function JobPositionCandidates() {
   const { id } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
+  const isHR = user?.department?.id === 2;
   const [selectedCandidate, setSelectedCandidate] = useState(null);
   const [activeCandidate, setActiveCandidate] = useState(null);
   const [showAddCandidateModal, setShowAddCandidateModal] = useState(false);
@@ -156,6 +159,7 @@ export default function JobPositionCandidates() {
   };
 
   const handleDragStart = (event) => {
+    if (!isHR) return;
     const { active } = event;
     const candidate = candidates.find((c) => c.id === active.id);
     setActiveCandidate(candidate);
@@ -168,7 +172,7 @@ export default function JobPositionCandidates() {
     const { active, over } = event;
     setActiveCandidate(null);
 
-    if (!over) return;
+    if (!over || !isHR) return;
 
     const activeId = active.id;
     const overId = over.id;
@@ -236,10 +240,12 @@ export default function JobPositionCandidates() {
             </div>
           }
           actions={
-            <Button onClick={() => setShowAddCandidateModal(true)}>
-              <User className="h-4 w-4 mr-2" />
-              Thêm ứng viên
-            </Button>
+            isHR ? (
+              <Button onClick={() => setShowAddCandidateModal(true)}>
+                <User className="h-4 w-4 mr-2" />
+                Thêm ứng viên
+              </Button>
+            ) : null
           }
         />
         <div className="flex-1 flex items-center justify-center">
@@ -267,10 +273,12 @@ export default function JobPositionCandidates() {
           </div>
         }
         actions={
-          <Button onClick={() => setShowAddCandidateModal(true)}>
-            <User className="h-4 w-4 mr-2" />
-            Thêm ứng viên
-          </Button>
+          isHR ? (
+            <Button onClick={() => setShowAddCandidateModal(true)}>
+              <User className="h-4 w-4 mr-2" />
+              Thêm ứng viên
+            </Button>
+          ) : null
         }
       />
 
@@ -301,7 +309,7 @@ export default function JobPositionCandidates() {
                     status={status}
                     candidates={candidatesByStatus[status.id] || []}
                     onCandidateClick={handleCandidateClick}
-                    onChangeStatus={handleChangeStatus}
+                    onChangeStatus={isHR ? handleChangeStatus : undefined}
                     allStatuses={CANDIDATE_STATUSES}
                   />
                 ))}
@@ -409,7 +417,12 @@ export default function JobPositionCandidates() {
               >
                 Đóng
               </Button>
-              <Button className="flex-1">Xem chi tiết</Button>
+              <Button 
+                className="flex-1"
+                onClick={() => navigate(`/candidates/${selectedCandidate.id}`)}
+              >
+                Xem chi tiết
+              </Button>
             </div>
           </div>
         </div>

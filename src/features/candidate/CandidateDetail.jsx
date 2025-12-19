@@ -1,5 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useCandidate, useAddCandidateComment } from "./hooks/useCandidates";
+import { useAuth } from "../../context/AuthContext";
 import ContentHeader from "../../components/ui/ContentHeader";
 import Button from "../../components/ui/Button";
 import CandidateInfoCard from "./components/CandidateInfoCard";
@@ -20,15 +21,15 @@ export default function CandidateDetail() {
   const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const isHR = user?.department?.id === 2;
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [showCreateEventModal, setShowCreateEventModal] = useState(false);
-  // Always fetch candidate detail by ID
   const { data, isLoading, isError, error } = useCandidate(id);
   const addComment = useAddCandidateComment();
 
   const candidate = data?.data;
 
-  // Loading state
   if (isLoading) {
     return (
       <div className="flex flex-col h-full">
@@ -51,7 +52,6 @@ export default function CandidateDetail() {
     );
   }
 
-  // Error state
   if (isError) {
     return (
       <div className="flex flex-col items-center justify-center h-full gap-4">
@@ -70,7 +70,6 @@ export default function CandidateDetail() {
     );
   }
 
-  // Map fields for backward compatibility
   const displayName = candidate.fullName || candidate.candidateName || "-";
   const displayEmail = candidate.email || candidate.candidateEmail || "-";
   const displayPhone = candidate.phone || candidate.candidatePhone || "-";
@@ -93,25 +92,27 @@ export default function CandidateDetail() {
             <Button variant="outline" onClick={() => navigate("/candidates")}>
               {t("close")}
             </Button>
-            <Button
-              variant="outline"
-              onClick={() => setShowEmailModal(true)}
-            >
-              <Mail className="h-4 w-4 mr-2" />
-              Gửi email
-            </Button>
-            <Button onClick={() => setShowCreateEventModal(true)}>
-              <Calendar className="h-4 w-4 mr-2" />
-              Tạo lịch
-            </Button>
+            {isHR && (
+              <>
+                <Button
+                  variant="outline"
+                  onClick={() => setShowEmailModal(true)}
+                >
+                  <Mail className="h-4 w-4 mr-2" />
+                  Gửi email
+                </Button>
+                <Button onClick={() => setShowCreateEventModal(true)}>
+                  <Calendar className="h-4 w-4 mr-2" />
+                  Tạo lịch
+                </Button>
+              </>
+            )}
           </div>
         }
       />
 
-      {/* Two Column Layout */}
       <div className="flex-1 mt-4 overflow-auto">
         <div className="grid grid-cols-12 gap-4">
-          {/* Left Column - Narrower (4 cols) */}
           <div className="col-span-4 space-y-4">
             <CandidateInfoCard
               displayName={displayName}
@@ -137,14 +138,13 @@ export default function CandidateDetail() {
             <FeedbackCard
               feedback={candidate.feedback}
               rejectionReason={candidate.rejectionReason}
-              comments={candidate.comments}
+              comments={Array.isArray(candidate.comments) ? candidate.comments : []}
               onAddComment={(content) =>
                 addComment.mutate({ applicationId: candidate.id, content })
               }
             />
           </div>
 
-          {/* Right Column - Wider (8 cols) */}
           <div className="col-span-8 space-y-4">
             <ApplicationProgress status={candidate.status} />
 
@@ -153,7 +153,6 @@ export default function CandidateDetail() {
         </div>
       </div>
 
-      {/* Email Modal */}
       <SendEmailModal
         isOpen={showEmailModal}
         onClose={() => setShowEmailModal(false)}
@@ -161,7 +160,6 @@ export default function CandidateDetail() {
         recipientName={displayName}
       />
 
-      {/* Create Event Modal */}
       <CreateEventModal
         isOpen={showCreateEventModal}
         onClose={() => setShowCreateEventModal(false)}

@@ -61,7 +61,7 @@ export default function JobPositions() {
   const userDeptId = user?.department?.id;
   const userDeptName = user?.department?.name || "";
   const nameLower = userDeptName.toLowerCase();
-  const isHR = nameLower.includes("nhân sự") || nameLower.includes("human resources") || nameLower.includes("hr");
+  const isHR = userDeptId === 2;
   const shouldRestrictToUserDept = !!userDeptId && !isHR;
   const effectiveDepartmentId = shouldRestrictToUserDept
     ? userDeptId
@@ -281,14 +281,16 @@ export default function JobPositions() {
                   className="min-w-[200px]"
                 />
               )}
-              <Button
-                onClick={() => {
-                  navigate("/job-positions/new");
-                }}
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                {t("createNewPosition")}
-              </Button>
+              {isHR && (
+                <Button
+                  onClick={() => {
+                    navigate("/job-positions/new");
+                  }}
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  {t("createNewPosition")}
+                </Button>
+              )}
             </div>
           }
         />
@@ -316,14 +318,16 @@ export default function JobPositions() {
                 className="min-w-[200px]"
               />
             )}
-            <Button
-              onClick={() => {
-                navigate("/job-positions/new");
-              }}
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              {t("createNewPosition")}
-            </Button>
+            {isHR && (
+              <Button
+                onClick={() => {
+                  navigate("/job-positions/new");
+                }}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                {t("createNewPosition")}
+              </Button>
+            )}
           </div>
         }
       />
@@ -362,11 +366,11 @@ export default function JobPositions() {
                       onClickedCandidates={(pos) => {
                         navigate(`/job-positions/${pos.id}/candidates`);
                       }}
-                      onAddCandidate={handleAddCandidate}
+                      onAddCandidate={isHR ? handleAddCandidate : undefined}
                       onView={handleView}
-                      onEdit={handleEdit}
-                      onDelete={handleDelete}
-                      onUpdateStatus={handleUpdateStatus}
+                      onEdit={isHR ? handleEdit : undefined}
+                      onDelete={isHR ? handleDelete : undefined}
+                      onUpdateStatus={isHR ? handleUpdateStatus : undefined}
                     />
                   );
                 })}

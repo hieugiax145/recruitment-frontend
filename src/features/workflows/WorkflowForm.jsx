@@ -21,8 +21,8 @@ const LEVEL_OPTIONS = [
 ];
 
 const TYPE_OPTIONS = [
-  { id: "RECRUITMENT", name: "Tuyển dụng" },
-  { id: "REPLACEMENT", name: "Thay thế" },
+  { id: "REQUEST", name: "Yêu cầu tuyển dụng" },
+  { id: "OFFER", name: "Offer" },
 ];
 
 export default function WorkflowForm() {
@@ -37,7 +37,7 @@ export default function WorkflowForm() {
   const [form, setForm] = useState({
     name: "",
     description: "",
-    type: "RECRUITMENT",
+    type: "REQUEST",
     applyConditions: {
       department_id: null,
       level: null,
@@ -60,7 +60,7 @@ export default function WorkflowForm() {
       setForm({
         name: workflowData.name || "",
         description: workflowData.description || "",
-        type: workflowData.type || "RECRUITMENT",
+        type: workflowData.type || "REQUEST",
         applyConditions: {
           department_id: workflowData.applyConditions?.department_id || null,
           level: workflowData.applyConditions?.level || null,
@@ -241,7 +241,7 @@ export default function WorkflowForm() {
                         setForm({
                           name: workflowData.name || "",
                           description: workflowData.description || "",
-                          type: workflowData.type || "RECRUITMENT",
+                          type: workflowData.type || "REQUEST",
                           applyConditions: {
                             department_id: workflowData.applyConditions?.department_id || null,
                             level: workflowData.applyConditions?.level || null,
@@ -375,6 +375,15 @@ export default function WorkflowForm() {
                   label={t("description", { defaultValue: "Mô tả" })}
                   value={form.description}
                   onChange={onChange("description")}
+                  required
+                  disabled={!isEditMode}
+                />
+                <SelectDropdown
+                  label={t("workflowType", { defaultValue: "Loại luồng" })}
+                  options={TYPE_OPTIONS}
+                  value={form.type}
+                  onChange={onChange("type")}
+                  placeholder={t("selectType", { defaultValue: "Chọn loại luồng" })}
                   required
                   disabled={!isEditMode}
                 />

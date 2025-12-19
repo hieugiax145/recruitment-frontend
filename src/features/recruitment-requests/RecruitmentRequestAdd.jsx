@@ -218,7 +218,7 @@ export default function RecruitmentRequestAdd() {
     if (!id) return;
 
     const approvalData = {
-      approvalNotes: "Đã duyệt bởi CEO",
+      approvalNotes: "_",
     };
 
     approveMutation.mutate(
