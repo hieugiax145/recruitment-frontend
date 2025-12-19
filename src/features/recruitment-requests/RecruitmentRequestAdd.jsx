@@ -45,7 +45,7 @@ export default function RecruitmentRequestAdd() {
     title: "",
     quantity: 1,
     reason: "",
-    isExceedBudget: false,
+    exceedBudget: false,
     salaryMin: null,
     salaryMax: null,
     currency: "VND",
@@ -72,7 +72,7 @@ export default function RecruitmentRequestAdd() {
         title: existingRequest.title || "",
         quantity: existingRequest.quantity || 1,
         reason: existingRequest.reason || "",
-        isExceedBudget: existingRequest.isExceedBudget || false,
+        exceedBudget: existingRequest.exceedBudget || false,
         salaryMin: existingRequest.salaryMin || null,
         salaryMax: existingRequest.salaryMax || null,
         currency: existingRequest.currency || "VND",
@@ -149,7 +149,7 @@ export default function RecruitmentRequestAdd() {
     }
 
     // Only validate salary if exceedBudget is checked
-    if (formData.isExceedBudget) {
+    if (formData.exceedBudget) {
       if (!formData.salaryMin || formData.salaryMin < 0) {
         toast.error(t("errorMinSalaryRequired"));
         return;
@@ -172,8 +172,8 @@ export default function RecruitmentRequestAdd() {
       title: formData.title,
       quantity: formData.quantity,
       reason: formData.reason,
-      isExceedBudget: formData.isExceedBudget,
-      ...(formData.isExceedBudget && {
+      exceedBudget: formData.exceedBudget,
+      ...(formData.exceedBudget && {
         salaryMin: formData.salaryMin,
         salaryMax: formData.salaryMax,
       }),
@@ -729,12 +729,12 @@ export default function RecruitmentRequestAdd() {
               <div className="flex items-center gap-2">
                 <input
                   type="checkbox"
-                  id="isExceedBudget"
-                  checked={formData.isExceedBudget}
+                  id="exceedBudget"
+                  checked={formData.exceedBudget}
                   onChange={(e) => {
                     setFormData((prev) => ({
                       ...prev,
-                      isExceedBudget: e.target.checked,
+                      exceedBudget: e.target.checked,
                       // Reset salary values when unchecking
                       salaryMin: e.target.checked ? prev.salaryMin : null,
                       salaryMax: e.target.checked ? prev.salaryMax : null,
@@ -744,15 +744,15 @@ export default function RecruitmentRequestAdd() {
                   className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 />
                 <label
-                  htmlFor="isExceedBudget"
+                  htmlFor="exceedBudget"
                   className="text-sm text-gray-700 cursor-pointer select-none"
                 >
                   {t("exceedBudget")}
                 </label>
               </div>
 
-              {/* Salary fields - only show when isExceedBudget is checked */}
-              {formData.isExceedBudget && (
+              {/* Salary fields - only show when exceedBudget is checked */}
+              {formData.exceedBudget && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <TextInput
                     label={t("minSalary")}
