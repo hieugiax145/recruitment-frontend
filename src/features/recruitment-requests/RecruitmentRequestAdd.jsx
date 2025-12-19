@@ -8,6 +8,7 @@ import SelectDropdown from "../../components/ui/SelectDropdown";
 import { useAuth } from "../../context/AuthContext";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
+import { formatNumber, parseFormattedNumber } from "../../utils/utils";
 import Modal from "../../components/ui/Modal";
 import {
   useCreateRecruitmentRequest,
@@ -88,7 +89,7 @@ export default function RecruitmentRequestAdd() {
   const selectedDepartmentId = formData.departmentId || user?.department?.id;
 
   const { data: workflowsData } = useWorkflows(
-    {  type: "RECRUITMENT", isActive: true },
+    {  type: "REQUEST", isActive: true },
     { enabled: !!selectedDepartmentId }
   );
 
@@ -107,7 +108,7 @@ export default function RecruitmentRequestAdd() {
 
   const isGeneralInfoField = (fieldName) => {
     const generalFields = [
-      "title", "reason", "requesterId", "departmentId", "workflowId" 
+      "title", "requesterId", "departmentId", "workflowId" 
     ];
     return generalFields.includes(fieldName);
   };
@@ -659,6 +660,36 @@ export default function RecruitmentRequestAdd() {
                 disabled={!selectedDepartmentId || isPending || (isViewMode ||isEditing)}
               />
             </div>
+
+            {/* Workflow Steps Preview - only show when workflow is selected and in create mode */}
+            {!isViewMode && formData.workflowId && (
+              <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h3 className="text-sm font-semibold text-blue-900 mb-3">Các bước phê duyệt của luồng đã chọn:</h3>
+                <div className="space-y-2">
+                  {(() => {
+                    const selectedWorkflow = workflows.find(w => w.id === formData.workflowId);
+                    if (!selectedWorkflow || !selectedWorkflow.steps || selectedWorkflow.steps.length === 0) {
+                      return <p className="text-sm text-blue-700">Không có bước phê duyệt nào</p>;
+                    }
+                    return selectedWorkflow.steps
+                      .sort((a, b) => a.stepOrder - b.stepOrder)
+                      .map((step, idx) => (
+                        <div key={step.id} className="flex items-start gap-3 text-sm">
+                          <span className="flex-shrink-0 w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center font-semibold text-xs">
+                            {step.stepOrder}
+                          </span>
+                          <div className="flex-1">
+                            <p className="text-blue-900 font-medium">{`Bước ${step.stepOrder}`}</p>
+                            <p className="text-blue-700 text-xs mt-0.5">
+                              Người phê duyệt: {step.approverPositionName || "Chưa xác định"}
+                            </p>
+                          </div>
+                        </div>
+                      ));
+                  })()}
+                </div>
+              </div>
+            )}
           </div>
           {/* recruitment details */}
           <div className="rounded-md border border-gray-300 p-4 gap-4 flex flex-col">
@@ -667,10 +698,15 @@ export default function RecruitmentRequestAdd() {
               <TextInput
                 label={t("numberOfPositionsLabel")}
                 placeholder={t("numberOfPositionsPlaceholder")}
-                type="number"
+                type="text"
                 name="quantity"
-                value={formData.quantity}
-                onChange={handleChange}
+                value={formatNumber(formData.quantity)}
+                onChange={(e) => {
+                  const parsed = parseFormattedNumber(e.target.value);
+                  if (parsed !== null || e.target.value === "") {
+                    setFormData(prev => ({ ...prev, quantity: parsed || 1 }));
+                  }
+                }}
                 required={true}
                 disabled={isPending || (isViewMode && !isEditing)}
               />
@@ -721,20 +757,30 @@ export default function RecruitmentRequestAdd() {
                   <TextInput
                     label={t("minSalary")}
                     placeholder={t("salaryPlaceholder")}
-                    type="number"
+                    type="text"
                     name="salaryMin"
-                    value={formData.salaryMin || ""}
-                    onChange={handleChange}
+                    value={formatNumber(formData.salaryMin)}
+                    onChange={(e) => {
+                      const parsed = parseFormattedNumber(e.target.value);
+                      if (parsed !== null || e.target.value === "") {
+                        setFormData(prev => ({ ...prev, salaryMin: parsed }));
+                      }
+                    }}
                     required={true}
                     disabled={isPending || (isViewMode && !isEditing)}
                   />
                   <TextInput
                     label={t("maxSalary")}
                     placeholder={t("salaryPlaceholder")}
-                    type="number"
+                    type="text"
                     name="salaryMax"
-                    value={formData.salaryMax || ""}
-                    onChange={handleChange}
+                    value={formatNumber(formData.salaryMax)}
+                    onChange={(e) => {
+                      const parsed = parseFormattedNumber(e.target.value);
+                      if (parsed !== null || e.target.value === "") {
+                        setFormData(prev => ({ ...prev, salaryMax: parsed }));
+                      }
+                    }}
                     required={true}
                     disabled={isPending || (isViewMode && !isEditing)}
                   />

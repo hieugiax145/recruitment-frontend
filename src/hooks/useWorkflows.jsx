@@ -42,7 +42,6 @@ export const useCreateWorkflow = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: workflowKeys.all });
-      toast.success("Thêm luồng phê duyệt thành công");
     },
     onError: (error) => {
       const message = error.response?.data?.message || "Có lỗi khi tạo luồng phê duyệt";
@@ -61,7 +60,6 @@ export const useUpdateWorkflow = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: workflowKeys.all });
-      toast.success("Cập nhật luồng phê duyệt thành công");
     },
     onError: (error) => {
       const message = error.response?.data?.message || "Có lỗi khi cập nhật luồng phê duyệt";
@@ -80,7 +78,6 @@ export const useDeleteWorkflow = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: workflowKeys.all });
-      toast.success("Xóa luồng phê duyệt thành công");
     },
     onError: (error) => {
       const message = error.response?.data?.message || "Có lỗi khi xóa luồng phê duyệt";

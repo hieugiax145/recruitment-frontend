@@ -41,7 +41,6 @@ export const useCreateEmployee = () => {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: employeeKeys.all });
-      toast.success("Thêm nhân sự thành công");
     },
     onError: (err) => {
       const msg = err.response?.data?.message || "Có lỗi khi thêm nhân sự";
@@ -59,7 +58,6 @@ export const useUpdateEmployee = () => {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: employeeKeys.all });
-      toast.success("Cập nhật nhân sự thành công");
     },
     onError: (err) => {
       const msg = err.response?.data?.message || "Có lỗi khi cập nhật";
@@ -77,7 +75,6 @@ export const useDeleteEmployee = () => {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: employeeKeys.all });
-      toast.success("Xóa nhân sự thành công");
     },
     onError: (err) => {
       const msg = err.response?.data?.message || "Có lỗi khi xóa";

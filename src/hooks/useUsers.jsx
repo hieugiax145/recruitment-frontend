@@ -43,7 +43,6 @@ export const useCreateUser = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: userKeys.all });
-      toast.success("Thêm tài khoản thành công");
     },
     onError: (error) => {
       const message = error.response?.data?.message || "Có lỗi khi tạo tài khoản";
@@ -62,7 +61,6 @@ export const useUpdateUser = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: userKeys.all });
-      toast.success("Cập nhật tài khoản thành công");
     },
     onError: (error) => {
       const message = error.response?.data?.message || "Có lỗi khi cập nhật tài khoản";

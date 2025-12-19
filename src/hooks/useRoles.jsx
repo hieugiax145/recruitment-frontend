@@ -42,7 +42,6 @@ export const useUpdateRolePermissions = () => {
     onSuccess: (_data, variables) => {
       qc.invalidateQueries({ queryKey: roleKeys.detail(variables?.id) });
       qc.invalidateQueries({ queryKey: roleKeys.all });
-      toast.success("Cập nhật phân quyền thành công");
     },
     onError: (error) => {
       const message = error.response?.data?.message || "Có lỗi khi cập nhật phân quyền";
@@ -60,7 +59,6 @@ export const useCreateRole = () => {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: roleKeys.all });
-      toast.success("Thêm vai trò thành công");
     },
     onError: (error) => {
       const message = error.response?.data?.message || "Có lỗi khi tạo vai trò";
@@ -79,7 +77,6 @@ export const useUpdateRole = () => {
     onSuccess: (_data, variables) => {
       qc.invalidateQueries({ queryKey: roleKeys.detail(variables?.id) });
       qc.invalidateQueries({ queryKey: roleKeys.all });
-      toast.success("Cập nhật vai trò thành công");
     },
     onError: (error) => {
       const message = error.response?.data?.message || "Có lỗi khi cập nhật vai trò";

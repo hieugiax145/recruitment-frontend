@@ -42,7 +42,6 @@ export const useUpdateOfferStatus = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: offerKeys.all });
-      toast.success("Cập nhật trạng thái offer thành công");
     },
     onError: (error) => {
       const errorMessage =
@@ -62,7 +61,6 @@ export const useCreateOffer = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: offerKeys.all });
-      toast.success("Tạo offer thành công");
     },
     onError: (error) => {
       const errorMessage =
@@ -82,7 +80,6 @@ export const useApproveOffer = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: offerKeys.all });
-      toast.success("Phê duyệt offer thành công");
     },
     onError: (error) => {
       const errorMessage =
@@ -102,7 +99,6 @@ export const useRejectOffer = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: offerKeys.all });
-      toast.success("Từ chối offer thành công");
     },
     onError: (error) => {
       const errorMessage =

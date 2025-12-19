@@ -40,7 +40,6 @@ export const useCreateRecruitmentRequest = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: recruitmentRequestKeys.all });
-      toast.success("Recruitment request created successfully");
     },
     onError: (error) => {
       const errorMessage =
@@ -60,7 +59,6 @@ export const useUpdateRecruitmentRequest = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: recruitmentRequestKeys.all });
-      toast.success("Recruitment request updated successfully");
     },
     onError: (error) => {
       const errorMessage =
@@ -80,7 +78,6 @@ export const useDeleteRecruitmentRequest = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: recruitmentRequestKeys.all });
-      toast.success("Recruitment request deleted successfully");
     },
     onError: (error) => {
       const errorMessage =
@@ -100,7 +97,6 @@ export const useApproveRecruitmentRequest = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: recruitmentRequestKeys.all });
-      toast.success("Yêu cầu đã được phê duyệt thành công");
     },
     onError: (error) => {
       const errorMessage =
@@ -120,7 +116,6 @@ export const useRejectRecruitmentRequest = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: recruitmentRequestKeys.all });
-      toast.success("Yêu cầu đã bị từ chối");
     },
     onError: (error) => {
       const errorMessage =
@@ -140,7 +135,6 @@ export const useSubmitRecruitmentRequest = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: recruitmentRequestKeys.all });
-      toast.success("Yêu cầu đã được nộp thành công");
     },
     onError: (error) => {
       const errorMessage =
@@ -160,7 +154,6 @@ export const useReturnRecruitmentRequest = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: recruitmentRequestKeys.all });
-      toast.success("Yêu cầu đã được trả về");
     },
     onError: (error) => {
       const errorMessage =
@@ -180,7 +173,6 @@ export const useCancelRecruitmentRequest = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: recruitmentRequestKeys.all });
-      toast.success("Yêu cầu đã được hủy");
     },
     onError: (error) => {
       const errorMessage =
@@ -200,7 +192,6 @@ export const useWithdrawRecruitmentRequest = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: recruitmentRequestKeys.all });
-      toast.success("Yêu cầu đã được thu hồi");
     },
     onError: (error) => {
       const errorMessage =

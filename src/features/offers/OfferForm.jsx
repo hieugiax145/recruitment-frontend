@@ -11,6 +11,7 @@ import TextArea from "../../components/ui/TextArea";
 import Button from "../../components/ui/Button";
 import LoadingSpinner from "../../components/ui/LoadingSpinner";
 import LoadingContent from "../../components/ui/LoadingContent";
+import { formatNumber, parseFormattedNumber } from "../../utils/utils";
 
 export default function OfferForm({ initialData, onSubmit, isLoading = false, mode = "create" }) {
     const { t } = useTranslation();
@@ -178,9 +179,14 @@ export default function OfferForm({ initialData, onSubmit, isLoading = false, mo
                             <TextInput
                                 label="Mức lương chính thức (VNĐ)"
                                 placeholder="0"
-                                type="number"
-                                value={form.salary}
-                                onChange={(e) => setValue("salary", e.target.value)}
+                                type="text"
+                                value={formatNumber(form.salary)}
+                                onChange={(e) => {
+                                    const parsed = parseFormattedNumber(e.target.value);
+                                    if (parsed !== null || e.target.value === "") {
+                                        setValue("salary", parsed);
+                                    }
+                                }}
                                 required
                                 disabled={isViewMode || isLoading}
                             />

@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import ContentHeader from "../../components/ui/ContentHeader";
 import Card from "../../components/ui/Card";
-import { Colors } from "../../constants/Colors";
 
 export default function Home() {
   const [stats, setStats] = useState({

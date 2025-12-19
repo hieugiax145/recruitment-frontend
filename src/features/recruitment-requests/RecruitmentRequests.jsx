@@ -40,9 +40,11 @@ export default function RecruitmentRequests() {
     ? userDeptId
     : selectedDepartmentId ?? undefined;
 
-  const queryParams = effectiveDepartmentId
-    ? { departmentId: effectiveDepartmentId }
-    : {};
+  const queryParams = {
+    page: currentPage,
+    pageSize: itemsPerPage,
+    ...(effectiveDepartmentId && { departmentId: effectiveDepartmentId }),
+  };
 
   const { data, isLoading, isError, error, refetch } =
     useRecruitmentRequests(queryParams);
@@ -52,8 +54,9 @@ export default function RecruitmentRequests() {
   const { data: departmentsData } = useAllDepartments();
   const departments = Array.isArray(departmentsData) ? departmentsData : [];
 
-  const allRequests = Array.isArray(data?.data?.result) ? data.data.result : [];
-  const requests = allRequests;
+  const currentRequests = Array.isArray(data?.data?.result) ? data.data.result : [];
+  const meta = data?.data?.meta;
+  const totalPages = meta?.pages || 1;
 
   useEffect(() => {
     if (isError) {
@@ -63,16 +66,13 @@ export default function RecruitmentRequests() {
     }
   }, [isError, error, t]);
 
-  const totalPages = Math.ceil(requests.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentRequests = requests.slice(startIndex, endIndex);
-
   const goToPage = (page) => {
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page);
     }
   };
+
+  const startIndex = (currentPage - 1) * itemsPerPage;
 
   const handleDelete = (id) => {
     if (window.confirm("Are you sure you want to delete this request?")) {
@@ -236,7 +236,7 @@ export default function RecruitmentRequests() {
             </table>
           </div>
 
-          {requests.length > 0 && (
+          {currentRequests.length > 0 && totalPages > 1 && (
             <div className="flex-shrink-0 flex justify-end items-center p-4 border-t border-gray-200 bg-white">
               <Pagination
                 currentPage={currentPage}

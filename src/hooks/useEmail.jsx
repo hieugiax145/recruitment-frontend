@@ -9,7 +9,6 @@ export const useSendEmail = () => {
       return response.data;
     },
     onSuccess: () => {
-      toast.success("Gửi email thành công");
     },
     onError: (error) => {
       const message = error.response?.data?.message || "Có lỗi khi gửi email";

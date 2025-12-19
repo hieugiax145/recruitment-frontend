@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
+import { formatNumber, parseFormattedNumber } from "../../utils/utils";
 import ContentHeader from "../../components/ui/ContentHeader";
 import Button from "../../components/ui/Button";
 import TextInput from "../../components/ui/TextInput";
@@ -272,10 +273,14 @@ export default function JobPositionAdd() {
               <TextInput
                 label="Số lượng cần tuyển"
                 name="quantity"
-                type="number"
-                value={formData.quantity}
-                onChange={handleChange}
-                min="1"
+                type="text"
+                value={formatNumber(formData.quantity)}
+                onChange={(e) => {
+                  const parsed = parseFormattedNumber(e.target.value);
+                  if (parsed !== null || e.target.value === "") {
+                    setFormData(prev => ({ ...prev, quantity: parsed || 1 }));
+                  }
+                }}
                 disabled={isPending}
                 required
               />
@@ -357,20 +362,30 @@ export default function JobPositionAdd() {
               <TextInput
                 label="Mức lương tối thiểu (VNĐ)"
                 placeholder="0"
-                type="number"
+                type="text"
                 name="salaryMin"
-                value={formData.salaryMin}
-                onChange={handleChange}
+                value={formatNumber(formData.salaryMin)}
+                onChange={(e) => {
+                  const parsed = parseFormattedNumber(e.target.value);
+                  if (parsed !== null || e.target.value === "") {
+                    setFormData(prev => ({ ...prev, salaryMin: parsed }));
+                  }
+                }}
                 required
                 disabled={isPending}
               />
               <TextInput
                 label="Mức lương tối đa (VNĐ)"
                 placeholder="0"
-                type="number"
+                type="text"
                 name="salaryMax"
-                value={formData.salaryMax}
-                onChange={handleChange}
+                value={formatNumber(formData.salaryMax)}
+                onChange={(e) => {
+                  const parsed = parseFormattedNumber(e.target.value);
+                  if (parsed !== null || e.target.value === "") {
+                    setFormData(prev => ({ ...prev, salaryMax: parsed }));
+                  }
+                }}
                 required
                 disabled={isPending}
               />

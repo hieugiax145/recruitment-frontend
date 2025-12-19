@@ -45,7 +45,6 @@ export const useCreateJobPosition = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: jobPositionKeys.all });
-      toast.success("Tạo vị trí tuyển dụng thành công");
     },
     onError: (error) => {
       const errorMessage =
@@ -69,7 +68,6 @@ export const useUpdateJobPosition = () => {
       queryClient.invalidateQueries({
         queryKey: jobPositionKeys.detail(variables.id),
       });
-      toast.success("Cập nhật vị trí tuyển dụng thành công");
     },
     onError: (error) => {
       const errorMessage =
@@ -90,7 +88,6 @@ export const useDeleteJobPosition = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: jobPositionKeys.all });
-      toast.success("Xóa vị trí tuyển dụng thành công");
     },
     onError: (error) => {
       const errorMessage =
