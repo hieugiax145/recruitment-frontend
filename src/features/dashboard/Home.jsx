@@ -3,8 +3,12 @@ import ContentHeader from "../../components/ui/ContentHeader";
 import Card from "../../components/ui/Card";
 import { useSummaryStatistics, useUpcomingSchedules, useJobOpenings } from "../../hooks/useStatistics";
 import LoadingSpinner from "../../components/ui/LoadingSpinner";
+import EmptyState from "../../components/ui/EmptyState";
+import { useTranslation } from "react-i18next";
+import { Briefcase, Calendar } from "lucide-react";
 
 export default function Home() {
+  const { t } = useTranslation();
   const { data: summaryData, isLoading: isLoadingSummary } = useSummaryStatistics();
   const { data: schedulesData, isLoading: isLoadingSchedules } = useUpcomingSchedules();
   const { data: jobOpeningsData, isLoading: isLoadingJobOpenings } = useJobOpenings();
@@ -30,15 +34,17 @@ export default function Home() {
     orange: "#F97316",
   };
 
-  const jobPositions = (jobOpeningsData?.data || []).map(job => ({
-    id: job.id,
-    title: job.title,
-    type: job.employmentType,
-    level: job.workLocation,
-    applications: job.applicantCount,
-    range: job.salaryDisplay,
-    color: colorMap[job.iconColor] || "#8B5CF6",
-  }));
+  const jobPositions = Array.isArray(jobOpeningsData?.data) 
+    ? jobOpeningsData.data.map(job => ({
+        id: job.id,
+        title: job.title,
+        type: job.employmentType,
+        level: job.workLocation,
+        applications: job.applicantCount,
+        range: job.salaryDisplay,
+        color: colorMap[job.iconColor] || "#8B5CF6",
+      }))
+    : [];
 
   const [applicationsByPosition] = useState([
     { position: "Giáo Viên Kaiwa", percentage: 12.5, applications: 2 },
@@ -47,7 +53,17 @@ export default function Home() {
     { position: "Thực Tập Sinh Kế Toán", percentage: 43.75, applications: 7 },
   ]);
 
-  const upcomingEvents = schedulesData?.data || [];
+  const upcomingEvents = Array.isArray(schedulesData?.data?.schedules) 
+    ? schedulesData.data.schedules.map(schedule => ({
+        scheduleId: schedule.scheduleId,
+        time: schedule.time,
+        title: `${schedule.jobTitle} - ${schedule.candidateName}`,
+        type: schedule.type === 'INTERVIEW' ? 'Phỏng vấn' : schedule.type,
+        status: schedule.status,
+        date: schedule.date,
+        color: schedule.priority === 'HIGH' ? '#EF4444' : schedule.status === 'SCHEDULED' ? '#FBBF24' : '#86EFAC',
+      }))
+    : [];
 
   const stats = {
     applications: summaryData?.data?.applications || { value: 0, changePercent: 0, isIncrease: null, changeText: "So với tuần trước" },
@@ -219,9 +235,13 @@ export default function Home() {
                 </button>
               </div>
               <div className="space-y-2">
-                {jobPositions.map((position) => (
-                  <JobPositionCard key={position.id} position={position} />
-                ))}
+                {jobPositions.length > 0 ? (
+                  jobPositions.map((position) => (
+                    <JobPositionCard key={position.id} position={position} />
+                  ))
+                ) : (
+                  <EmptyState title={t("noPositionsFound", { defaultValue: "Không có vị trí tuyển dụng" })} icon={Briefcase}/>
+                )}
               </div>
             </div>
           </div>
@@ -326,9 +346,13 @@ export default function Home() {
                   </button>
                 </div>
                 <div className="space-y-3">
-                  {upcomingEvents.map((event, index) => (
-                    <EventCard key={index} event={event} />
-                  ))}
+                  {upcomingEvents.length > 0 ? (
+                    upcomingEvents.map((event, index) => (
+                      <EventCard key={index} event={event} />
+                    ))
+                  ) : (
+                    <EmptyState title={t("noUpcomingSchedules", { defaultValue: "Không có lịch sắp tới" })} icon={Calendar}/>
+                  )}
                 </div>
               </div>
             </div>
