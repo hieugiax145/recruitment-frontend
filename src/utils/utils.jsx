@@ -5,6 +5,19 @@ export function cn(...inputs) {
   return twMerge(clsx(inputs));
 }
 
+export function formatNumber(value) {
+  if (!value && value !== 0) return "";
+  const num = typeof value === "string" ? parseFloat(value.replace(/,/g, "")) : value;
+  if (isNaN(num) || num < 0) return "";
+  return num.toLocaleString("en-US");
+}
+
+export function parseFormattedNumber(formattedValue) {
+  if (!formattedValue) return null;
+  const num = parseFloat(String(formattedValue).replace(/,/g, ""));
+  return isNaN(num) || num < 0 ? null : num;
+}
+
 export function formatSalary(amount) {
   if (!amount && amount !== 0) return "N/A";
 
