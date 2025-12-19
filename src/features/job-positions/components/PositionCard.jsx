@@ -46,22 +46,8 @@ export default function PositionCard({
     return status;
   };
 
-  // Build status submenu based on current status
-  const statusTransitions = [
-    { label: "Còn tuyển", icon: CheckCircle, value: "PUBLISHED" },
-    { label: "Tạm dừng", icon: PauseCircle, value: "DRAFT" },
-    { label: "Đã đủ", icon: XCircle, value: "CLOSED" },
-  ];
-  const currentStatus = getStatusLabel(position.status);
-  const statusSubmenu = statusTransitions
-    .filter((opt) => opt.value !== currentStatus)
-    .map((opt) => ({
-      label: opt.label,
-      icon: opt.icon,
-      onClick: () => onUpdateStatus && onUpdateStatus(position, opt.value),
-    }));
-
-  // Build menu options
+  const currentStatusValue = String(position.status || "").toUpperCase();
+  
   const menuOptions = [
     onView && {
       label: "Xem chi tiết",
@@ -78,12 +64,16 @@ export default function PositionCard({
       icon: UserPlus,
       onClick: () => onAddCandidate(position),
     },
-    onUpdateStatus &&
-      statusSubmenu.length > 0 && {
-        label: "Cập nhật trạng thái",
-        icon: RefreshCw,
-        submenu: statusSubmenu,
-      },
+    onUpdateStatus && currentStatusValue === "DRAFT" && {
+      label: "Đăng tuyển",
+      icon: CheckCircle,
+      onClick: () => onUpdateStatus(position, "PUBLISHED"),
+    },
+    onUpdateStatus && currentStatusValue === "PUBLISHED" && {
+      label: "Đóng tuyển",
+      icon: XCircle,
+      onClick: () => onUpdateStatus(position, "CLOSED"),
+    },
     onEdit && {
       label: "Chỉnh sửa",
       icon: Edit,
