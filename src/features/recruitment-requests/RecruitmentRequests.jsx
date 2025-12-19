@@ -168,7 +168,6 @@ export default function RecruitmentRequests() {
                 <tr>
                   {tableHeaders(t("id"))}
                   {tableHeaders(t("staffCreated"))}
-                  {tableHeaders(t("staffInCharge"))}
                   {tableHeaders(t("position"))}
                   {tableHeaders(t("quantity"))}
                   {tableHeaders(t("department"))}
@@ -179,7 +178,7 @@ export default function RecruitmentRequests() {
               <tbody>
                 {currentRequests.length === 0 ? (
                   <tr>
-                    <td colSpan="8" className="p-8">
+                    <td colSpan="7" className="p-8">
                       <EmptyState
                         title={t("noRequestsFound", {
                           defaultValue: "Không có yêu cầu tuyển dụng",
@@ -205,9 +204,6 @@ export default function RecruitmentRequests() {
                       </td>
                       <td className="p-4 text-sm whitespace-nowrap max-w-[150px] truncate">
                         {request.requester?.name || "N/A"}
-                      </td>
-                      <td className="p-4 text-sm whitespace-nowrap max-w-[150px] truncate">
-                        {request.approver?.name || "N/A"}
                       </td>
                       <td
                         className="p-4 text-sm whitespace-nowrap max-w-[200px] truncate"

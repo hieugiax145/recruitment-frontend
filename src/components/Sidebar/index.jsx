@@ -12,12 +12,14 @@ import {
   FileText,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
-// Removed permission-based filtering; menu visible to all authenticated users
 
 const Sidebar = ({ isVisible, toggleSidebar, sidebarWidth }) => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const isAdmin = user?.role?.name === "ADMIN";
+  const isCEO = user?.role?.name === "CEO";
+  const isHRDepartment = user?.department?.id === 2;
+  const canAccessEmployees = isAdmin || isCEO || isHRDepartment;
 
   // Admin: only management; Non-admin: business functions + employees
   const adminMenus = [
@@ -28,7 +30,7 @@ const Sidebar = ({ isVisible, toggleSidebar, sidebarWidth }) => {
   ];
 
   const businessMenus = [
-    { text: t("employeeManagement", { defaultValue: "Quản lý nhân sự" }), link: "/employees", icon: <UsersRound /> },
+    ...(canAccessEmployees ? [{ text: t("employeeManagement", { defaultValue: "Quản lý nhân sự" }), link: "/employees", icon: <UsersRound /> }] : []),
     { text: t("recruitmentReq"), link: "/recruitment-requests", icon: <ClipboardList /> },
     { text: t("jobPosition"), link: "/job-positions", icon: <Briefcase /> },
     { text: t("candidate"), link: "/candidates", icon: <UsersRound /> },
