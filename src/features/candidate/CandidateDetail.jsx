@@ -25,7 +25,12 @@ export default function CandidateDetail() {
   const isHR = user?.department?.id === 2;
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [showCreateEventModal, setShowCreateEventModal] = useState(false);
-  const { data, isLoading, isError, error } = useCandidate(id);
+  const { data, isLoading, isError, error } = useCandidate(id, {
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: true,
+    staleTime: 0,
+    cacheTime: 0,
+  });
   const addComment = useAddCandidateComment();
 
   const candidate = data?.data;
