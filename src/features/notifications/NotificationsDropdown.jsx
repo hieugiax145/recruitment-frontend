@@ -1,10 +1,13 @@
-import { useNotifications, useMarkAllNotificationsAsRead } from "./hooks/useNotifications";
+import { useNotifications, useMarkNotificationAsRead, useMarkAllNotificationsAsRead } from "./hooks/useNotifications";
 import { Bell, CheckCheck } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
+import { useSocket } from "../../context/SocketContext";
 
 export default function NotificationsDropdown() {
-  const { data: notifications = [], isLoading } = useNotifications();
+  const { data: notifications = [], isLoading, refetch } = useNotifications();
+  const markAsRead = useMarkNotificationAsRead();
   const markAllAsRead = useMarkAllNotificationsAsRead();
+  const { isConnected } = useSocket();
   const unreadCount = notifications.filter((n) => !n.read).length;
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -12,6 +15,7 @@ export default function NotificationsDropdown() {
   console.log("Notifications:", notifications);
   console.log("Unread count:", unreadCount);
   console.log("Is loading:", isLoading);
+  console.log("Socket connected:", isConnected);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -27,10 +31,20 @@ export default function NotificationsDropdown() {
   }, []);
 
   const toggleDropdown = () => {
+    if (!isOpen) {
+      refetch();
+    }
     setIsOpen(!isOpen);
   };
 
-  const handleNotificationClick = () => {
+  const handleNotificationClick = async (notification) => {
+    if (!notification.read) {
+      try {
+        await markAsRead.mutateAsync(notification.id);
+      } catch (error) {
+        console.error("Failed to mark notification as read:", error);
+      }
+    }
     setIsOpen(false);
   };
 
@@ -47,6 +61,7 @@ export default function NotificationsDropdown() {
       <button
         onClick={toggleDropdown}
         className="relative p-2 rounded-lg hover:bg-gray-100 focus:outline-none transition-colors duration-200"
+        title={isConnected ? "Đã kết nối real-time" : "Chưa kết nối"}
       >
         <Bell className="w-5 h-5 text-gray-700" />
         {unreadCount > 0 && (
@@ -54,6 +69,8 @@ export default function NotificationsDropdown() {
             {unreadCount > 99 ? "99+" : unreadCount}
           </span>
         )}
+        {/* Socket connection indicator */}
+        <span className={`absolute bottom-0 right-0 w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-gray-400'}`}></span>
       </button>
       {isOpen && (
         <div className="absolute right-0 mt-2 w-96 bg-white shadow-lg rounded-lg z-50 max-h-96 overflow-hidden border border-gray-200">
@@ -80,7 +97,7 @@ export default function NotificationsDropdown() {
                 {notifications.map((n) => (
                   <li
                     key={n.id}
-                    onClick={handleNotificationClick}
+                    onClick={() => handleNotificationClick(n)}
                     className={`px-4 py-3 hover:bg-gray-50 transition-colors duration-150 cursor-pointer ${!n.read ? "bg-blue-50/30" : ""}`}
                   >
                     <div className="flex items-start gap-3">
