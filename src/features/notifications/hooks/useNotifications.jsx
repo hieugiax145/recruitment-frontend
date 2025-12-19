@@ -11,13 +11,30 @@ export const useNotifications = () => {
   });
 };
 
+export const useMarkNotificationAsRead = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id) => notificationServices.markAsRead(id),
+    onSuccess: (_, id) => {
+      queryClient.setQueryData(["notifications"], (oldData) => {
+        if (!oldData) return oldData;
+        return oldData.map(notification => 
+          notification.id === id 
+            ? { ...notification, read: true, readAt: new Date().toISOString() }
+            : notification
+        );
+      });
+    },
+  });
+};
+
 export const useMarkAllNotificationsAsRead = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: () => notificationServices.markAllAsRead(),
     onSuccess: () => {
-      // Update the cache to mark all notifications as read
       queryClient.setQueryData(["notifications"], (oldData) => {
         if (!oldData) return oldData;
         return oldData.map(notification => ({
@@ -29,3 +46,4 @@ export const useMarkAllNotificationsAsRead = () => {
     },
   });
 };
+

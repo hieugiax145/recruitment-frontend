@@ -6,6 +6,7 @@ import "./config/translation/index.jsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { AuthProvider } from "./context/AuthContext.jsx";
+import { SocketProvider } from "./context/SocketContext.jsx";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -21,7 +22,9 @@ createRoot(document.getElementById("root")).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <App />
+        <SocketProvider>
+          <App />
+        </SocketProvider>
       </AuthProvider>
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
