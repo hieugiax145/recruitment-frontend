@@ -45,10 +45,6 @@ export default function RecruitmentRequestAdd() {
     title: "",
     quantity: 1,
     reason: "",
-    exceedBudget: false,
-    salaryMin: null,
-    salaryMax: null,
-    currency: "VND",
     requesterId: user?.userId || null,
     departmentId: user?.department?.id || null,
     workflowId: null,
@@ -72,10 +68,6 @@ export default function RecruitmentRequestAdd() {
         title: existingRequest.title || "",
         quantity: existingRequest.quantity || 1,
         reason: existingRequest.reason || "",
-        exceedBudget: existingRequest.exceedBudget || false,
-        salaryMin: existingRequest.salaryMin || null,
-        salaryMax: existingRequest.salaryMax || null,
-        currency: existingRequest.currency || "VND",
         requesterId: existingRequest.requesterId || user?.id || null,
         departmentId: existingRequest.department?.id || null,
         workflowId: existingRequest.workflowId || null,
@@ -148,36 +140,10 @@ export default function RecruitmentRequestAdd() {
       return;
     }
 
-    // Only validate salary if exceedBudget is checked
-    if (formData.exceedBudget) {
-      if (!formData.salaryMin || formData.salaryMin < 0) {
-        toast.error(t("errorMinSalaryRequired"));
-        return;
-      }
-      if (!formData.salaryMax || formData.salaryMax < 0) {
-        toast.error(t("errorMaxSalaryRequired"));
-        return;
-      }
-      if (
-        formData.salaryMin &&
-        formData.salaryMax &&
-        formData.salaryMin > formData.salaryMax
-      ) {
-        toast.error(t("errorSalaryInvalid"));
-        return;
-      }
-    }
-
     const payload = {
       title: formData.title,
       quantity: formData.quantity,
       reason: formData.reason,
-      exceedBudget: formData.exceedBudget,
-      ...(formData.exceedBudget && {
-        salaryMin: formData.salaryMin,
-        salaryMax: formData.salaryMax,
-      }),
-      currency: formData.currency,
       requesterId: formData.requesterId,
       departmentId: formData.departmentId,
       workflowId: formData.workflowId,
@@ -724,68 +690,6 @@ export default function RecruitmentRequestAdd() {
                 required={true}
                 disabled={isPending || (isViewMode && !isEditing)}
               />
-
-              {/* Exceed Budget Checkbox */}
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  id="exceedBudget"
-                  checked={formData.exceedBudget}
-                  onChange={(e) => {
-                    setFormData((prev) => ({
-                      ...prev,
-                      exceedBudget: e.target.checked,
-                      // Reset salary values when unchecking
-                      salaryMin: e.target.checked ? prev.salaryMin : null,
-                      salaryMax: e.target.checked ? prev.salaryMax : null,
-                    }));
-                  }}
-                  disabled={isPending || (isViewMode && !isEditing)}
-                  className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                />
-                <label
-                  htmlFor="exceedBudget"
-                  className="text-sm text-gray-700 cursor-pointer select-none"
-                >
-                  {t("exceedBudget")}
-                </label>
-              </div>
-
-              {/* Salary fields - only show when exceedBudget is checked */}
-              {formData.exceedBudget && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <TextInput
-                    label={t("minSalary")}
-                    placeholder={t("salaryPlaceholder")}
-                    type="text"
-                    name="salaryMin"
-                    value={formatNumber(formData.salaryMin)}
-                    onChange={(e) => {
-                      const parsed = parseFormattedNumber(e.target.value);
-                      if (parsed !== null || e.target.value === "") {
-                        setFormData(prev => ({ ...prev, salaryMin: parsed }));
-                      }
-                    }}
-                    required={true}
-                    disabled={isPending || (isViewMode && !isEditing)}
-                  />
-                  <TextInput
-                    label={t("maxSalary")}
-                    placeholder={t("salaryPlaceholder")}
-                    type="text"
-                    name="salaryMax"
-                    value={formatNumber(formData.salaryMax)}
-                    onChange={(e) => {
-                      const parsed = parseFormattedNumber(e.target.value);
-                      if (parsed !== null || e.target.value === "") {
-                        setFormData(prev => ({ ...prev, salaryMax: parsed }));
-                      }
-                    }}
-                    required={true}
-                    disabled={isPending || (isViewMode && !isEditing)}
-                  />
-                </div>
-              )}
             </div>
           </div>
           {/* Job description section removed temporarily */}
