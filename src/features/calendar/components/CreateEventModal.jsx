@@ -189,18 +189,18 @@ export default function CreateEventModal({ isOpen, onClose, defaultDate }) {
 
     // Validation
     if (!formData.title.trim()) {
-      toast.error("Vui lòng nhập tiêu đề sự kiện");
+      toast.error(t("toasts.pleaseEnterEventTitle"));
       return;
     }
 
     if (!formData.date) {
-      toast.error("Vui lòng chọn ngày");
+      toast.error(t("toasts.pleaseSelectDate"));
       return;
     }
 
     // Check if end time is after start time
     if (formData.endTime <= formData.startTime) {
-      toast.error("Thời gian kết thúc phải sau thời gian bắt đầu");
+      toast.error(t("toasts.endTimeAfterStartTime"));
       return;
     }
 
@@ -292,9 +292,7 @@ export default function CreateEventModal({ isOpen, onClose, defaultDate }) {
                   options={availableCandidates}
                   value={formData.candidate}
                   onChange={handleSelectChange("candidate")}
-                  placeholder={
-                    isLoadingCandidates ? "Đang tải..." : "Chọn ứng viên"
-                  }
+                  placeholder={isLoadingCandidates ? t("loading") : "Chọn ứng viên"}
                   required
                 />
                 {/* Meeting Type */}
@@ -335,7 +333,7 @@ export default function CreateEventModal({ isOpen, onClose, defaultDate }) {
                     !formData.candidate
                       ? "Chọn ứng viên trước"
                       : isLoadingParticipants
-                      ? "Đang tải..."
+                      ? t("loading")
                       : availableParticipants.length === 0
                       ? "Không có người tham dự trong phòng này"
                       : "Chọn người tham dự"

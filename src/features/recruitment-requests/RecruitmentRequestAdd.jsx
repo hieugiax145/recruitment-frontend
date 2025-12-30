@@ -110,7 +110,7 @@ export default function RecruitmentRequestAdd() {
 
     // Prevent editing general info fields during edit mode
     if (isEditing && isGeneralInfoField(name)) {
-      toast.warning(t("generalInfoEditRestricted"));
+      toast.warning(t("recruitmentRequests.generalInfoEditRestricted"));
       return;
     }
 
@@ -168,10 +168,10 @@ export default function RecruitmentRequestAdd() {
     } else if (!isViewMode) {
       createMutation.mutate(payload, {
         onSuccess: () => {
+          toast.success(t("toasts.createSuccess"));
           navigate(-1);
         },
         onError: (error) => {
-          console.error("Error creating request:", error);
           const errorMessage =
             error.response?.data?.message || t("errorCreateRequest");
           toast.error(errorMessage);
@@ -191,7 +191,7 @@ export default function RecruitmentRequestAdd() {
       { id, data: approvalData },
       {
         onSuccess: () => {
-          toast.success(t("approveSuccess") || "Yêu cầu đã được phê duyệt");
+          toast.success(t("approveSuccess"));
           // Refetch để cập nhật UI
         },
       }
@@ -207,7 +207,7 @@ export default function RecruitmentRequestAdd() {
     if (rejectMutation.isPending) return;
 
     if (!rejectionReason || !rejectionReason.trim()) {
-      toast.error("Vui lòng nhập lý do từ chối");
+      toast.error(t("toasts.pleaseEnterRejectionReason"));
       return;
     }
 
@@ -250,7 +250,7 @@ export default function RecruitmentRequestAdd() {
   const confirmReturn = () => {
     if (returnMutation.isPending) return;
     if (!returnReason || !returnReason.trim()) {
-      toast.error("Vui lòng nhập lý do trả về");
+      toast.error(t("toasts.pleaseEnterReturnReason"));
       return;
     }
     returnMutation.mutate(
@@ -272,7 +272,7 @@ export default function RecruitmentRequestAdd() {
   const confirmCancel = () => {
     if (cancelMutation.isPending) return;
     if (!cancelReason || !cancelReason.trim()) {
-      toast.error("Vui lòng nhập lý do hủy");
+      toast.error(t("toasts.pleaseEnterCancellationReason"));
       return;
     }
     cancelMutation.mutate(
@@ -346,12 +346,12 @@ export default function RecruitmentRequestAdd() {
   const currentStatus = getCurrentStatus();
 
   const progressSteps = [
-    { key: "DRAFT", label: "Nháp" },
-    { key: "PENDING", label: "Đang xử lý" },
-    { key: "APPROVED", label: "Đã duyệt" },
-    { key: "REJECTED", label: "Từ chối" },
-    { key: "RETURNED", label: "Trả về" },
-    { key: "CANCELLED", label: "Đã hủy" },
+    { key: "DRAFT", label: t("statuses.draft") },
+    { key: "PENDING", label: t("statuses.pending") },
+    { key: "APPROVED", label: t("statuses.approved") },
+    { key: "REJECTED", label: t("statuses.rejected") },
+    { key: "RETURNED", label: t("statuses.returned") },
+    { key: "CANCELLED", label: t("statuses.cancelled") },
   ];
 
   const getStepStyle = (stepKey) => {
@@ -392,7 +392,7 @@ export default function RecruitmentRequestAdd() {
             {/* Requester Actions */}
             {canSubmit && (
               <Button onClick={handleSubmit} disabled={isPending}>
-                {submitMutation.isPending ? "Đang nộp..." : "Nộp yêu cầu"}
+                {submitMutation.isPending ? t("buttons.submitting") : t("recruitmentRequests.submitRequest")}
               </Button>
             )}
             
@@ -403,14 +403,14 @@ export default function RecruitmentRequestAdd() {
                 disabled={isPending}
                 className="border-orange-600 text-orange-600 hover:bg-orange-50"
               >
-                {withdrawMutation.isPending ? "Đang thu hồi..." : "Thu hồi"}
+                {withdrawMutation.isPending ? t("buttons.withdrawing") : t("buttons.withdraw")}
               </Button>
             )}
 
             {/* Approver Actions */}
             {canApprove && (
               <Button onClick={handleApprove} disabled={isPending}>
-                {approveMutation.isPending ? "Đang phê duyệt..." : "Phê duyệt"}
+                {approveMutation.isPending ? t("approving") : t("approve")}
               </Button>
             )}
             
@@ -421,7 +421,7 @@ export default function RecruitmentRequestAdd() {
                 disabled={isPending}
                 className="border-red-600 text-red-600 hover:bg-red-50"
               >
-                {rejectMutation.isPending ? "Đang từ chối..." : "Từ chối"}
+                {rejectMutation.isPending ? t("rejecting") : t("reject")}
               </Button>
             )}
             
@@ -432,7 +432,7 @@ export default function RecruitmentRequestAdd() {
                 disabled={isPending}
                 className="border-yellow-600 text-yellow-600 hover:bg-yellow-50"
               >
-                {returnMutation.isPending ? "Đang trả về..." : "Trả về"}
+                {returnMutation.isPending ? t("buttons.returning") : t("buttons.return")}
               </Button>
             )}
 
@@ -492,18 +492,18 @@ export default function RecruitmentRequestAdd() {
         {isViewMode && existingRequest?.workflowInfo?.workflow && (
           <div className="mb-6 bg-white rounded-xl shadow overflow-hidden">
             <div className="p-6 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900">Các bước phê duyệt & trạng thái xử lý</h3>
+              <h3 className="text-lg font-semibold text-gray-900">{t("recruitmentRequests.approvalStepsTitle")}</h3>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-red-50">
                   <tr>
-                    <th className="p-4 text-left text-sm font-medium text-gray-600 whitespace-nowrap">Thứ tự</th>
-                    <th className="p-4 text-left text-sm font-medium text-gray-600 whitespace-nowrap">Tên bước</th>
-                    <th className="p-4 text-left text-sm font-medium text-gray-600 whitespace-nowrap">Trạng thái xử lý</th>
-                    <th className="p-4 text-left text-sm font-medium text-gray-600 whitespace-nowrap">Người phụ trách</th>
-                    <th className="p-4 text-left text-sm font-medium text-gray-600 whitespace-nowrap">Thời gian</th>
-                    <th className="p-4 text-left text-sm font-medium text-gray-600 whitespace-nowrap">Ghi chú</th>
+                    <th className="p-4 text-left text-sm font-medium text-gray-600 whitespace-nowrap">{t("recruitmentRequests.stepOrder")}</th>
+                    <th className="p-4 text-left text-sm font-medium text-gray-600 whitespace-nowrap">{t("recruitmentRequests.stepName")}</th>
+                    <th className="p-4 text-left text-sm font-medium text-gray-600 whitespace-nowrap">{t("recruitmentRequests.processingStatus")}</th>
+                    <th className="p-4 text-left text-sm font-medium text-gray-600 whitespace-nowrap">{t("recruitmentRequests.assignedPerson")}</th>
+                    <th className="p-4 text-left text-sm font-medium text-gray-600 whitespace-nowrap">{t("recruitmentRequests.time")}</th>
+                    <th className="p-4 text-left text-sm font-medium text-gray-600 whitespace-nowrap">{t("notes")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -513,7 +513,7 @@ export default function RecruitmentRequestAdd() {
                       ? existingRequest.workflowInfo.approvalTrackings.filter(tr => tr.stepId === step.id)
                       : [];
                     
-                    let trackingStatus = "Chưa xử lý";
+                    let trackingStatus = t("recruitmentRequests.notProcessed");
                     let actionUserName = "-";
                     let actionTime = "-";
                     let notes = "-";
@@ -526,11 +526,11 @@ export default function RecruitmentRequestAdd() {
                       const latestTracking = approvalTrackings[approvalTrackings.length - 1];
                       const status = latestTracking.status;
                       
-                      if (status === "APPROVED") trackingStatus = "Đã duyệt";
-                      else if (status === "REJECTED") trackingStatus = "Từ chối";
-                      else if (status === "RETURNED") trackingStatus = "Trả về";
-                      else if (status === "CANCELLED") trackingStatus = "Đã hủy";
-                      else if (status === "PENDING") trackingStatus = "Đang chờ";
+                      if (status === "APPROVED") trackingStatus = t("statuses.approved");
+                      else if (status === "REJECTED") trackingStatus = t("statuses.rejected");
+                      else if (status === "RETURNED") trackingStatus = t("statuses.returned");
+                      else if (status === "CANCELLED") trackingStatus = t("statuses.cancelled");
+                      else if (status === "PENDING") trackingStatus = t("statuses.pending");
                       else trackingStatus = status;
                       
                       // Lấy tên người thao tác
@@ -586,7 +586,7 @@ export default function RecruitmentRequestAdd() {
               ) : (
                 <SelectDropdown
                   label={t("department")}
-                  placeholder={t("selectDepartment", { defaultValue: "Chọn phòng ban" })}
+                  placeholder={t("recruitmentRequests.selectDepartment")}
                   options={departments.map(d => ({ id: d.id, name: d.name }))}
                   value={formData.departmentId}
                   onChange={(value) => {
@@ -615,8 +615,8 @@ export default function RecruitmentRequestAdd() {
               {/* Priority removed temporarily */}
 
               <SelectDropdown
-                label={t("workflow", { defaultValue: "Luồng phê duyệt" })}
-                placeholder={selectedDepartmentId ? t("selectWorkflow", { defaultValue: "Chọn luồng phê duyệt" }) : t("selectDepartmentFirst", { defaultValue: "Chọn phòng ban trước" })}
+                label={t("recruitmentRequests.workflow")}
+                placeholder={selectedDepartmentId ? t("recruitmentRequests.selectWorkflow") : t("recruitmentRequests.selectDepartmentFirst")}
                 options={workflows.map(w => ({ id: w.id, name: w.name }))}
                 value={formData.workflowId}
                 onChange={(value) => {
@@ -630,12 +630,12 @@ export default function RecruitmentRequestAdd() {
             {/* Workflow Steps Preview - only show when workflow is selected and in create mode */}
             {!isViewMode && formData.workflowId && (
               <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <h3 className="text-sm font-semibold text-blue-900 mb-3">Các bước phê duyệt của luồng đã chọn:</h3>
+                <h3 className="text-sm font-semibold text-blue-900 mb-3">{t("recruitmentRequests.selectedWorkflowSteps")}</h3>
                 <div className="space-y-2">
                   {(() => {
                     const selectedWorkflow = workflows.find(w => w.id === formData.workflowId);
                     if (!selectedWorkflow || !selectedWorkflow.steps || selectedWorkflow.steps.length === 0) {
-                      return <p className="text-sm text-blue-700">Không có bước phê duyệt nào</p>;
+                      return <p className="text-sm text-blue-700">{t("recruitmentRequests.noApprovalSteps")}</p>;
                     }
                     return selectedWorkflow.steps
                       .sort((a, b) => a.stepOrder - b.stepOrder)
@@ -645,9 +645,9 @@ export default function RecruitmentRequestAdd() {
                             {step.stepOrder}
                           </span>
                           <div className="flex-1">
-                            <p className="text-blue-900 font-medium">{`Bước ${step.stepOrder}`}</p>
+                            <p className="text-blue-900 font-medium">{`${t("recruitmentRequests.step")} ${step.stepOrder}`}</p>
                             <p className="text-blue-700 text-xs mt-0.5">
-                              Người phê duyệt: {step.approverPositionName || "Chưa xác định"}
+                              {t("recruitmentRequests.approver")}: {step.approverPositionName || t("recruitmentRequests.notDetermined")}
                             </p>
                           </div>
                         </div>
@@ -712,14 +712,14 @@ export default function RecruitmentRequestAdd() {
             </div>
           )}
           <div className="p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Nộp yêu cầu</h3>
-            <p className="text-sm text-gray-600 mb-4">Bạn có chắc chắn muốn nộp yêu cầu tuyển dụng này?</p>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">{t("recruitmentRequests.submitDialogTitle")}</h3>
+            <p className="text-sm text-gray-600 mb-4">{t("recruitmentRequests.submitDialogMessage")}</p>
             <div className="flex gap-3">
               <Button variant="outline" onClick={() => setShowSubmitDialog(false)} disabled={submitMutation.isPending} className="flex-1">
-                Hủy
+                {t("cancel")}
               </Button>
               <Button onClick={confirmSubmit} disabled={submitMutation.isPending} className="flex-1">
-                {submitMutation.isPending ? "Đang xử lý..." : "Nộp"}
+                {submitMutation.isPending ? t("buttons.processing") : t("common.confirm")}
               </Button>
             </div>
           </div>
@@ -755,14 +755,14 @@ export default function RecruitmentRequestAdd() {
                 <AlertTriangle className="h-6 w-6" />
               </div>
               <div className="flex-1">
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Từ chối yêu cầu</h3>
-                <p className="text-sm text-gray-600 leading-relaxed">Vui lòng nhập lý do từ chối yêu cầu này</p>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">{t("recruitmentRequests.rejectDialogTitle")}</h3>
+                <p className="text-sm text-gray-600 leading-relaxed">{t("recruitmentRequests.rejectDialogMessage")}</p>
               </div>
             </div>
           </div>
           <div className="px-6 pb-6">
             <textarea
-              placeholder="Nhập lý do từ chối..."
+              placeholder={t("recruitmentRequests.rejectPlaceholder")}
               value={rejectionReason}
               onChange={(e) => setRejectionReason(e.target.value)}
               disabled={rejectMutation.isPending}
@@ -782,14 +782,14 @@ export default function RecruitmentRequestAdd() {
               disabled={rejectMutation.isPending}
               className="flex-1"
             >
-              Hủy
+              {t("cancel")}
             </Button>
             <Button
               onClick={confirmReject}
               disabled={rejectMutation.isPending || !rejectionReason.trim()}
               className="flex-1"
             >
-              {rejectMutation.isPending ? "Đang xử lý..." : "Từ chối"}
+              {rejectMutation.isPending ? t("buttons.processing") : t("reject")}
             </Button>
           </div>
         </div>
@@ -824,14 +824,14 @@ export default function RecruitmentRequestAdd() {
                 <AlertTriangle className="h-6 w-6" />
               </div>
               <div className="flex-1">
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Trả về yêu cầu</h3>
-                <p className="text-sm text-gray-600 leading-relaxed">Vui lòng nhập lý do trả về yêu cầu này</p>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">{t("recruitmentRequests.returnDialogTitle")}</h3>
+                <p className="text-sm text-gray-600 leading-relaxed">{t("recruitmentRequests.returnDialogMessage")}</p>
               </div>
             </div>
           </div>
           <div className="px-6 pb-6">
             <textarea
-              placeholder="Nhập lý do trả về..."
+              placeholder={t("recruitmentRequests.returnPlaceholder")}
               value={returnReason}
               onChange={(e) => setReturnReason(e.target.value)}
               disabled={returnMutation.isPending}
@@ -851,14 +851,14 @@ export default function RecruitmentRequestAdd() {
               disabled={returnMutation.isPending}
               className="flex-1"
             >
-              Hủy
+              {t("cancel")}
             </Button>
             <Button
               onClick={confirmReturn}
               disabled={returnMutation.isPending || !returnReason.trim()}
               className="flex-1"
             >
-              {returnMutation.isPending ? "Đang xử lý..." : "Trả về"}
+              {returnMutation.isPending ? t("buttons.processing") : t("buttons.return")}
             </Button>
           </div>
         </div>
@@ -893,14 +893,14 @@ export default function RecruitmentRequestAdd() {
                 <AlertTriangle className="h-6 w-6" />
               </div>
               <div className="flex-1">
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Hủy yêu cầu</h3>
-                <p className="text-sm text-gray-600 leading-relaxed">Vui lòng nhập lý do hủy yêu cầu này</p>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">{t("recruitmentRequests.cancelDialogTitle")}</h3>
+                <p className="text-sm text-gray-600 leading-relaxed">{t("recruitmentRequests.cancelDialogMessage")}</p>
               </div>
             </div>
           </div>
           <div className="px-6 pb-6">
             <textarea
-              placeholder="Nhập lý do hủy..."
+              placeholder={t("recruitmentRequests.cancelPlaceholder")}
               value={cancelReason}
               onChange={(e) => setCancelReason(e.target.value)}
               disabled={cancelMutation.isPending}
@@ -920,14 +920,14 @@ export default function RecruitmentRequestAdd() {
               disabled={cancelMutation.isPending}
               className="flex-1"
             >
-              Hủy
+              {t("cancel")}
             </Button>
             <Button
               onClick={confirmCancel}
               disabled={cancelMutation.isPending || !cancelReason.trim()}
               className="flex-1"
             >
-              {cancelMutation.isPending ? "Đang xử lý..." : "Xác nhận"}
+              {cancelMutation.isPending ? t("buttons.processing") : t("common.confirm")}
             </Button>
           </div>
         </div>
@@ -949,14 +949,14 @@ export default function RecruitmentRequestAdd() {
             </div>
           )}
           <div className="p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Thu hồi yêu cầu</h3>
-            <p className="text-sm text-gray-600 mb-4">Bạn có chắc chắn muốn thu hồi yêu cầu tuyển dụng này?</p>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">{t("recruitmentRequests.withdrawDialogTitle")}</h3>
+            <p className="text-sm text-gray-600 mb-4">{t("recruitmentRequests.withdrawDialogMessage")}</p>
             <div className="flex gap-3">
               <Button variant="outline" onClick={() => setShowWithdrawDialog(false)} disabled={withdrawMutation.isPending} className="flex-1">
-                Hủy
+                {t("cancel")}
               </Button>
               <Button onClick={confirmWithdraw} disabled={withdrawMutation.isPending} className="flex-1">
-                {withdrawMutation.isPending ? "Đang xử lý..." : "Thu hồi"}
+                {withdrawMutation.isPending ? t("buttons.processing") : t("buttons.withdraw")}
               </Button>
             </div>
           </div>

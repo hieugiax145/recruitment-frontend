@@ -1,25 +1,18 @@
-import Can from "../../components/Can";
 import Button from "../../components/ui/Button";
 import ContentHeader from "../../components/ui/ContentHeader";
+import TextInput from "../../components/ui/TextInput";
 import {
   Plus,
-  Code,
   User,
-  Megaphone,
-  DollarSign,
-  BarChart3,
-  Building2,
-  FileText,
-  MoreVertical,
-  Search,
   Briefcase,
-  Filter,
+  FileText,
+  CheckCircle,
+  XCircle,
+  Search,
 } from "lucide-react";
 import Pagination from "../../components/ui/Pagination";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import PositionCard from "./components/PositionCard";
-import PositionDetail from "./components/PositionDetail";
 import ConfirmDialog from "../../components/ui/ConfirmDialog";
 import AddCandidateModal from "../candidate/components/AddCandidateModal";
 import {
@@ -36,31 +29,23 @@ import { useAllDepartments } from "../../hooks/useDepartments";
 import LoadingContent from "../../components/ui/LoadingContent";
 import EmptyState from "../../components/ui/EmptyState";
 import { useAuth } from "../../context/AuthContext";
+import StatusBadge from "../../components/ui/StatusBadge";
 
 export default function JobPositions() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { user } = useAuth();
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedPosition, setSelectedPosition] = useState(null);
-  const [isDetailFixed, setIsDetailFixed] = useState(false);
-  const [detailDimensions, setDetailDimensions] = useState({
-    width: 0,
-    left: 0,
-    height: 0,
-  });
-  const detailRef = useRef(null);
-  const detailPlaceholderRef = useRef(null);
+  const [expandedRowId, setExpandedRowId] = useState(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [positionToDelete, setPositionToDelete] = useState(null);
   const [showAddCandidateModal, setShowAddCandidateModal] = useState(false);
   const [positionForCandidate, setPositionForCandidate] = useState(null);
   const [selectedDepartmentId, setSelectedDepartmentId] = useState(null);
+  const [keyword, setKeyword] = useState("");
 
   // Determine effective department filter
   const userDeptId = user?.department?.id;
-  const userDeptName = user?.department?.name || "";
-  const nameLower = userDeptName.toLowerCase();
   const isHR = userDeptId === 2;
   const shouldRestrictToUserDept = !!userDeptId && !isHR;
   const effectiveDepartmentId = shouldRestrictToUserDept
@@ -80,10 +65,9 @@ export default function JobPositions() {
 
   // Get positions from API response
   const rawPositions = Array.isArray(data?.data?.result) ? data.data.result : [];
-  const filteredRawPositions = rawPositions;
 
   // Map API data to UI format
-  const positions = filteredRawPositions.map((pos) => ({
+  const positions = rawPositions.map((pos) => ({
     id: pos.id.toString(),
     title: pos.title,
     description: pos.description,
@@ -92,32 +76,26 @@ export default function JobPositions() {
     qualifications: pos.qualifications,
     benefits: pos.benefits,
     salary: `₫ ${formatSalary(pos.salaryMin)} - ${formatSalary(pos.salaryMax)}`,
-    salaryMin: pos.salaryMin,
-    salaryMax: pos.salaryMax,
-    currency: pos.currency,
-    level:
-      pos.experienceLevel?.toLowerCase().replace(/[_\s-]/g, "-") || "mid-level",
-    experienceLevel: pos.experienceLevel,
-    experience: pos.yearsOfExperience || "N/A",
-    yearsOfExperience: pos.yearsOfExperience,
     type: pos.employmentType || "Full-time",
-    employmentType: pos.employmentType,
     location: pos.location || "N/A",
-    mode: pos.remote ? "Remote" : null,
-    remoteWorkAllowed: pos.remote,
-    numberOfPositions: pos.quantity,
     quantity: pos.quantity,
     applicants: pos.applicationCount || 0,
-    applicationCount: pos.applicationCount,
     deadline: pos.deadline,
-    status: pos.status?.toLowerCase() || "draft",
+    status: pos.status?.toUpperCase() || "DRAFT",
     recruitmentRequestId: pos.recruitmentRequest?.id,
-    recruitmentRequest: pos.recruitmentRequest,
     department: pos.departmentName || "",
-    departmentName: pos.departmentName,
-    icon: Code, // Default icon
-    iconBg: "bg-lime-200", // Default background
-  }));
+    experience: pos.yearsOfExperience || "N/A",
+    remote: pos.remote || false,
+    publishedAt: pos.publishedAt
+  })).filter((pos) => {
+    if (!keyword) return true;
+    const searchLower = keyword.toLowerCase();
+    return (
+      pos.title?.toLowerCase().includes(searchLower) ||
+      pos.description?.toLowerCase().includes(searchLower) ||
+      pos.department?.toLowerCase().includes(searchLower)
+    );
+  });
 
   // Show toast notification when there's an error
   useEffect(() => {
@@ -140,33 +118,20 @@ export default function JobPositions() {
     }
   };
 
-  const handlePositionClick = (position) => {
-    if (selectedPosition?.id === position.id) {
-      setSelectedPosition(null);
-    } else {
-      setSelectedPosition(position);
-    }
-  };
-
-  const handleView = (position) => {
-    console.log("View position:", position);
-    setSelectedPosition(position);
+  const handleRowClick = (positionId) => {
+    setExpandedRowId(expandedRowId === positionId ? null : positionId);
   };
 
   const handleEdit = (position) => {
-    console.log("Edit position:", position);
-    // Navigate to edit page or open edit modal
     navigate(`/job-positions/${position.id}/edit`);
   };
 
   const handleAddCandidate = (position) => {
-    console.log("Add candidate for position:", position);
     setPositionForCandidate(position);
     setShowAddCandidateModal(true);
   };
 
   const handleDelete = (position) => {
-    console.log("Delete position:", position);
     setPositionToDelete(position);
     setShowDeleteDialog(true);
   };
@@ -198,9 +163,10 @@ export default function JobPositions() {
     if (positionToDelete) {
       deleteMutation.mutate(positionToDelete.id, {
         onSuccess: () => {
-          // If deleted position is selected, close detail panel
-          if (selectedPosition?.id === positionToDelete.id) {
-            setSelectedPosition(null);
+          toast.success(t("toasts.deleteSuccess"));
+          // If deleted position is expanded, close it
+          if (expandedRowId === positionToDelete.id) {
+            setExpandedRowId(null);
           }
           setShowDeleteDialog(false);
           setPositionToDelete(null);
@@ -209,67 +175,24 @@ export default function JobPositions() {
     }
   };
 
-  // Handle scroll to make detail panel fixed
-  useEffect(() => {
-    if (!selectedPosition) {
-      setIsDetailFixed(false);
-      return;
-    }
-
-    const handleScroll = () => {
-      if (detailPlaceholderRef.current && detailRef.current) {
-        const placeholderRect =
-          detailPlaceholderRef.current.getBoundingClientRect();
-        const detailRect = detailRef.current.getBoundingClientRect();
-        // AppBar height (60px) + top padding (16px) = 76px
-        // Add gap (16px) = 92px total offset
-        const stickyOffset = 92;
-
-        // Always update dimensions to handle resize and position changes
-        const newDimensions = {
-          width: placeholderRect.width,
-          left: placeholderRect.left,
-          height: detailRect.height,
-        };
-
-        // Only update state if dimensions actually changed
-        setDetailDimensions((prev) => {
-          if (
-            prev.width !== newDimensions.width ||
-            prev.left !== newDimensions.left ||
-            prev.height !== newDimensions.height
-          ) {
-            return newDimensions;
-          }
-          return prev;
-        });
-
-        // Check if should be fixed with some threshold
-        const shouldBeFixed = placeholderRect.top <= stickyOffset;
-
-        if (shouldBeFixed !== isDetailFixed) {
-          setIsDetailFixed(shouldBeFixed);
-        }
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    window.addEventListener("resize", handleScroll); // Update on resize
-    handleScroll(); // Check initial position
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("resize", handleScroll);
-    };
-  }, [selectedPosition, isDetailFixed]);
-
   if (isLoading) {
     return (
       <div className="flex flex-col h-full">
         <ContentHeader
           title={t("listJobPosition")}
           actions={
-            <div className="flex gap-4 items-center">
+            <div className="flex gap-3 items-center">
+              <TextInput
+                placeholder={t("common.search")}
+                value={keyword}
+                onChange={(e) => {
+                  setKeyword(e.target.value);
+                  setCurrentPage(1);
+                }}
+                icon={Search}
+                hideLabel
+                className="w-[300px]"
+              />
               {isHR && (
                 <SelectDropdown
                   value={selectedDepartmentId}
@@ -306,13 +229,24 @@ export default function JobPositions() {
       <ContentHeader
         title={t("listJobPosition")}
         actions={
-          <div className="flex gap-4 items-center">
+          <div className="flex gap-3 items-center">
+            <TextInput
+              placeholder={t("common.search")}
+              value={keyword}
+              onChange={(e) => {
+                setKeyword(e.target.value);
+                setCurrentPage(1);
+              }}
+              icon={Search}
+              hideLabel
+              className="w-[300px]"
+            />
             {isHR && (
               <SelectDropdown
                 value={selectedDepartmentId}
                 onChange={setSelectedDepartmentId}
-                options={[{ id: null, name: "Tất cả phòng ban" }, ...departments.map(d => ({ id: d.id, name: d.name }))]}
-                placeholder="Tất cả phòng ban"
+              options={[{ id: null, name: t("jobPositions.allDepartments") }, ...departments.map(d => ({ id: d.id, name: d.name }))]}
+              placeholder={t("jobPositions.allDepartments")}
                 hideLabel
                 compact
                 className="min-w-[200px]"
@@ -331,85 +265,169 @@ export default function JobPositions() {
           </div>
         }
       />
-      <div
-        className={`flex ${
-          selectedPosition ? "" : "flex-col"
-        } flex-1 mt-4 gap-4 items-start`}
-      >
-        {/* Left side - Positions List */}
-        <div
-          className={`${
-            selectedPosition ? "w-1/2" : "flex-1  w-full"
-          } bg-white rounded-xl shadow p-6 flex flex-col`}
-        >
-          <div className="flex-1 overflow-visible">
-            {currentPositions.length === 0 ? (
-              <div className="py-12">
-                <EmptyState title={t("noPositionsFound", { defaultValue: "Không có vị trí tuyển dụng" })} icon={Briefcase}/>
-              </div>
-            ) : (
-              <div
-                className={
-                  selectedPosition
-                    ? `space-y-3`
-                    : `grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3`
-                }
-              >
-                {currentPositions.map((position) => {
-                  return (
-                    <PositionCard
-                      key={position.id}
-                      position={position}
-                      isCompact={!!selectedPosition}
-                      isSelected={selectedPosition?.id === position.id}
-                      onClicked={() => handlePositionClick(position)}
-                      onClickedCandidates={(pos) => {
-                        navigate(`/job-positions/${pos.id}/candidates`);
-                      }}
-                      onAddCandidate={isHR ? handleAddCandidate : undefined}
-                      onView={handleView}
-                      onEdit={isHR ? handleEdit : undefined}
-                      onDelete={isHR ? handleDelete : undefined}
-                      onUpdateStatus={isHR ? handleUpdateStatus : undefined}
-                    />
-                  );
-                })}
-              </div>
-            )}
+      
+      {/* Table View */}
+      <div className="flex-1 flex flex-col mt-4 min-h-0">
+        <div className="flex-1 flex flex-col bg-white rounded-xl shadow overflow-hidden">
+          <div className="flex-1 overflow-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50 border-b border-gray-200 sticky top-0 z-10">
+                <tr>
+                  <th className="p-4 text-left text-sm font-medium text-gray-600">
+                    ID
+                  </th>
+                  <th className="p-4 text-left text-sm font-medium text-gray-600">
+                    {t("position")}
+                  </th>
+                  <th className="p-4 text-left text-sm font-medium text-gray-600">
+                    {t("department")}
+                  </th>
+                  <th className="p-4 text-left text-sm font-medium text-gray-600">
+                    {t("quantity")}
+                  </th>
+                  <th className="p-4 text-left text-sm font-medium text-gray-600">
+                    {t("applicants")}
+                  </th>
+                  <th className="p-4 text-left text-sm font-medium text-gray-600">
+                    {t("salary")}
+                  </th>
+                  <th className="p-4 text-left text-sm font-medium text-gray-600">
+                    {t("status")}
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {currentPositions.length === 0 ? (
+                  <tr>
+                    <td colSpan="7" className="p-8">
+                      <EmptyState title={t("noPositionsFound")} icon={Briefcase}/>
+                    </td>
+                  </tr>
+                ) : (
+                  currentPositions.map((position) => {
+                    const isExpanded = expandedRowId === position.id;
+                    
+                    return (
+                      <>
+                        <tr 
+                          key={position.id}
+                          className={`hover:bg-gray-50 cursor-pointer transition-colors ${isExpanded ? 'bg-blue-50' : ''}`}
+                          onClick={() => handleRowClick(position.id)}
+                        >
+                          <td className="p-4 text-sm text-gray-900">{position.id}</td>
+                          <td className="p-4">
+                            <div className="text-sm font-medium text-gray-900">{position.title}</div>
+                            <div className="text-xs text-gray-500">{position.type} • {position.location}</div>
+                          </td>
+                          <td className="p-4 text-sm text-gray-600">{position.department}</td>
+                          <td className="p-4 text-sm text-gray-600">{position.quantity}</td>
+                          <td className="p-4 text-sm text-gray-600">{position.applicants}</td>
+                          <td className="p-4 text-sm text-gray-600">{position.salary}</td>
+                          <td className="p-4">
+                            <StatusBadge status={position.status} />
+                          </td>
+                        </tr>
+                        {isExpanded && (
+                          <tr>
+                            <td colSpan="7" className="p-0">
+                              <div className="bg-gray-50 px-6 py-4 space-y-4">
+                                <div>
+                                  <h4 className="text-sm font-semibold text-gray-900 mb-2">{t("jobPositions.jobDescription")}</h4>
+                                  <p className="text-sm text-gray-700 whitespace-pre-wrap">{position.description}</p>
+                                </div>
+                                
+                                {position.responsibilities && (
+                                  <div>
+                                    <h4 className="text-sm font-semibold text-gray-900 mb-2">{t("jobPositions.responsibilities")}</h4>
+                                    <p className="text-sm text-gray-700 whitespace-pre-wrap">{position.responsibilities}</p>
+                                  </div>
+                                )}
+                                
+                                {position.requirements && (
+                                  <div>
+                                    <h4 className="text-sm font-semibold text-gray-900 mb-2">{t("jobPositions.requirements")}</h4>
+                                    <p className="text-sm text-gray-700 whitespace-pre-wrap">{position.requirements}</p>
+                                  </div>
+                                )}
+                                
+                                {position.qualifications && (
+                                  <div>
+                                    <h4 className="text-sm font-semibold text-gray-900 mb-2">{t("jobPositions.qualifications")}</h4>
+                                    <p className="text-sm text-gray-700 whitespace-pre-wrap">{position.qualifications}</p>
+                                  </div>
+                                )}
+                                
+                                {position.benefits && (
+                                  <div>
+                                    <h4 className="text-sm font-semibold text-gray-900 mb-2">{t("jobPositions.benefits")}</h4>
+                                    <p className="text-sm text-gray-700 whitespace-pre-wrap">{position.benefits}</p>
+                                  </div>
+                                )}
+                                
+                                {isHR && (
+                                  <div className="flex items-center justify-end flex-wrap gap-2 pt-2 border-t border-gray-200">
+                                    <Button onClick={() => navigate(`/job-positions/${position.id}/candidates`)}>
+                                      <User className="h-4 w-4 mr-2" />
+                                      {t("jobPositions.viewCandidates")} ({position.applicants})
+                                    </Button>
+                                    
+                                    <Button variant="outline" onClick={() => handleAddCandidate(position)}>
+                                      <Plus className="h-4 w-4 mr-2" />
+                                      {t("jobPositions.addCandidate")}
+                                    </Button>
+                                    
+                                    {position.status === 'DRAFT' && (
+                                      <Button variant="outline" onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleUpdateStatus(position, 'PUBLISHED');
+                                      }}>
+                                        <CheckCircle className="h-4 w-4 mr-2" />
+                                        {t("jobPositions.publish")}
+                                      </Button>
+                                    )}
+                                    
+                                    {position.status === 'PUBLISHED' && (
+                                      <Button variant="outline" onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleUpdateStatus(position, 'CLOSED');
+                                      }}>
+                                        <XCircle className="h-4 w-4 mr-2" />
+                                        {t("jobPositions.close")}
+                                      </Button>
+                                    )}
+                                    
+                                    <Button variant="outline" onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleEdit(position);
+                                    }}>
+                                      <FileText className="h-4 w-4 mr-2" />
+                                      {t("edit")}
+                                    </Button>
+                                  </div>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        )}
+                      </>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
           </div>
-          {/* mark: pagination */}
-          <div className="flex justify-end items-center mt-4">
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={goToPage}
-            />
-          </div>
+          
+          {/* Pagination */}
+          {positions.length > 0 && (
+            <div className="flex-shrink-0 flex justify-end items-center p-4 border-t border-gray-200">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={goToPage}
+              />
+            </div>
+          )}
         </div>
-
-        {/* Right side - Position Detail */}
-        {selectedPosition && (
-          <div
-            className="w-1/2 flex"
-            ref={detailPlaceholderRef}
-            style={
-              isDetailFixed
-                ? { minHeight: `${detailDimensions.height}px` }
-                : undefined
-            }
-          >
-            <PositionDetail
-              ref={detailRef}
-              position={selectedPosition}
-              onClose={() => setSelectedPosition(null)}
-              onNavigateToCandidates={() =>
-                navigate(`/job-positions/${selectedPosition.id}/candidates`)
-              }
-              isFixed={isDetailFixed}
-              dimensions={detailDimensions}
-            />
-          </div>
-        )}
       </div>
 
       {/* Delete Confirmation Dialog */}

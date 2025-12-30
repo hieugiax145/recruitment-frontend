@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { reqServices } from "../services/reqServices";
 import { toast } from "react-toastify";
+import i18n from "../../../config/translation";
 
 export const recruitmentRequestKeys = {
   all: ["recruitment-requests"],
@@ -43,7 +44,7 @@ export const useCreateRecruitmentRequest = () => {
     },
     onError: (error) => {
       const errorMessage =
-        error.response?.data?.message || "Failed to create request";
+        error.response?.data?.message || i18n.t("recruitmentRequests.errorCreate");
       toast.error(errorMessage);
     },
   });
@@ -62,7 +63,7 @@ export const useUpdateRecruitmentRequest = () => {
     },
     onError: (error) => {
       const errorMessage =
-        error.response?.data?.message || "Failed to update request";
+        error.response?.data?.message || i18n.t("recruitmentRequests.errorUpdate");
       toast.error(errorMessage);
     },
   });
@@ -81,7 +82,7 @@ export const useDeleteRecruitmentRequest = () => {
     },
     onError: (error) => {
       const errorMessage =
-        error.response?.data?.message || "Failed to delete request";
+        error.response?.data?.message || i18n.t("recruitmentRequests.errorDelete");
       toast.error(errorMessage);
     },
   });
@@ -100,7 +101,7 @@ export const useApproveRecruitmentRequest = () => {
     },
     onError: (error) => {
       const errorMessage =
-        error.response?.data?.message || "Không thể phê duyệt yêu cầu";
+        error.response?.data?.message || i18n.t("recruitmentRequests.errorApprove");
       toast.error(errorMessage);
     },
   });
@@ -119,7 +120,7 @@ export const useRejectRecruitmentRequest = () => {
     },
     onError: (error) => {
       const errorMessage =
-        error.response?.data?.message || "Không thể từ chối yêu cầu";
+        error.response?.data?.message || i18n.t("recruitmentRequests.errorReject");
       toast.error(errorMessage);
     },
   });
@@ -138,7 +139,7 @@ export const useSubmitRecruitmentRequest = () => {
     },
     onError: (error) => {
       const errorMessage =
-        error.response?.data?.message || "Không thể nộp yêu cầu";
+        error.response?.data?.message || i18n.t("recruitmentRequests.errorSubmit");
       toast.error(errorMessage);
     },
   });
@@ -157,7 +158,7 @@ export const useReturnRecruitmentRequest = () => {
     },
     onError: (error) => {
       const errorMessage =
-        error.response?.data?.message || "Không thể trả về yêu cầu";
+        error.response?.data?.message || i18n.t("recruitmentRequests.errorReturn");
       toast.error(errorMessage);
     },
   });
@@ -176,7 +177,7 @@ export const useCancelRecruitmentRequest = () => {
     },
     onError: (error) => {
       const errorMessage =
-        error.response?.data?.message || "Không thể hủy yêu cầu";
+        error.response?.data?.message || i18n.t("recruitmentRequests.errorCancel");
       toast.error(errorMessage);
     },
   });
@@ -195,7 +196,7 @@ export const useWithdrawRecruitmentRequest = () => {
     },
     onError: (error) => {
       const errorMessage =
-        error.response?.data?.message || "Không thể thu hồi yêu cầu";
+        error.response?.data?.message || i18n.t("recruitmentRequests.errorWithdraw");
       toast.error(errorMessage);
     },
   });

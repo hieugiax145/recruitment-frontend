@@ -72,22 +72,22 @@ export default function EmployeeForm() {
   const handleSubmit = (e) => {
     e.preventDefault();
     const requiredFieldsMap = {
-      name: t("employeeName", { defaultValue: "Employee Name" }),
-      phone: t("phone", { defaultValue: "Phone" }),
-      email: t("email", { defaultValue: "Email" }),
-      gender: t("gender", { defaultValue: "Gender" }),
-      address: t("address", { defaultValue: "Address" }),
-      nationality: t("nationality", { defaultValue: "Nationality" }),
-      dateOfBirth: t("dateOfBirth", { defaultValue: "Date of Birth" }),
-      idNumber: t("idNumber", { defaultValue: "ID Number" }),
-      departmentId: t("department", { defaultValue: "Department" }),
-      positionId: t("position", { defaultValue: "Position" }),
+      name: t("employeeName"),
+      phone: t("phone"),
+      email: t("email"),
+      gender: t("gender"),
+      address: t("address"),
+      nationality: t("nationality"),
+      dateOfBirth: t("dateOfBirth"),
+      idNumber: t("idNumber"),
+      departmentId: t("department"),
+      positionId: t("position"),
     };
 
     for (const [field, label] of Object.entries(requiredFieldsMap)) {
       const value = form[field];
       if (value === null || value === undefined || String(value).trim() === "") {
-        toast.error(`${label} ${t("isRequired", { defaultValue: "is required" })}`);
+        toast.error(`${label} ${t("isRequired")}`);
         return;
       }
     }
@@ -217,14 +217,14 @@ export default function EmployeeForm() {
             <div className="grid grid-cols-3 gap-6">
               <div className="col-span-2 space-y-4">
                 <TextInput 
-                  label={t("employeeName", { defaultValue: "Employee Name" })} 
+                  label={t("employeeName")} 
                   value={form.name} 
                   onChange={onChange("name")} 
                   required 
                   disabled={isEditPage && !isEditMode}
                 />
                 <TextInput 
-                  label={t("email", { defaultValue: "Email" })} 
+                  label={t("email")} 
                   type="email" 
                   value={form.email} 
                   onChange={onChange("email")} 
@@ -232,7 +232,7 @@ export default function EmployeeForm() {
                   disabled={isEditPage && !isEditMode}
                 />
                 <TextInput 
-                  label={t("phone", { defaultValue: "Phone" })} 
+                  label={t("phone")} 
                   value={form.phone} 
                   onChange={onChange("phone")} 
                   required 
@@ -240,15 +240,15 @@ export default function EmployeeForm() {
                 />
                 <div className="grid grid-cols-2 gap-4">
                   <SelectDropdown
-                    label={t("gender", { defaultValue: "Gender" })}
+                    label={t("gender")}
                     options={[
-                      { id: "Male", name: t("male", { defaultValue: "Male" }) },
-                      { id: "Female", name: t("female", { defaultValue: "Female" }) },
-                      { id: "Other", name: t("other", { defaultValue: "Other" }) },
+                      { id: "Male", name: t("male") },
+                      { id: "Female", name: t("female") },
+                      { id: "Other", name: t("other") },
                     ]}
                     value={form.gender}
                     onChange={(v) => setForm((s) => ({ ...s, gender: v }))}
-                    placeholder={t("gender", { defaultValue: "Gender" })}
+                    placeholder={t("gender")}
                     required
                     disabled={isEditPage && !isEditMode}
                   />
@@ -278,7 +278,7 @@ export default function EmployeeForm() {
                   />
                 </div>
                 <TextInput 
-                  label={t("address", { defaultValue: "Address" })} 
+                  label={t("address")} 
                   value={form.address} 
                   onChange={onChange("address")} 
                   required 
@@ -307,7 +307,7 @@ export default function EmployeeForm() {
               </div>
               <div className="col-span-1 flex flex-col">
                 <FileUploader
-                  label={t("avatar", { defaultValue: "Avatar" })}
+                  label={t("avatar")}
                   onFileChange={setAvatarFile}
                   preview={avatarPreview}
                   setPreview={setAvatarPreview}

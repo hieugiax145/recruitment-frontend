@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useCandidate, useAddCandidateComment } from "./hooks/useCandidates";
+import { useCandidate, useAddCandidateComment, useUpdateCandidateStatus } from "./hooks/useCandidates";
 import { useAuth } from "../../context/AuthContext";
 import ContentHeader from "../../components/ui/ContentHeader";
 import Button from "../../components/ui/Button";
@@ -16,6 +16,7 @@ import LoadingContent from "../../components/ui/LoadingContent";
 import { useState } from "react";
 import SendEmailModal from "./components/SendEmailModal";
 import CreateEventModal from "../calendar/components/CreateEventModal";
+import { toast } from "react-toastify";
 
 export default function CandidateDetail() {
   const { t } = useTranslation();
@@ -32,6 +33,17 @@ export default function CandidateDetail() {
     cacheTime: 0,
   });
   const addComment = useAddCandidateComment();
+  const updateStatus = useUpdateCandidateStatus();
+
+  const CANDIDATE_STATUSES = [
+    { id: "SUBMITTED", label: t("statuses.submitted"), color: "#3B82F6" },
+    { id: "REVIEWING", label: t("statuses.reviewing"), color: "#6366F1" },
+    { id: "INTERVIEW", label: t("statuses.interview"), color: "#F59E0B" },
+    { id: "OFFER", label: t("statuses.offer"), color: "#8B5CF6" },
+    { id: "HIRED", label: t("statuses.hired"), color: "#10B981" },
+    { id: "ARCHIVED", label: t("statuses.archived"), color: "#6B7280" },
+    { id: "REJECTED", label: t("statuses.rejected"), color: "#EF4444" },
+  ];
 
   const candidate = data?.data;
 
@@ -75,7 +87,7 @@ export default function CandidateDetail() {
     );
   }
 
-  const displayName = candidate.fullName || candidate.candidateName || "-";
+  const displayName = candidate.name || candidate.candidateName || "-";
   const displayEmail = candidate.email || candidate.candidateEmail || "-";
   const displayPhone = candidate.phone || candidate.candidatePhone || "-";
   const jobPositionTitle = candidate.jobPosition?.title || "-";
@@ -86,6 +98,17 @@ export default function CandidateDetail() {
   const experienceLevel = candidate.jobPosition?.experienceLevel;
   const yearsOfExperience = candidate.jobPosition?.yearsOfExperience;
 
+  const handleStatusChange = (newStatus) => {
+    updateStatus.mutate(
+      { id: candidate.id, status: newStatus },
+      {
+        onSuccess: () => {
+          toast.success(t("toasts.updateStatusSuccess"));
+        },
+      }
+    );
+  };
+
   return (
     <div className="flex flex-col h-full">
       <ContentHeader
@@ -94,6 +117,25 @@ export default function CandidateDetail() {
         onBack={() => navigate("/candidates")}
         actions={
           <div className="flex gap-2">
+            {isHR && (
+              <div className="relative">
+                <select
+                  value={candidate.status}
+                  onChange={(e) => handleStatusChange(e.target.value)}
+                  disabled={updateStatus.isPending}
+                  className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  style={{
+                    color: CANDIDATE_STATUSES.find(s => s.id === candidate.status)?.color || "#6B7280"
+                  }}
+                >
+                  {CANDIDATE_STATUSES.map((status) => (
+                    <option key={status.id} value={status.id}>
+                      {status.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
             <Button variant="outline" onClick={() => navigate("/candidates")}>
               {t("close")}
             </Button>
@@ -145,7 +187,11 @@ export default function CandidateDetail() {
               rejectionReason={candidate.rejectionReason}
               comments={Array.isArray(candidate.comments) ? candidate.comments : []}
               onAddComment={(content) =>
-                addComment.mutate({ applicationId: candidate.id, content })
+                addComment.mutate({ applicationId: candidate.id, content }, {
+                  onSuccess: () => {
+                    toast.success(t("toasts.submitFeedbackSuccess"));
+                  }
+                })
               }
             />
           </div>

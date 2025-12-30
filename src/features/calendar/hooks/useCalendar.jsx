@@ -27,8 +27,8 @@ export const useCreateSchedule = () => {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: calendarKeys.all });
-      toast.success("Tạo sự kiện thành công!");
+      queryClient.invalidateQueries({ queryKey: ["events"] });
+      toast.success(t("toasts.createEventSuccess"));
     },
     onError: (error) => {
       const message = error?.response?.data?.message || "Không thể tạo sự kiện";

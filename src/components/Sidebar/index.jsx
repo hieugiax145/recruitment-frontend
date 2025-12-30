@@ -23,18 +23,18 @@ const Sidebar = ({ isVisible, toggleSidebar, sidebarWidth }) => {
 
   // Admin: only management; Non-admin: business functions + employees
   const adminMenus = [
-    { text: t("accountManagement", { defaultValue: "Quản lý tài khoản" }), link: "/users", icon: <UsersRound /> },
-    { text: t("roleManagement", { defaultValue: "Quản lý vai trò" }), link: "/roles", icon: <UsersRound /> },
-    { text: t("employeeManagement", { defaultValue: "Quản lý nhân sự" }), link: "/employees", icon: <UsersRound /> },
-    { text: t("workflowManagement", { defaultValue: "Luồng phê duyệt" }), link: "/workflows", icon: <GitBranch /> },
+    { text: t("accountManagement"), link: "/users", icon: <UsersRound /> },
+    { text: t("roleManagement"), link: "/roles", icon: <UsersRound /> },
+    { text: t("employeeManagement"), link: "/employees", icon: <UsersRound /> },
+    { text: t("workflowManagement"), link: "/workflows", icon: <GitBranch /> },
   ];
 
   const businessMenus = [
-    ...(canAccessEmployees ? [{ text: t("employeeManagement", { defaultValue: "Quản lý nhân sự" }), link: "/employees", icon: <UsersRound /> }] : []),
+    ...(canAccessEmployees ? [{ text: t("employeeManagement"), link: "/employees", icon: <UsersRound /> }] : []),
     { text: t("recruitmentReq"), link: "/recruitment-requests", icon: <ClipboardList /> },
     { text: t("jobPosition"), link: "/job-positions", icon: <Briefcase /> },
     { text: t("candidate"), link: "/candidates", icon: <UsersRound /> },
-    { text: t("offers", { defaultValue: "Offer" }), link: "/offers", icon: <FileText /> },
+    { text: t("offers.title"), link: "/offers", icon: <FileText /> },
     { text: t("calendar"), link: "/calendar", icon: <CalendarDays /> },
     { text: t("email"), link: "/email", icon: <Mail /> },
   ];

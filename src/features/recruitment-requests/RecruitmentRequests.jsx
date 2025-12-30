@@ -1,9 +1,9 @@
-import { ClipboardListIcon, Plus } from "lucide-react";
+import { ClipboardListIcon, Plus, Search } from "lucide-react";
 import Button from "../../components/ui/Button";
+import TextInput from "../../components/ui/TextInput";
 import { useState, useEffect } from "react";
 import Pagination from "../../components/ui/Pagination";
 import EmptyState from "../../components/ui/EmptyState";
-import RequestCard from "./components/RequestCard";
 import RequestStatus from "./components/RequestStatus";
 import { Navigate, useNavigate } from "react-router-dom";
 import ContentHeader from "../../components/ui/ContentHeader";
@@ -19,6 +19,7 @@ import LoadingContent from "../../components/ui/LoadingContent";
 import SelectDropdown from "../../components/ui/SelectDropdown";
 import { useAllDepartments } from "../../hooks/useDepartments";
 import { formatDateTime } from "../../utils/utils";
+import StatusBadge from "../../components/ui/StatusBadge";
 
 export default function RecruitmentRequests() {
   const { t } = useTranslation();
@@ -26,6 +27,7 @@ export default function RecruitmentRequests() {
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedDepartmentId, setSelectedDepartmentId] = useState(null);
+  const [keyword, setKeyword] = useState("");
   const itemsPerPage = 10;
 
   const userDeptId = user?.department?.id;
@@ -44,6 +46,7 @@ export default function RecruitmentRequests() {
     page: currentPage,
     pageSize: itemsPerPage,
     ...(effectiveDepartmentId && { departmentId: effectiveDepartmentId }),
+    ...(keyword && { keyword }),
   };
 
   const { data, isLoading, isError, error, refetch } =
@@ -76,7 +79,11 @@ export default function RecruitmentRequests() {
 
   const handleDelete = (id) => {
     if (window.confirm("Are you sure you want to delete this request?")) {
-      deleteMutation.mutate(id);
+      deleteMutation.mutate(id, {
+        onSuccess: () => {
+          toast.success(t("toasts.deleteSuccess"));
+        },
+      });
     }
   };
 
@@ -96,16 +103,27 @@ export default function RecruitmentRequests() {
         <ContentHeader
           title={t("listRequest")}
           actions={
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
+              <TextInput
+                placeholder={t("common.search")}
+                value={keyword}
+                onChange={(e) => {
+                  setKeyword(e.target.value);
+                  setCurrentPage(1);
+                }}
+                icon={Search}
+                hideLabel
+                className="w-[300px]"
+              />
               {isHR && (
                 <SelectDropdown
                   value={selectedDepartmentId}
                   onChange={setSelectedDepartmentId}
                   options={[
-                    { id: null, name: "Tất cả phòng ban" },
+                    { id: null, name: t("jobPositions.allDepartments") },
                     ...departments.map((d) => ({ id: d.id, name: d.name })),
                   ]}
-                  placeholder="Tất cả phòng ban"
+                  placeholder={t("jobPositions.allDepartments")}
                   hideLabel
                   compact
                   className="min-w-[200px]"
@@ -134,16 +152,27 @@ export default function RecruitmentRequests() {
       <ContentHeader
         title={t("listRequest")}
         actions={
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
+            <TextInput
+              placeholder={t("common.search")}
+              value={keyword}
+              onChange={(e) => {
+                setKeyword(e.target.value);
+                setCurrentPage(1);
+              }}
+              icon={Search}
+              hideLabel
+              className="w-[300px]"
+            />
             {isHR && (
               <SelectDropdown
                 value={selectedDepartmentId}
                 onChange={setSelectedDepartmentId}
                 options={[
-                  { id: null, name: "Tất cả phòng ban" },
+                  { id: null, name: t("jobPositions.allDepartments") },
                   ...departments.map((d) => ({ id: d.id, name: d.name })),
                 ]}
-                placeholder="Tất cả phòng ban"
+                placeholder={t("jobPositions.allDepartments")}
                 hideLabel
                 compact
                 className="min-w-[200px]"
@@ -180,9 +209,7 @@ export default function RecruitmentRequests() {
                   <tr>
                     <td colSpan="7" className="p-8">
                       <EmptyState
-                        title={t("noRequestsFound", {
-                          defaultValue: "Không có yêu cầu tuyển dụng",
-                        })}
+                        title={t("noRequestsFound")}
                         icon={ClipboardListIcon}
                       />
                     </td>
@@ -223,7 +250,7 @@ export default function RecruitmentRequests() {
                           : "N/A"}
                       </td>
                       <td className="p-4 whitespace-nowrap">
-                        <RequestStatus status={request.status} />
+                        <StatusBadge status={request.status} />
                       </td>
                     </tr>
                   ))

@@ -143,21 +143,21 @@ export default function WorkflowForm() {
     e?.preventDefault();
 
     const requiredFieldsMap = {
-      name: t("workflowName", { defaultValue: "Tên luồng phê duyệt" }),
-      description: t("description", { defaultValue: "Mô tả" }),
+      name: t("workflowName"),
+      description: t("description"),
     };
 
     for (const [field, label] of Object.entries(requiredFieldsMap)) {
       const value = form[field];
       if (value === null || value === undefined || String(value).trim() === "") {
-        toast.error(`${label} ${t("isRequired", { defaultValue: "là bắt buộc" })}`);
+        toast.error(`${label} ${t("isRequired")}`);
         return;
       }
     }
 
     if (form.steps.length === 0) {
       toast.error(
-        t("stepsRequired", { defaultValue: "Cần ít nhất 1 bước phê duyệt" })
+        t("stepsRequired")
       );
       return;
     }
@@ -166,9 +166,7 @@ export default function WorkflowForm() {
       const step = form.steps[i];
       if (!step.approverPositionId) {
         toast.error(
-          `${t("step", { defaultValue: "Bước" })} ${i + 1}: ${t("approverRequired", {
-            defaultValue: "Người phê duyệt là bắt buộc",
-          })}`
+          `${t("step")} ${i + 1}: ${t("approverRequired")}`
         );
         return;
       }
@@ -217,18 +215,18 @@ export default function WorkflowForm() {
         <ContentHeader
           title={
             isAddMode
-              ? t("addWorkflow", { defaultValue: "Thêm luồng phê duyệt" })
-              : t("workflowDetail", { defaultValue: "Chi tiết luồng phê duyệt" })
+              ? t("addWorkflow")
+              : t("workflowDetail")
           }
           actions={
             <>
               {isAddMode ? (
                 <>
                   <Button variant="outline" onClick={() => navigate(-1)}>
-                    {t("cancel", { defaultValue: "Hủy" })}
+                    {t("cancel")}
                   </Button>
                   <Button onClick={() => formRef.current?.requestSubmit()}>
-                    {t("save", { defaultValue: "Lưu" })}
+                    {t("save")}
                   </Button>
                 </>
               ) : isEditMode ? (
@@ -258,19 +256,19 @@ export default function WorkflowForm() {
                       }
                     }}
                   >
-                    {t("cancel", { defaultValue: "Hủy" })}
+                    {t("cancel")}
                   </Button>
                   <Button onClick={() => formRef.current?.requestSubmit()}>
-                    {t("save", { defaultValue: "Lưu" })}
+                    {t("save")}
                   </Button>
                 </>
               ) : (
                 <>
                   <Button variant="outline" onClick={() => navigate(-1)}>
-                    {t("cancel", { defaultValue: "Hủy" })}
+                    {t("cancel")}
                   </Button>
                   <Button onClick={() => setIsEditMode(true)}>
-                    {t("edit", { defaultValue: "Sửa" })}
+                    {t("edit")}
                   </Button>
                 </>
               )}
@@ -289,21 +287,21 @@ export default function WorkflowForm() {
       <ContentHeader
         title={
           isAddMode
-            ? t("addWorkflow", { defaultValue: "Thêm luồng phê duyệt" })
-            : t("workflowDetail", { defaultValue: "Chi tiết luồng phê duyệt" })
+            ? t("addWorkflow")
+            : t("workflowDetail")
         }
         actions={
           <>
             {isAddMode ? (
               <>
                 <Button variant="outline" onClick={() => navigate(-1)}>
-                  {t("cancel", { defaultValue: "Hủy" })}
+                  {t("cancel")}
                 </Button>
                 <Button
                   onClick={() => formRef.current?.requestSubmit()}
                   disabled={isPending}
                 >
-                  {t("save", { defaultValue: "Lưu" })}
+                  {t("save")}
                 </Button>
               </>
             ) : isEditMode ? (
@@ -332,22 +330,22 @@ export default function WorkflowForm() {
                     }
                   }}
                 >
-                  {t("cancel", { defaultValue: "Hủy" })}
+                  {t("cancel")}
                 </Button>
                 <Button
                   onClick={() => formRef.current?.requestSubmit()}
                   disabled={isPending}
                 >
-                  {t("save", { defaultValue: "Lưu" })}
+                  {t("save")}
                 </Button>
               </>
             ) : (
               <>
                 <Button variant="outline" onClick={() => navigate(-1)}>
-                  {t("cancel", { defaultValue: "Hủy" })}
+                  {t("cancel")}
                 </Button>
                 <Button onClick={() => setIsEditMode(true)}>
-                  {t("edit", { defaultValue: "Sửa" })}
+                  {t("edit")}
                 </Button>
               </>
             )}
@@ -362,28 +360,28 @@ export default function WorkflowForm() {
               {/* Basic Info */}
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold text-gray-900">
-                  {t("basicInfo", { defaultValue: "Thông tin cơ bản" })}
+                  {t("basicInfo")}
                 </h3>
                 <TextInput
-                  label={t("workflowName", { defaultValue: "Tên luồng phê duyệt" })}
+                  label={t("workflowName")}
                   value={form.name}
                   onChange={onChange("name")}
                   required
                   disabled={!isEditMode}
                 />
                 <TextInput
-                  label={t("description", { defaultValue: "Mô tả" })}
+                  label={t("description")}
                   value={form.description}
                   onChange={onChange("description")}
                   required
                   disabled={!isEditMode}
                 />
                 <SelectDropdown
-                  label={t("workflowType", { defaultValue: "Loại luồng" })}
+                  label={t("workflowType")}
                   options={TYPE_OPTIONS}
                   value={form.type}
                   onChange={onChange("type")}
-                  placeholder={t("selectType", { defaultValue: "Chọn loại luồng" })}
+                  placeholder={t("selectType")}
                   required
                   disabled={!isEditMode}
                 />
@@ -392,7 +390,7 @@ export default function WorkflowForm() {
               {/* Apply Conditions */}
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold text-gray-900">
-                  {t("applyConditions", { defaultValue: "Điều kiện áp dụng" })}
+                  {t("applyConditions")}
                 </h3>
                 <div className="flex items-center gap-2 mb-4">
                   <input
@@ -404,24 +402,24 @@ export default function WorkflowForm() {
                     className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                   />
                   <label htmlFor="isReplacement" className="text-sm text-gray-700">
-                    {t("isReplacement", { defaultValue: "Áp dụng cho tuyển dụng thay thế" })}
+                    {t("isReplacement")}
                   </label>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <SelectDropdown
-                    label={t("department", { defaultValue: "Phòng ban" })}
-                    options={[{ id: null, name: t("allDepartments", { defaultValue: "Tất cả phòng ban" }) }, ...departmentsData.map((d) => ({ id: d.id, name: d.name }))]}
+                    label={t("department")}
+                    options={[{ id: null, name: t("allDepartments") }, ...departmentsData.map((d) => ({ id: d.id, name: d.name }))]}
                     value={form.applyConditions.department_id}
                     onChange={onConditionChange("department_id")}
-                    placeholder={t("allDepartments", { defaultValue: "Tất cả phòng ban" })}
+                    placeholder={t("allDepartments")}
                     disabled={!isEditMode}
                   />
                   <SelectDropdown
-                    label={t("level", { defaultValue: "Cấp bậc" })}
+                    label={t("level")}
                     options={LEVEL_OPTIONS}
                     value={form.applyConditions.level}
                     onChange={onConditionChange("level")}
-                    placeholder={t("selectLevel", { defaultValue: "Chọn cấp bậc" })}
+                    placeholder={t("selectLevel")}
                     disabled={!isEditMode}
                   />
                 </div>
@@ -431,19 +429,19 @@ export default function WorkflowForm() {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <h3 className="text-lg font-semibold text-gray-900">
-                    {t("approvalSteps", { defaultValue: "Các bước phê duyệt" })}
+                    {t("approvalSteps")}
                   </h3>
                   {isEditMode && (
                     <Button type="button" variant="outline" onClick={addStep}>
                       <Plus className="h-4 w-4 mr-2" />
-                      {t("addStep", { defaultValue: "Thêm bước" })}
+                      {t("addStep")}
                     </Button>
                   )}
                 </div>
 
                 {form.steps.length === 0 ? (
                   <div className="text-center py-8 text-gray-500 border border-gray-200 rounded-lg">
-                    {t("noSteps", { defaultValue: "Chưa có bước phê duyệt nào" })}
+                    {t("noSteps")}
                   </div>
                 ) : (
                   <div className="border border-gray-200 rounded-lg overflow-hidden">
@@ -451,14 +449,14 @@ export default function WorkflowForm() {
                       <thead className="bg-gray-50 border-b border-gray-200">
                         <tr>
                           <th className="p-3 text-left text-sm font-medium text-gray-600 w-20">
-                            {t("order", { defaultValue: "Thứ tự" })}
+                            {t("order")}
                           </th>
                           <th className="p-3 text-left text-sm font-medium text-gray-600">
-                            {t("approver", { defaultValue: "Người phê duyệt (Chức vụ)" })}
+                            {t("approver")}
                           </th>
                           {isEditMode && (
                             <th className="p-3 text-center text-sm font-medium text-gray-600 w-32">
-                              {t("actions", { defaultValue: "Thao tác" })}
+                              {t("actions")}
                             </th>
                           )}
                         </tr>
@@ -482,7 +480,7 @@ export default function WorkflowForm() {
                                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 >
                                   <option value="">
-                                    {t("selectPosition", { defaultValue: "Chọn chức vụ" })}
+                                    {t("selectPosition")}
                                   </option>
                                   {positionsData.map((p) => (
                                     <option key={p.id} value={p.id}>
@@ -504,7 +502,7 @@ export default function WorkflowForm() {
                                     onClick={() => moveStep(index, "up")}
                                     disabled={index === 0}
                                     className="p-1 text-gray-600 hover:text-gray-800 disabled:opacity-30 disabled:cursor-not-allowed"
-                                    title={t("moveUp", { defaultValue: "Di chuyển lên" })}
+                                    title={t("moveUp")}
                                   >
                                     <MoveUp className="h-4 w-4" />
                                   </button>
@@ -513,7 +511,7 @@ export default function WorkflowForm() {
                                     onClick={() => moveStep(index, "down")}
                                     disabled={index === form.steps.length - 1}
                                     className="p-1 text-gray-600 hover:text-gray-800 disabled:opacity-30 disabled:cursor-not-allowed"
-                                    title={t("moveDown", { defaultValue: "Di chuyển xuống" })}
+                                    title={t("moveDown")}
                                   >
                                     <MoveDown className="h-4 w-4" />
                                   </button>
@@ -521,7 +519,7 @@ export default function WorkflowForm() {
                                     type="button"
                                     onClick={() => removeStep(index)}
                                     className="p-1 text-red-600 hover:text-red-800"
-                                    title={t("delete", { defaultValue: "Xóa" })}
+                                    title={t("delete")}
                                   >
                                     <Trash2 className="h-4 w-4" />
                                   </button>

@@ -12,11 +12,6 @@ export default function NotificationsDropdown() {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  console.log("Notifications:", notifications);
-  console.log("Unread count:", unreadCount);
-  console.log("Is loading:", isLoading);
-  console.log("Socket connected:", isConnected);
-
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -85,7 +80,7 @@ export default function NotificationsDropdown() {
             {isLoading ? (
               <div className="px-4 py-6 text-center">
                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-900 mx-auto"></div>
-                <p className="text-sm text-gray-500 mt-2">Đang tải...</p>
+                <p className="text-sm text-gray-500 mt-2">{t("loading")}</p>
               </div>
             ) : notifications.length === 0 ? (
               <div className="px-4 py-6 text-center">

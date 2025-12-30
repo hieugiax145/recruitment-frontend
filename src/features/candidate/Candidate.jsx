@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import ContentHeader from "../../components/ui/ContentHeader";
 import Button from "../../components/ui/Button";
+import TextInput from "../../components/ui/TextInput";
+import { Search } from "lucide-react";
 import Pagination from "../../components/ui/Pagination";
 import CandidateStatus from "./components/CandidateStatus";
 import { useCandidates } from "./hooks/useCandidates";
@@ -20,6 +22,7 @@ export default function Candidate() {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedJobPositionId, setSelectedJobPositionId] = useState(null);
   const [selectedStatus, setSelectedStatus] = useState(null);
+  const [keyword, setKeyword] = useState("");
   const itemsPerPage = 10;
 
   // Determine if user is HR or Director
@@ -50,7 +53,12 @@ export default function Candidate() {
       c.jobPosition?.id === selectedJobPositionId || 
       c.jobPositionId === selectedJobPositionId;
     const matchesStatus = !selectedStatus || c.status === selectedStatus;
-    return matchesPosition && matchesStatus;
+    const matchesKeyword = !keyword || 
+      c.name?.toLowerCase().includes(keyword.toLowerCase()) ||
+      c.email?.toLowerCase().includes(keyword.toLowerCase()) ||
+      c.phone?.toLowerCase().includes(keyword.toLowerCase()) ||
+      c.jobPosition?.title?.toLowerCase().includes(keyword.toLowerCase());
+    return matchesPosition && matchesStatus && matchesKeyword;
   });
 
   // Show toast notification when there's an error
@@ -100,15 +108,26 @@ export default function Candidate() {
         <ContentHeader
           title={t("listCandidate")}
           actions={
-            <div className="flex gap-3">
+            <div className="flex items-center gap-3">
+              <TextInput
+                placeholder={t("common.search")}
+                value={keyword}
+                onChange={(e) => {
+                  setKeyword(e.target.value);
+                  setCurrentPage(1);
+                }}
+                icon={Search}
+                hideLabel
+                className="w-[300px]"
+              />
               <SelectDropdown
                 value={selectedJobPositionId}
                 onChange={setSelectedJobPositionId}
                 options={[
-                  { id: null, name: "Tất cả vị trí" },
+                  { id: null, name: t("candidates.allPositions") },
                   ...jobPositions.map((jp) => ({ id: jp.id, name: jp.title })),
                 ]}
-                placeholder="Tất cả vị trí"
+                placeholder={t("candidates.allPositions")}
                 hideLabel
                 compact
                 className="min-w-[200px]"
@@ -117,16 +136,16 @@ export default function Candidate() {
                 value={selectedStatus}
                 onChange={setSelectedStatus}
                 options={[
-                  { id: null, name: "Tất cả trạng thái" },
-                  { id: "SUBMITTED", name: "Đã nộp" },
-                  { id: "REVIEWING", name: "Đang xem xét" },
-                  { id: "INTERVIEW", name: "Phỏng vấn" },
-                  { id: "OFFER", name: "Đã đề xuất" },
-                  { id: "HIRED", name: "Đã tuyển" },
-                  { id: "REJECTED", name: "Từ chối" },
-                  { id: "ARCHIVED", name: "Lưu trữ" },
+                  { id: null, name: t("candidates.allStatuses") },
+                  { id: "SUBMITTED", name: t("statuses.submitted") },
+                  { id: "REVIEWING", name: t("statuses.reviewing") },
+                  { id: "INTERVIEW", name: t("statuses.interview") },
+                  { id: "OFFER", name: t("statuses.offer") },
+                  { id: "HIRED", name: t("statuses.hired") },
+                  { id: "REJECTED", name: t("statuses.rejected") },
+                  { id: "ARCHIVED", name: t("statuses.archived") },
                 ]}
-                placeholder="Tất cả trạng thái"
+                placeholder={t("candidates.allStatuses")}
                 hideLabel
                 compact
                 className="min-w-[200px]"
@@ -146,15 +165,26 @@ export default function Candidate() {
       <ContentHeader
         title={t("listCandidate")}
         actions={
-          <div className="flex gap-3">
+          <div className="flex items-center gap-3">
+            <TextInput
+              placeholder={t("common.search")}
+              value={keyword}
+              onChange={(e) => {
+                setKeyword(e.target.value);
+                setCurrentPage(1);
+              }}
+              icon={Search}
+              hideLabel
+              className="w-[300px]"
+            />
             <SelectDropdown
               value={selectedJobPositionId}
               onChange={setSelectedJobPositionId}
               options={[
-                { id: null, name: "Tất cả vị trí" },
+                { id: null, name: t("candidates.allPositions") },
                 ...jobPositions.map((jp) => ({ id: jp.id, name: jp.title })),
               ]}
-              placeholder="Tất cả vị trí"
+              placeholder={t("candidates.allPositions")}
               hideLabel
               compact
               className="min-w-[200px]"
@@ -163,16 +193,16 @@ export default function Candidate() {
               value={selectedStatus}
               onChange={setSelectedStatus}
               options={[
-                { id: null, name: "Tất cả trạng thái" },
-                { id: "SUBMITTED", name: "Đã nộp" },
-                { id: "REVIEWING", name: "Đang xem xét" },
-                { id: "INTERVIEW", name: "Phỏng vấn" },
-                { id: "OFFER", name: "Đã đề xuất" },
-                { id: "HIRED", name: "Đã tuyển" },
-                { id: "REJECTED", name: "Từ chối" },
-                { id: "ARCHIVED", name: "Lưu trữ" },
+                { id: null, name: t("candidates.allStatuses") },
+                { id: "SUBMITTED", name: t("statuses.submitted") },
+                { id: "REVIEWING", name: t("statuses.reviewing") },
+                { id: "INTERVIEW", name: t("statuses.interview") },
+                { id: "OFFER", name: t("statuses.offer") },
+                { id: "HIRED", name: t("statuses.hired") },
+                { id: "REJECTED", name: t("statuses.rejected") },
+                { id: "ARCHIVED", name: t("statuses.archived") },
               ]}
-              placeholder="Tất cả trạng thái"
+              placeholder={t("candidates.allStatuses")}
               hideLabel
               compact
               className="min-w-[200px]"
@@ -219,7 +249,7 @@ export default function Candidate() {
                         #{candidate.id}
                       </td>
                       <td className="p-4 text-sm text-gray-900 font-medium">
-                        {candidate.fullName || "-"}
+                        {candidate.name || "-"}
                       </td>
                       <td className="p-4 text-sm text-gray-600">
                         {candidate.email || "-"}

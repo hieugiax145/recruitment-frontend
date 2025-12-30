@@ -3,23 +3,30 @@ import { statisticsServices } from "../services/statisticsServices";
 
 const statisticsKeys = {
   all: ["statistics"],
-  summary: () => [...statisticsKeys.all, "summary"],
+  summary: (period, dateRange) => [...statisticsKeys.all, "summary", period, dateRange],
   upcomingSchedules: () => [...statisticsKeys.all, "upcoming-schedules"],
   jobOpenings: () => [...statisticsKeys.all, "job-openings"],
 };
 
-export const useSummaryStatistics = () => {
+export const useSummaryStatistics = (period = "WEEKLY", dateRange = null) => {
   return useQuery({
-    queryKey: statisticsKeys.summary(),
-    queryFn: statisticsServices.getSummary,
+    queryKey: statisticsKeys.summary(period, dateRange),
+    queryFn: async () => {
+      const response = await statisticsServices.getSummary(period, dateRange);
+      return response.data;
+    },
     staleTime: 1000 * 60 * 5, // 5 minutes
+    enabled: period !== "CUSTOM" || Boolean(dateRange?.from && dateRange?.to), // Only fetch if custom dates are provided
   });
 };
 
 export const useUpcomingSchedules = () => {
   return useQuery({
     queryKey: statisticsKeys.upcomingSchedules(),
-    queryFn: statisticsServices.getUpcomingSchedules,
+    queryFn: async () => {
+      const response = await statisticsServices.getUpcomingSchedules();
+      return response.data;
+    },
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 };
@@ -27,7 +34,10 @@ export const useUpcomingSchedules = () => {
 export const useJobOpenings = () => {
   return useQuery({
     queryKey: statisticsKeys.jobOpenings(),
-    queryFn: statisticsServices.getJobOpenings,
+    queryFn: async () => {
+      const response = await statisticsServices.getJobOpenings();
+      return response.data;
+    },
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 };

@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import ContentHeader from "../../components/ui/ContentHeader";
 import Button from "../../components/ui/Button";
-import { Plus } from "lucide-react";
+import TextInput from "../../components/ui/TextInput";
+import { Plus, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import LoadingContent from "../../components/ui/LoadingContent";
 import { useUsers } from "../../hooks/useUsers";
@@ -13,10 +14,15 @@ import EmptyState from "../../components/ui/EmptyState";
 export default function Users() {
   const { t } = useTranslation();
   const [currentPage, setCurrentPage] = useState(1);
+  const [keyword, setKeyword] = useState("");
   const itemsPerPage = 10;
 
   // Fetch users from server with paging params
-  const { data, isLoading, isError, error } = useUsers({ page: currentPage, size: itemsPerPage });
+  const { data, isLoading, isError, error } = useUsers({ 
+    page: currentPage, 
+    size: itemsPerPage,
+    keyword: keyword || undefined,
+  });
 
   const navigate = useNavigate();
 
@@ -42,7 +48,18 @@ export default function Users() {
         <ContentHeader
           title={t("accountManagement")}
           actions={
-            <div className="flex gap-2 items-center">
+            <div className="flex gap-3 items-center">
+              <TextInput
+                placeholder={t("common.search")}
+                value={keyword}
+                onChange={(e) => {
+                  setKeyword(e.target.value);
+                  setCurrentPage(1);
+                }}
+                icon={Search}
+                hideLabel
+                className="w-[300px]"
+              />
               <Button onClick={() => navigate("/users/new")}>
                 <Plus className="h-4 w-4 mr-2" />
                 {t("addAccount")}
@@ -62,7 +79,18 @@ export default function Users() {
       <ContentHeader
         title={t("accountManagement")}
         actions={
-          <div className="flex gap-2 items-center">
+          <div className="flex gap-3 items-center">
+            <TextInput
+              placeholder={t("common.search")}
+              value={keyword}
+              onChange={(e) => {
+                setKeyword(e.target.value);
+                setCurrentPage(1);
+              }}
+              icon={Search}
+              hideLabel
+              className="w-[300px]"
+            />
             <Button onClick={() => navigate("/users/new")}>
               <Plus className="h-4 w-4 mr-2" />
               {t("addAccount")}
@@ -89,7 +117,7 @@ export default function Users() {
                 {users.length === 0 ? (
                   <tr>
                     <td colSpan="6" className="p-8">
-                      <EmptyState title={t("noData", { defaultValue: "Không có dữ liệu" })} />
+                      <EmptyState title={t("noData")} />
                     </td>
                   </tr>
                 ) : (

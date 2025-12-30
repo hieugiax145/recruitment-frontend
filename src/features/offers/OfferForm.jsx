@@ -100,7 +100,7 @@ export default function OfferForm({ initialData, onSubmit, isLoading = false, mo
                         !isViewMode && (
                             <>
                                 <Button onClick={handleSubmit} disabled={true}>
-                                    Đang tải...
+                                    {t("loading")}
                                 </Button>
                                 <Button variant="outline" onClick={() => navigate(-1)} disabled={true}>
                                     Hủy

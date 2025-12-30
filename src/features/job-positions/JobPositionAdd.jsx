@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
 import { formatNumber, parseFormattedNumber } from "../../utils/utils";
 import ContentHeader from "../../components/ui/ContentHeader";
 import Button from "../../components/ui/Button";
@@ -18,6 +19,7 @@ import LoadingContent from "../../components/ui/LoadingContent";
 export default function JobPositionAdd() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const isEditMode = !!id;
 
   const [formData, setFormData] = useState({
@@ -62,7 +64,7 @@ export default function JobPositionAdd() {
 
   useEffect(() => {
     if (positionError) {
-      toast.error("Không thể tải thông tin vị trí tuyển dụng");
+      toast.error(t("toasts.cannotLoadPositionInfo"));
     }
   }, [positionError]);
 
@@ -89,18 +91,18 @@ export default function JobPositionAdd() {
   }, [existingPosition, isEditMode]);
 
   const employmentTypes = [
-    { id: "Full-time", name: "Toàn thời gian" },
-    { id: "Part-time", name: "Bán thời gian" },
-    { id: "Contract", name: "Hợp đồng" },
-    { id: "Intern", name: "Thực tập" },
+    { id: "Full-time", name: t("employmentTypes.fullTime") },
+    { id: "Part-time", name: t("employmentTypes.partTime") },
+    { id: "Contract", name: t("employmentTypes.contract") },
+    { id: "Intern", name: t("employmentTypes.internship") },
   ];
 
   const experienceLevels = [
-    { id: "Entry-level", name: "Mới vào nghề" },
-    { id: "Mid-level", name: "Trung cấp" },
-    { id: "Senior-level", name: "Cao cấp" },
-    { id: "Lead", name: "Trưởng nhóm" },
-    { id: "Manager", name: "Quản lý" },
+    { id: "Entry-level", name: t("experienceLevels.entry") },
+    { id: "Mid-level", name: t("experienceLevels.mid") },
+    { id: "Senior-level", name: t("experienceLevels.senior") },
+    { id: "Lead", name: t("experienceLevels.lead") },
+    { id: "Manager", name: t("experienceLevels.manager") },
   ];
 
   const handleChange = (e) => {
@@ -130,7 +132,7 @@ export default function JobPositionAdd() {
         quantity: selectedRequest.numberOfPositions || prev.quantity,
       }));
 
-      toast.success("Đã điền thông tin từ yêu cầu tuyển dụng");
+      toast.success(t("toasts.fillFromRequestSuccess"));
     } else {
       setFormData((prev) => ({
         ...prev,
@@ -141,12 +143,12 @@ export default function JobPositionAdd() {
 
   const onSubmit = () => {
     if (!formData.title) {
-      toast.error("Vui lòng nhập tên vị trí");
+      toast.error(t("toasts.pleaseEnterPositionTitle"));
       return;
     }
 
     if (!formData.recruitmentRequestId) {
-      toast.error("Vui lòng chọn yêu cầu tuyển dụng");
+      toast.error(t("toasts.pleaseChooseRecruitmentRequest"));
       return;
     }
 
@@ -155,13 +157,13 @@ export default function JobPositionAdd() {
         { id, data: formData },
         {
           onSuccess: () => {
-            toast.success("Cập nhật thành công");
+            toast.success(t("updateSuccess"));
             navigate(-1);
           },
           onError: (error) => {
             const errorMessage =
               error.response?.data?.message ||
-              "Có lỗi xảy ra khi cập nhật vị trí";
+              t("errorUpdatePosition");
             toast.error(errorMessage);
           },
         }
@@ -169,11 +171,12 @@ export default function JobPositionAdd() {
     } else {
       createMutation.mutate(formData, {
         onSuccess: () => {
+          toast.success(t("toasts.createSuccess"));
           navigate(-1);
         },
         onError: (error) => {
           const errorMessage =
-            error.response?.data?.message || "Có lỗi xảy ra khi tạo vị trí";
+            error.response?.data?.message || t("errorCreatePosition");
           toast.error(errorMessage);
         },
       });
@@ -186,20 +189,18 @@ export default function JobPositionAdd() {
     return (
       <div className="flex flex-col h-full">
         <ContentHeader
-          title={
-            isEditMode ? "Chỉnh sửa vị trí tuyển dụng" : "Tạo vị trí tuyển dụng"
-          }
+          title={t(isEditMode ? "editJobPosition" : "createJobPosition")}
           actions={
             <>
               <Button onClick={() => onSubmit()} disabled={true}>
-                Đang tải...
+                {t("loading")}
               </Button>
               <Button
                 variant="outline"
                 onClick={() => navigate(-1)}
                 disabled={true}
               >
-                Hủy
+                {t("cancel")}
               </Button>
             </>
           }
@@ -214,26 +215,24 @@ export default function JobPositionAdd() {
   return (
     <div className="flex flex-col h-full">
       <ContentHeader
-        title={
-          isEditMode ? "Chỉnh sửa vị trí tuyển dụng" : "Tạo vị trí tuyển dụng"
-        }
+        title={t(isEditMode ? "editJobPosition" : "createJobPosition")}
         actions={
           <>
             <Button onClick={() => onSubmit()} disabled={isPending}>
               {isPending
                 ? isEditMode
-                  ? "Đang cập nhật..."
-                  : "Đang lưu..."
+                  ? t("updating")
+                  : t("saving")
                 : isEditMode
-                ? "Cập nhật"
-                : "Lưu vị trí"}
+                ? t("update")
+                : t("savePosition")}
             </Button>
             <Button
               variant="outline"
               onClick={() => navigate(-1)}
               disabled={isPending}
             >
-              Hủy
+              {t("cancel")}
             </Button>
           </>
         }
@@ -244,10 +243,10 @@ export default function JobPositionAdd() {
         <div className="flex flex-col gap-4">
           
           <div className="rounded-md border border-gray-300 p-4 gap-4 flex flex-col">
-            <h2>Thông tin cơ bản</h2>
+            <h2>{t("generalInformation")}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <SelectDropdown
-                label="Yêu cầu tuyển dụng"
+                label={t("recruitmentRequestLabel")}
                 name="recruitmentRequestId"
                 value={formData.recruitmentRequestId}
                 onChange={handleRecruitmentRequestChange}
@@ -256,12 +255,12 @@ export default function JobPositionAdd() {
                   name: req.title,
                 }))}
                 disabled={isPending}
-                placeholder="Chọn yêu cầu tuyển dụng"
+                placeholder={t("chooseRecruitmentRequest")}
                 required
               />
 
               <TextInput
-                label="Tên vị trí tuyển dụng"
+                label={t("jobPositionTitle")}
                 name="title"
                 value={formData.title}
                 onChange={handleChange}
@@ -271,7 +270,7 @@ export default function JobPositionAdd() {
               />
 
               <TextInput
-                label="Số lượng cần tuyển"
+                label={t("positionQuantity")}
                 name="quantity"
                 type="text"
                 value={formatNumber(formData.quantity)}
@@ -286,7 +285,7 @@ export default function JobPositionAdd() {
               />
 
               <SelectDropdown
-                label="Loại hình công việc"
+                label={t("employmentTypeLabel")}
                 name="employmentType"
                 value={formData.employmentType}
                 onChange={(value) =>
@@ -298,7 +297,7 @@ export default function JobPositionAdd() {
               />
 
               <SelectDropdown
-                label="Cấp độ kinh nghiệm"
+                label={t("experienceLevel")}
                 name="experienceLevel"
                 value={formData.experienceLevel}
                 onChange={(value) =>
@@ -310,7 +309,7 @@ export default function JobPositionAdd() {
               />
 
               <TextInput
-                label="Số năm kinh nghiệm"
+                label={t("yearsExperience")}
                 name="yearsOfExperience"
                 value={formData.yearsOfExperience}
                 onChange={handleChange}
@@ -319,7 +318,7 @@ export default function JobPositionAdd() {
               />
 
               <TextInput
-                label="Địa điểm làm việc"
+                label={t("workLocation")}
                 name="location"
                 value={formData.location}
                 onChange={handleChange}
@@ -329,7 +328,7 @@ export default function JobPositionAdd() {
               />
 
               <TextInput
-                label="Hạn nộp hồ sơ"
+                label={t("applicationDeadline")}
                 name="deadline"
                 type="date"
                 value={formData.deadline}
@@ -350,17 +349,17 @@ export default function JobPositionAdd() {
                 className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded"
               />
               <label htmlFor="isRemote" className="ml-2 text-sm text-gray-700">
-                Làm việc từ xa
+                {t("remoteWork")}
               </label>
             </div>
           </div>
 
           
           <div className="rounded-md border border-gray-300 p-4 gap-4 flex flex-col">
-            <h2>Thông tin lương thưởng</h2>
+            <h2>{t("salaryInfo")}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <TextInput
-                label="Mức lương tối thiểu (VNĐ)"
+                label={t("minSalary")}
                 placeholder="0"
                 type="text"
                 name="salaryMin"
@@ -375,7 +374,7 @@ export default function JobPositionAdd() {
                 disabled={isPending}
               />
               <TextInput
-                label="Mức lương tối đa (VNĐ)"
+                label={t("maxSalary")}
                 placeholder="0"
                 type="text"
                 name="salaryMax"
@@ -394,44 +393,44 @@ export default function JobPositionAdd() {
 
           
           <div className="rounded-md border border-gray-300 p-4 gap-4 flex flex-col">
-            <h2>Mô tả công việc</h2>
+            <h2>{t("jobDescriptionSection")}</h2>
             <div className="gap-4 flex flex-col">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Mô tả vị trí
+                  {t("jobDescription")}
                 </label>
                 <RichTextEditor
                   value={formData.description}
                   onChange={(value) =>
                     setFormData((prev) => ({ ...prev, description: value }))
                   }
-                  placeholder="Nhập mô tả ngắn về vị trí"
+                  placeholder={t("enterJobDescription")}
                   disabled={isPending}
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Yêu cầu công việc
+                  {t("requirements")}
                 </label>
                 <RichTextEditor
                   value={formData.requirements}
                   onChange={(value) =>
                     setFormData((prev) => ({ ...prev, requirements: value }))
                   }
-                  placeholder="Nhập yêu cầu công việc"
+                  placeholder={t("enterJobRequirements")}
                   disabled={isPending}
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Quyền lợi
+                  {t("benefits")}
                 </label>
                 <RichTextEditor
                   value={formData.benefits}
                   onChange={(value) =>
                     setFormData((prev) => ({ ...prev, benefits: value }))
                   }
-                  placeholder="Nhập quyền lợi"
+                  placeholder={t("enterBenefits")}
                   disabled={isPending}
                 />
               </div>

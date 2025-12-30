@@ -121,7 +121,11 @@ export const router = createBrowserRouter([
       {
         path: "/employees",
         element: (
-          <RoleBasedGuard requiredRoles={["ADMIN", "CEO"]} requiredDepartmentIds={[2]}>
+          <RoleBasedGuard 
+            requiredRoles={["ADMIN", "CEO", "MANAGER", "STAFF"]}
+            requiredDepartmentIds={[2]}
+            exemptRoles={["ADMIN", "CEO"]}
+          >
             <Employees />
           </RoleBasedGuard>
         ),
@@ -129,7 +133,11 @@ export const router = createBrowserRouter([
       {
         path: "/employees/new",
         element: (
-          <RoleBasedGuard requiredRoles={["ADMIN", "CEO"]} requiredDepartmentIds={[2]}>
+          <RoleBasedGuard 
+            requiredRoles={["ADMIN", "CEO", "MANAGER", "STAFF"]}
+            requiredDepartmentIds={[2]}
+            exemptRoles={["ADMIN", "CEO"]}
+          >
             <EmployeeForm />
           </RoleBasedGuard>
         ),
@@ -137,7 +145,11 @@ export const router = createBrowserRouter([
       {
         path: "/employees/:id",
         element: (
-          <RoleBasedGuard requiredRoles={["ADMIN", "CEO"]} requiredDepartmentIds={[2]}>
+          <RoleBasedGuard 
+            requiredRoles={["ADMIN", "CEO", "MANAGER", "STAFF"]}
+            requiredDepartmentIds={[2]}
+            exemptRoles={["ADMIN", "CEO"]}
+          >
             <EmployeeForm />
           </RoleBasedGuard>
         ),

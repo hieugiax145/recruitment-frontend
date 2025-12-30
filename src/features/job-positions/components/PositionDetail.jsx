@@ -2,23 +2,12 @@ import { Users } from "lucide-react";
 import { forwardRef } from "react";
 import { parseMarkdown } from "../../../utils/utils";
 import Button from "../../../components/ui/Button";
+import StatusBadge from "../../../components/ui/StatusBadge";
 import { useTranslation } from "react-i18next";
 
 const PositionDetail = forwardRef(
   ({ position, onClose, onNavigateToCandidates, isFixed, dimensions }, ref) => {
     const { t } = useTranslation();
-    const getStatusStyle = (status) => {
-      switch (status) {
-        case "active":
-          return "bg-[#E7F6EC] text-[#12B76A] border border-[#12B76A]";
-        case "draft":
-          return "bg-[#EFF4FF] text-[#3E63DD] border border-[#3E63DD]";
-        case "closed":
-          return "bg-[#FEE4E2] text-[#F04438] border border-[#F04438]";
-        default:
-          return "bg-gray-100 text-gray-600";
-      }
-    };
 
     return (
       <div
@@ -54,13 +43,7 @@ const PositionDetail = forwardRef(
 
             {/* Right: Status and Close Button */}
             <div className="flex items-center gap-3">
-              <span
-                className={`px-3 py-1 rounded-full text-sm whitespace-nowrap ${getStatusStyle(
-                  position.status
-                )}`}
-              >
-                {position.status}
-              </span>
+              <StatusBadge status={position.status} />
               <Button variant="outline" onClick={onClose}>
                 {t("close")}
               </Button>

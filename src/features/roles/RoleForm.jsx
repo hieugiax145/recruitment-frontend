@@ -43,7 +43,7 @@ export default function RoleForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.name?.trim()) {
-      toast.error(`${t("roleName", { defaultValue: "Role Name" })} ${t("isRequired", { defaultValue: "is required" })}`);
+      toast.error(`${t("roleName")} ${t("isRequired")}`);
       return;
     }
 
@@ -137,9 +137,9 @@ export default function RoleForm() {
     return max;
   }, [actionsPerGroup]);
 
-  const getServiceLabel = (service) => t(`permissionGroups.services.${service}`, { defaultValue: service.replace(/-/g, " ") });
-  const getResourceLabel = (_service, resource) => t(`permissionGroups.resources.${resource}`, { defaultValue: resource.replace(/-/g, " ") });
-  const getActionLabel = (act) => t(`permissionGroups.actions.${act}`, { defaultValue: act.charAt(0).toUpperCase() + act.slice(1) });
+  const getServiceLabel = (service) => t(`permissionGroups.services.${service}`, service.replace(/-/g, " "));
+  const getResourceLabel = (_service, resource) => t(`permissionGroups.resources.${resource}`, resource.replace(/-/g, " "));
+  const getActionLabel = (act) => t(`permissions.actions.${act}`, act.charAt(0).toUpperCase() + act.slice(1));
 
   const getPermIdsInGroup = (service) => {
     const svc = groupedPermissions[service];
@@ -217,17 +217,17 @@ export default function RoleForm() {
       />
       <div className="flex-1 mt-4 overflow-auto">
         <div className="bg-white rounded-xl shadow p-6 mb-4">
-          <h4 className="font-medium mb-4 text-lg">{t("roleInformation", { defaultValue: "Role Information" })}</h4>
+          <h4 className="font-medium mb-4 text-lg">{t("roleInformation")}</h4>
           <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <TextInput
-              label={t("roleName", { defaultValue: "Role Name" })}
+              label={t("roleName")}
               value={form.name}
               onChange={onChange("name")}
               required
-              disabled={isEditPage && !isEditMode}
+              disabled={!isEditMode}
             />
             <TextInput
-              label={t("roleDescription", { defaultValue: "Description" })}
+              label={t("roleDescription")}
               value={form.description}
               onChange={onChange("description")}
               disabled={isEditPage && !isEditMode}

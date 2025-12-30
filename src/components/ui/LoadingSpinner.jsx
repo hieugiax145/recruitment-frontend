@@ -1,10 +1,13 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 export default function LoadingSpinner({
   size = "md",
   color = "blue",
-  text = "Loading...",
+  text,
 }) {
+  const { t } = useTranslation();
+  const displayText = text !== undefined ? text : t("loading");
   const sizes = {
     sm: "w-8 h-8 border-2",
     md: "w-16 h-16 border-4",
@@ -31,7 +34,7 @@ export default function LoadingSpinner({
       </div>
 
       {/* Optional loading text */}
-      {text && <div className="font-medium text-lg">{text}</div>}
+      {displayText && <div className="font-medium text-lg">{displayText}</div>}
     </div>
   );
 }

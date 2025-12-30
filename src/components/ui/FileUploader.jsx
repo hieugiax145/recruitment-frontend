@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { User, X } from "lucide-react";
 import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
 
 export default function FileUploader({
   label,
@@ -10,16 +11,17 @@ export default function FileUploader({
   disabled,
   maxSize = 5 * 1024 * 1024,
 }) {
+  const { t } = useTranslation();
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       if (!file.type.startsWith("image/")) {
-        toast.error("Please select an image file");
+        toast.error(t("toasts.pleaseSelectImageFile"));
         e.target.value = "";
         return;
       }
       if (file.size > maxSize) {
-        toast.error("Image size must not exceed 5MB");
+        toast.error(t("toasts.imageSizeExceeded"));
         e.target.value = "";
         return;
       }

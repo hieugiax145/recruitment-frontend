@@ -2,11 +2,11 @@ import api from "../../../config/axios";
 
 export const candidateServices = {
   getCandidates: async (params = {}) => {
-    return api.get("/candidate-service/applications", { params });
+    return api.get("/candidate-service/candidates", { params });
   },
 
   getCandidateById: async (id) => {
-    return api.get(`/candidate-service/applications/${id}`);
+    return api.get(`/candidate-service/candidates/${id}`);
   },
 
   newCandidate: async (data) => {
@@ -16,11 +16,9 @@ export const candidateServices = {
     Object.keys(data).forEach((key) => {
       if (data[key] !== null && data[key] !== undefined) {
         formData.append(key, data[key]);
-        console.log(`FormData append: ${key} = ${data[key]}`);
       }
     });
 
-    console.log("Sending FormData to API...");
     return api.post("/candidate-service/public/upload-cv", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
@@ -29,13 +27,13 @@ export const candidateServices = {
   },
 
   updateCandidateStatus: async (id, status) => {
-    return api.patch(`/candidate-service/applications/${id}/status`, {
+    return api.patch(`/candidate-service/candidates/${id}/status`, {
       status,
     });
   },
 
   deleteCandidate: async (id) => {
-    return api.delete(`/candidate-service/applications/${id}`);
+    return api.delete(`/candidate-service/candidates/${id}`);
   },
 
   commentCandidate: async (id, data) => {
@@ -43,6 +41,6 @@ export const candidateServices = {
   },
 
   changeStageCandidate: async (id, stage) => {
-    return api.put(`/candidate-service/applications/status/${id}?status=${stage}`);
+    return api.put(`/candidate-service/candidates/status/${id}?status=${stage}`);
   },
 };

@@ -45,7 +45,7 @@ export default function Offers() {
   useEffect(() => {
     if (isError) {
       const errorMessage =
-        error?.response?.data?.message || t("errorLoadingOffers");
+        error?.response?.data?.message || t("offers.errorLoadingOffers");
       toast.error(errorMessage);
     }
   }, [isError, error, t]);
@@ -95,7 +95,7 @@ export default function Offers() {
     return (
       <div className="flex flex-col h-full">
         <ContentHeader
-          title={t("offers", { defaultValue: "Danh sách Offer" })}
+          title={t("offers.title")}
         actions={
           <div className="flex gap-3">
             
@@ -103,10 +103,10 @@ export default function Offers() {
               value={selectedJobPositionId}
               onChange={setSelectedJobPositionId}
               options={[
-                { id: null, name: "Tất cả vị trí" },
+                { id: null, name: t("offers.allPositions") },
                 ...jobPositions.map((jp) => ({ id: jp.id, name: jp.title })),
               ]}
-              placeholder="Tất cả vị trí"
+              placeholder={t("offers.allPositions")}
               hideLabel
               compact
               className="min-w-[200px]"
@@ -115,19 +115,19 @@ export default function Offers() {
               value={selectedStatus}
               onChange={setSelectedStatus}
               options={[
-                { id: null, name: "Tất cả trạng thái" },
-                { id: "OFFER", name: "Đã đề xuất" },
-                { id: "HIRED", name: "Đã tuyển" },
-                { id: "REJECTED", name: "Từ chối" },
-                { id: "PENDING", name: "Chờ xác nhận" },
+                { id: null, name: t("offers.allStatuses") },
+                { id: "OFFER", name: t("statuses.offer") },
+                { id: "HIRED", name: t("statuses.hired") },
+                { id: "REJECTED", name: t("statuses.rejected") },
+                { id: "PENDING", name: t("statuses.pending") },
               ]}
-              placeholder="Tất cả trạng thái"
+              placeholder={t("offers.allStatuses")}
               hideLabel
               compact
               className="min-w-[200px]"
             />
             <Button onClick={() => navigate("/offers/new")}>
-              <Plus className="h-4 w-4 mr-2" /> {t("offers.newOfferButton", { defaultValue: "Tạo Offer" })}
+              <Plus className="h-4 w-4 mr-2" /> {t("offers.newOfferButton")}
             </Button>
           </div>
         }
@@ -142,7 +142,7 @@ export default function Offers() {
   return (
     <div className="flex flex-col h-full">
       <ContentHeader
-        title={t("offers", { defaultValue: "Danh sách Offer" })}
+        title={t("offers.title")}
         actions={
           <div className="flex gap-3">
          
@@ -150,10 +150,10 @@ export default function Offers() {
               value={selectedJobPositionId}
               onChange={setSelectedJobPositionId}
               options={[
-                { id: null, name: "Tất cả vị trí" },
+                { id: null, name: t("offers.allPositions") },
                 ...jobPositions.map((jp) => ({ id: jp.id, name: jp.title })),
               ]}
-              placeholder="Tất cả vị trí"
+              placeholder={t("offers.allPositions")}
               hideLabel
               compact
               className="min-w-[200px]"
@@ -162,19 +162,19 @@ export default function Offers() {
               value={selectedStatus}
               onChange={setSelectedStatus}
               options={[
-                { id: null, name: "Tất cả trạng thái" },
-                { id: "OFFER", name: "Đã đề xuất" },
-                { id: "HIRED", name: "Đã tuyển" },
-                { id: "REJECTED", name: "Từ chối" },
-                { id: "PENDING", name: "Chờ xác nhận" },
+                { id: null, name: t("offers.allStatuses") },
+                { id: "OFFER", name: t("statuses.offer") },
+                { id: "HIRED", name: t("statuses.hired") },
+                { id: "REJECTED", name: t("statuses.rejected") },
+                { id: "PENDING", name: t("statuses.pending") },
               ]}
-              placeholder="Tất cả trạng thái"
+              placeholder={t("offers.allStatuses")}
               hideLabel
               compact
               className="min-w-[200px]"
             />
             <Button onClick={() => navigate("/offers/new")}>
-              <Plus className="h-4 w-4 mr-2" /> {t("offers.newOfferButton", { defaultValue: "Tạo Offer" })}
+              <Plus className="h-4 w-4 mr-2" /> {t("offers.newOfferButton")}
             </Button>
           </div>
         }
@@ -187,13 +187,13 @@ export default function Offers() {
             <table className="w-full">
               <thead className="bg-gray-50 border-b border-gray-200 sticky top-0 z-10">
                 <tr>
-                  {tableHeaders("ID")}
-                  {tableHeaders("Tên ứng viên")}
-                  {tableHeaders("Vị trí")}
-                  {tableHeaders("Phòng ban")}
-                  {tableHeaders("Mức lương")}
-                  {tableHeaders("Ngày")}
-                  {tableHeaders("Trạng thái")}
+                  {tableHeaders(t("id"))}
+                  {tableHeaders(t("offers.candidateName"))}
+                  {tableHeaders(t("position"))}
+                  {tableHeaders(t("department"))}
+                  {tableHeaders(t("salary"))}
+                  {tableHeaders(t("createdDate"))}
+                  {tableHeaders(t("status"))}
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
@@ -201,9 +201,7 @@ export default function Offers() {
                   <tr>
                     <td colSpan="7" className="p-8">
                       <EmptyState
-                        title={t("noOffersFound", {
-                          defaultValue: "Không có offer",
-                        })}
+                        title={t("offers.noOffersFound")}
                       />
                     </td>
                   </tr>

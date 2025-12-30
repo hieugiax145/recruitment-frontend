@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../../context/AuthContext";
+import { useTranslation } from "react-i18next";
 import ContentHeader from "../../components/ui/ContentHeader";
 import { ArrowLeft, User, Mail, Calendar, FileText, Phone } from "lucide-react";
 import Button from "../../components/ui/Button";
@@ -27,60 +28,63 @@ import LoadingOverlay from "../../components/ui/LoadingOverlay";
 import AddCandidateModal from "../candidate/components/AddCandidateModal";
 import LoadingContent from "../../components/ui/LoadingContent";
 
-const CANDIDATE_STATUSES = [
-  {
-    id: "SUBMITTED",
-    label: "Đã nộp",
-    color: "#3B82F6",
-    bgColor: "#EFF6FF",
-  },
-  {
-    id: "REVIEWING",
-    label: "Đang xem xét",
-    color: "#6366F1",
-    bgColor: "#EEF2FF",
-  },
-  {
-    id: "INTERVIEW",
-    label: "Phỏng vấn",
-    color: "#F59E0B",
-    bgColor: "#FEF3C7",
-  },
-  {
-    id: "OFFER",
-    label: "Offer",
-    color: "#8B5CF6",
-    bgColor: "#F5F3FF",
-  },
-  {
-    id: "HIRED",
-    label: "Tuyển",
-    color: "#10B981",
-    bgColor: "#D1FAE5",
-  },
-  {
-    id: "REJECTED",
-    label: "Từ chối",
-    color: "#EF4444",
-    bgColor: "#FEE2E2",
-  },
-  {
-    id: "ARCHIVED",
-    label: "Lưu trữ",
-    color: "#6B7280",
-    bgColor: "#F3F4F6",
-  },
-];
+
 
 export default function JobPositionCandidates() {
   const { id } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { user } = useAuth();
+  const { t } = useTranslation();
   const isHR = user?.department?.id === 2;
   const [selectedCandidate, setSelectedCandidate] = useState(null);
   const [activeCandidate, setActiveCandidate] = useState(null);
   const [showAddCandidateModal, setShowAddCandidateModal] = useState(false);
+
+  const CANDIDATE_STATUSES = [
+    {
+      id: "SUBMITTED",
+      label: t("statuses.submitted"),
+      color: "#3B82F6",
+      bgColor: "#EFF6FF",
+    },
+    {
+      id: "REVIEWING",
+      label: t("statuses.reviewing"),
+      color: "#6366F1",
+      bgColor: "#EEF2FF",
+    },
+    {
+      id: "INTERVIEW",
+      label: t("statuses.interview"),
+      color: "#F59E0B",
+      bgColor: "#FEF3C7",
+    },
+    {
+      id: "OFFER",
+      label: t("statuses.offer"),
+      color: "#8B5CF6",
+      bgColor: "#F5F3FF",
+    },
+    {
+      id: "HIRED",
+      label: t("statuses.hired"),
+      color: "#10B981",
+      bgColor: "#D1FAE5",
+    },
+    {
+      id: "REJECTED",
+      label: t("statuses.rejected"),
+      color: "#EF4444",
+      bgColor: "#FEE2E2",
+    },
+    {
+      id: "ARCHIVED",
+      label: t("statuses.archived"),
+      color: "#6B7280",
+      bgColor: "#F3F4F6",
+    },
+  ];
 
   const { data: jobPosition } = useJobPosition(id);
 
@@ -118,8 +122,8 @@ export default function JobPositionCandidates() {
     jobPositionTitle: candidate.jobPositionTitle || "",
     departmentId: candidate.departmentId,
     departmentName: candidate.departmentName || "",
-    experience: candidate.experience || "Chưa cập nhật",
-    education: candidate.education || "Chưa cập nhật",
+    experience: candidate.experience || t("candidates.notUpdated"),
+    education: candidate.education || t("candidates.notUpdated"),
   }));
 
   const normalizeCandidate = (candidate) => ({
@@ -152,7 +156,7 @@ export default function JobPositionCandidates() {
         id: candidate.id,
         stage: newStatus,
       });
-      toast.success(`Đã chuyển ${candidate.name} sang ${statusLabel || newStatus}`);
+      toast.success(t("candidates.changedStatus", { name: candidate.name, status: statusLabel || newStatus }));
     } catch (error) {
       console.error("Failed to change candidate stage:", error);
     }
@@ -177,45 +181,32 @@ export default function JobPositionCandidates() {
     const activeId = active.id;
     const overId = over.id;
 
-    console.log("Drag end:", { activeId, overId });
-
     const candidate = candidates.find((c) => c.id === activeId);
     if (!candidate) {
-      console.log("Candidate not found:", activeId);
       return;
     }
-
-    console.log("Found candidate:", candidate);
 
     let targetStatus = null;
     if (CANDIDATE_STATUSES.find((s) => s.id === overId)) {
       targetStatus = overId;
-      console.log("Target is a column:", targetStatus);
     } else {
       const overCandidate = candidates.find((c) => c.id === overId);
       if (overCandidate) {
         targetStatus = overCandidate.status;
-        console.log("Target is a candidate, using status:", targetStatus);
       }
     }
-
-    console.log("Target status:", targetStatus, "Current status:", candidate.status);
 
     if (targetStatus && candidate.status !== targetStatus) {
       const statusLabel = CANDIDATE_STATUSES.find(
         (s) => s.id === targetStatus
       )?.label;
 
-      console.log("Calling changeStage API with:", { id: candidate.id, stage: targetStatus });
-
       try {
         await changeStageMutation.mutateAsync({
           id: candidate.id,
           stage: targetStatus,
         });
-        toast.success(
-          `Đã chuyển ${candidate.name} sang ${statusLabel || targetStatus}`
-        );
+        toast.success(t("toasts.updateStatusSuccess"));
       } catch (error) {
         console.error("Failed to change candidate stage:", error);
       }
@@ -286,7 +277,7 @@ export default function JobPositionCandidates() {
       {error && (
         <div className="flex-1 flex items-center justify-center">
           <div className="text-red-500">
-            Có lỗi xảy ra khi tải dữ liệu: {error.message || "Unknown error"}
+            {t("candidates.errorLoadingData")}: {error.message || "Unknown error"}
           </div>
         </div>
       )}

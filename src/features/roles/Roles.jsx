@@ -16,7 +16,7 @@ export default function Roles() {
   if (isLoading) {
     return (
       <div className="flex flex-col h-full">
-        <ContentHeader title={t("roleManagement", { defaultValue: "Role Management" })} actions={<Button onClick={() => navigate("/roles/new")}><Plus className="h-4 w-4 mr-2" />{t("addRole", { defaultValue: "Add Role" })}</Button>} />
+        <ContentHeader title={t("roleManagement")} actions={<Button onClick={() => navigate("/roles/new")}><Plus className="h-4 w-4 mr-2" />{t("addRole")}</Button>} />
         <div className="flex-1 flex items-center justify-center mt-4">
           <LoadingContent />
         </div>
@@ -42,7 +42,7 @@ export default function Roles() {
                 {roles.length === 0 ? (
                   <tr>
                     <td colSpan="3" className="p-8">
-                      <EmptyState title={t("noData", { defaultValue: "Không có dữ liệu" })} />
+                      <EmptyState title={t("noData")} />
                     </td>
                   </tr>
                 ) : (

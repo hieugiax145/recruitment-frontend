@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { candidateServices } from "../services/candidateServices";
 import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
 
 // Query Keys
 export const candidateKeys = {
@@ -38,6 +39,7 @@ export const useCandidate = (id, options = {}) => {
 // Custom hook to update candidate status
 export const useUpdateCandidateStatus = () => {
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   return useMutation({
     mutationFn: async ({ id, status }) => {
@@ -49,11 +51,10 @@ export const useUpdateCandidateStatus = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: candidateKeys.all });
-      toast.success("Cập nhật trạng thái thành công");
     },
     onError: (error) => {
       const errorMessage =
-        error.response?.data?.message || "Không thể cập nhật trạng thái";
+        error.response?.data?.message || t("candidates.updateStatusError");
       toast.error(errorMessage);
     },
   });
@@ -62,31 +63,19 @@ export const useUpdateCandidateStatus = () => {
 // Custom hook to create a new candidate
 export const useCreateCandidate = () => {
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   return useMutation({
     mutationFn: async (data) => {
-      console.log("Creating candidate with data:", data);
-      console.log("Data fields:", {
-        fullName: data.fullName,
-        email: data.email,
-        phone: data.phone,
-        notes: data.notes,
-        jobPositionId: data.jobPositionId,
-      });
       const response = await candidateServices.newCandidate(data);
-      console.log("Create candidate response:", response);
       return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: candidateKeys.all });
-      toast.success("Thêm ứng viên thành công!");
     },
     onError: (error) => {
-      console.error("Error creating candidate:", error);
-      console.error("Error response:", error.response);
-      console.error("Error data:", error.response?.data);
       const errorMessage =
-        error.response?.data?.message || "Có lỗi xảy ra khi thêm ứng viên";
+        error.response?.data?.message || t("candidates.addCandidateError");
       toast.error(errorMessage);
     },
   });
@@ -95,6 +84,7 @@ export const useCreateCandidate = () => {
 // Custom hook to delete a candidate
 export const useDeleteCandidate = () => {
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   return useMutation({
     mutationFn: async (id) => {
@@ -103,11 +93,10 @@ export const useDeleteCandidate = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: candidateKeys.all });
-      toast.success("Xóa ứng viên thành công");
     },
     onError: (error) => {
       const errorMessage =
-        error.response?.data?.message || "Không thể xóa ứng viên";
+        error.response?.data?.message || t("candidates.deleteCandidateError");
       toast.error(errorMessage);
     },
   });
@@ -116,6 +105,7 @@ export const useDeleteCandidate = () => {
 // Custom hook to add a comment to an application
 export const useAddCandidateComment = () => {
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   return useMutation({
     mutationFn: async ({ applicationId, content }) => {
@@ -131,11 +121,10 @@ export const useAddCandidateComment = () => {
       queryClient.invalidateQueries({
         queryKey: candidateKeys.detail(variables.applicationId),
       });
-      toast.success("Đã gửi nhận xét");
     },
     onError: (error) => {
       const errorMessage =
-        error.response?.data?.message || "Không thể gửi nhận xét";
+        error.response?.data?.message || t("candidates.submitFeedbackError");
       toast.error(errorMessage);
     },
   });
@@ -144,6 +133,7 @@ export const useAddCandidateComment = () => {
 // Custom hook to change candidate stage (for drag and drop)
 export const useChangeStageCandidate = () => {
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   return useMutation({
     mutationFn: async ({ id, stage }) => {
@@ -155,7 +145,7 @@ export const useChangeStageCandidate = () => {
     },
     onError: (error) => {
       const errorMessage =
-        error.response?.data?.message || "Không thể thay đổi trạng thái";
+        error.response?.data?.message || t("candidates.updateStatusError");
       toast.error(errorMessage);
     },
   });

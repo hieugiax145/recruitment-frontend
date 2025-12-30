@@ -2,7 +2,7 @@ import React from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
-const RoleBasedGuard = ({ children, requiredRoles = [], requiredDepartmentIds = [] }) => {
+const RoleBasedGuard = ({ children, requiredRoles = [], requiredDepartmentIds = [], exemptRoles = [] }) => {
   const { user } = useAuth();
 
   // If no roles and no departments required, allow access
@@ -13,11 +13,14 @@ const RoleBasedGuard = ({ children, requiredRoles = [], requiredDepartmentIds = 
   const userRole = user?.role?.name;
   const userDepartmentId = user?.department?.id;
 
+  // Check if user has exempt role (e.g., ADMIN, CEO don't need department check)
+  const isExempt = exemptRoles.length > 0 && exemptRoles.includes(userRole);
+
   // Check role access
   const hasRoleAccess = requiredRoles.length === 0 || requiredRoles.includes(userRole);
   
-  // Check department access
-  const hasDepartmentAccess = requiredDepartmentIds.length === 0 || requiredDepartmentIds.includes(userDepartmentId);
+  // Check department access (skip if user is exempt)
+  const hasDepartmentAccess = isExempt || requiredDepartmentIds.length === 0 || requiredDepartmentIds.includes(userDepartmentId);
 
   // User must satisfy both conditions (if specified)
   const hasAccess = hasRoleAccess && hasDepartmentAccess;

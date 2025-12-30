@@ -10,6 +10,7 @@ import {
   XCircle,
 } from "lucide-react";
 import DropdownMenu from "../../../components/ui/DropdownMenu";
+import StatusBadge from "../../../components/ui/StatusBadge";
 
 export default function PositionCard({
   position,
@@ -23,29 +24,6 @@ export default function PositionCard({
   onView,
   onUpdateStatus,
 }) {
-  const getStatusStyle = (status) => {
-    const s = String(status || "").toLowerCase();
-    switch (s) {
-      case "active":
-      case "published":
-        return "bg-[#E7F6EC] text-[#12B76A] border border-[#12B76A]";
-      case "draft":
-        return "bg-[#EFF4FF] text-[#3E63DD] border border-[#3E63DD]";
-      case "closed":
-        return "bg-[#FEE4E2] text-[#F04438] border border-[#F04438]";
-      default:
-        return "bg-gray-100 text-gray-600";
-    }
-  };
-
-  const getStatusLabel = (status) => {
-    const s = String(status || "").toLowerCase();
-    if (s === "published" || s === "active") return "PUBLISHED";
-    if (s === "draft") return "DRAFT";
-    if (s === "closed") return "CLOSED";
-    return status;
-  };
-
   const currentStatusValue = String(position.status || "").toUpperCase();
   
   const menuOptions = [
@@ -113,13 +91,7 @@ export default function PositionCard({
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
               <span className="text-xs text-gray-500">ID: {position.id}</span>
-              <span
-                className={`px-2 py-0.5 rounded-full text-xs whitespace-nowrap ${getStatusStyle(
-                  position.status
-                )}`}
-              >
-                {getStatusLabel(position.status)}
-              </span>
+              <StatusBadge status={position.status} />
             </div>
             <h3
               className={`text-sm font-medium mb-0.5 truncate ${
@@ -181,13 +153,7 @@ export default function PositionCard({
     >
       {/* Status badge and Menu button */}
       <div className="absolute top-2 right-2 flex items-center gap-2">
-        <span
-          className={`px-2 py-1 rounded-full text-xs ${getStatusStyle(
-            position.status
-          )}`}
-        >
-          {getStatusLabel(position.status)}
-        </span>
+        <StatusBadge status={position.status} />
         <DropdownMenu options={menuOptions} />
       </div>
 

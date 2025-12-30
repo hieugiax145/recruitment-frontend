@@ -55,10 +55,8 @@ export default function Workflows() {
 
   const handleDelete = (workflow) => {
     showConfirm({
-      title: t("confirmDelete", { defaultValue: "Xác nhận xóa" }),
-      message: `${t("confirmDeleteWorkflow", {
-        defaultValue: "Bạn có chắc chắn muốn xóa luồng phê duyệt",
-      })} "${workflow.name}"?`,
+      title: t("confirmDelete"),
+      message: `${t("confirmDeleteWorkflow")} "${workflow.name}"?`,
       variant: "danger",
       onConfirm: () => {
         deleteWorkflow.mutate(workflow.id);
@@ -70,7 +68,7 @@ export default function Workflows() {
     return (
       <div className="flex flex-col h-full">
         <ContentHeader
-          title={t("workflowManagement", { defaultValue: "Quản lý luồng phê duyệt" })}
+          title={t("workflowManagement")}
           actions={
             <div className="flex items-center gap-4">
               <SelectDropdown
@@ -87,7 +85,7 @@ export default function Workflows() {
               />
               <Button onClick={() => navigate("/workflows/new")}>
                 <Plus className="h-4 w-4 mr-2" />
-                {t("addWorkflow", { defaultValue: "Thêm luồng phê duyệt" })}
+                {t("addWorkflow")}
               </Button>
             </div>
           }
@@ -102,7 +100,7 @@ export default function Workflows() {
   return (
     <div className="flex flex-col h-full">
       <ContentHeader
-        title={t("workflowManagement", { defaultValue: "Quản lý luồng phê duyệt" })}
+        title={t("workflowManagement")}
         actions={
           <div className="flex items-center gap-4">
             <SelectDropdown
@@ -119,7 +117,7 @@ export default function Workflows() {
             />
             <Button onClick={() => navigate("/workflows/new")}>
               <Plus className="h-4 w-4 mr-2" />
-              {t("addWorkflow", { defaultValue: "Thêm luồng phê duyệt" })}
+              {t("addWorkflow")}
             </Button>
           </div>
         }
@@ -132,25 +130,25 @@ export default function Workflows() {
               <thead className="bg-gray-50 border-b border-gray-200 sticky top-0 z-10">
                 <tr>
                   <th className="p-4 text-left text-sm font-medium text-gray-600">
-                    {t("id", { defaultValue: "ID" })}
+                    {t("id")}
                   </th>
                   <th className="p-4 text-left text-sm font-medium text-gray-600">
-                    {t("workflowName", { defaultValue: "Tên luồng" })}
+                    {t("workflowName")}
                   </th>
                   <th className="p-4 text-left text-sm font-medium text-gray-600">
-                    {t("description", { defaultValue: "Mô tả" })}
+                    {t("description")}
                   </th>
                   <th className="p-4 text-left text-sm font-medium text-gray-600">
-                    {t("type", { defaultValue: "Loại" })}
+                    {t("type")}
                   </th>
                   <th className="p-4 text-left text-sm font-medium text-gray-600">
-                    {t("steps", { defaultValue: "Số bước" })}
+                    {t("steps")}
                   </th>
                   <th className="p-4 text-left text-sm font-medium text-gray-600">
-                    {t("status", { defaultValue: "Trạng thái" })}
+                    {t("status")}
                   </th>
                   <th className="p-4 text-center text-sm font-medium text-gray-600">
-                    {t("actions", { defaultValue: "Thao tác" })}
+                    {t("actions")}
                   </th>
                 </tr>
               </thead>
@@ -158,7 +156,7 @@ export default function Workflows() {
                 {workflows.length === 0 ? (
                   <tr>
                     <td colSpan="7" className="p-8">
-                      <EmptyState title={t("noData", { defaultValue: "Không có dữ liệu" })} />
+                      <EmptyState title={t("noData")} />
                     </td>
                   </tr>
                 ) : (
@@ -181,16 +179,16 @@ export default function Workflows() {
                         </span>
                       </td>
                       <td className="p-4 text-sm text-gray-600">
-                        {workflow.steps?.length || 0} {t("steps", { defaultValue: "bước" })}
+                        {workflow.steps?.length || 0} {t("steps")}
                       </td>
                       <td className="p-4 text-sm text-gray-600">
                         {workflow.isActive ? (
                           <span className="px-2 py-1 rounded-full bg-green-100 text-green-800 text-xs">
-                            {t("active", { defaultValue: "Hoạt động" })}
+                            {t("active")}
                           </span>
                         ) : (
                           <span className="px-2 py-1 rounded-full bg-gray-100 text-gray-800 text-xs">
-                            {t("inactive", { defaultValue: "Không hoạt động" })}
+                            {t("inactive")}
                           </span>
                         )}
                       </td>
@@ -201,7 +199,7 @@ export default function Workflows() {
                             handleDelete(workflow);
                           }}
                           className="text-red-600 hover:text-red-800 p-1"
-                          title={t("delete", { defaultValue: "Xóa" })}
+                          title={t("delete")}
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>

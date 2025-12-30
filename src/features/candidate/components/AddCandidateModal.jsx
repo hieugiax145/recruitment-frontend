@@ -48,7 +48,7 @@ export default function AddCandidateModal({
     if (file) {
       // Validate file type
       if (file.type !== "application/pdf") {
-        toast.error("Vui lòng chọn file PDF");
+        toast.error(t("toasts.pleaseSelectPdfFile"));
         e.target.value = ""; // Reset input
         return;
       }
@@ -56,7 +56,7 @@ export default function AddCandidateModal({
       // Validate file size (max 5MB)
       const maxSize = 5 * 1024 * 1024; // 5MB in bytes
       if (file.size > maxSize) {
-        toast.error("Kích thước file không được vượt quá 5MB");
+        toast.error(t("toasts.fileSizeExceeded"));
         e.target.value = ""; // Reset input
         return;
       }
@@ -79,35 +79,35 @@ export default function AddCandidateModal({
 
     // Validation
     if (!formData.fullName.trim()) {
-      toast.error("Vui lòng nhập họ tên");
+      toast.error(t("toasts.pleaseEnterFullName"));
       return;
     }
     if (!formData.email.trim()) {
-      toast.error("Vui lòng nhập email");
+      toast.error(t("toasts.pleaseEnterEmail"));
       return;
     }
     if (!formData.phone.trim()) {
-      toast.error("Vui lòng nhập số điện thoại");
+      toast.error(t("toasts.pleaseEnterPhone"));
       return;
     }
 
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
-      toast.error("Email không hợp lệ");
+      toast.error(t("invalidEmail"));
       return;
     }
 
     // Phone validation (basic)
     const phoneRegex = /^[0-9]{10,11}$/;
     if (!phoneRegex.test(formData.phone.replace(/\s/g, ""))) {
-      toast.error("Số điện thoại không hợp lệ");
+      toast.error(t("toasts.invalidPhoneNumber"));
       return;
     }
 
     // CV file validation
     if (!cvFile) {
-      toast.error("Vui lòng tải lên file CV");
+      toast.error(t("toasts.pleaseUploadCV"));
       return;
     }
 
@@ -124,6 +124,7 @@ export default function AddCandidateModal({
     // Call API to create candidate
     createMutation.mutate(submitData, {
       onSuccess: () => {
+        toast.success(t("toasts.addCandidateSuccess"));
         // Reset form
         setFormData({
           fullName: "",

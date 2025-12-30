@@ -5,6 +5,7 @@ import {
   ChevronRight,
   Calendar as CalendarIcon,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import Button from "../../components/ui/Button";
 import { useCalendar as useCalendarQuery } from "./hooks/useCalendar";
 import CreateEventModal from "./components/CreateEventModal";
@@ -16,6 +17,7 @@ import WeekView from "./components/WeekView";
 import LoadingContent from "../../components/ui/LoadingContent";
 
 export default function Calendar() {
+  const { t } = useTranslation();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [viewMode, setViewMode] = useState("month"); // day, week, month
   const [selectedDate, setSelectedDate] = useState(null);
@@ -324,8 +326,8 @@ export default function Calendar() {
                       }}
                       title={
                         viewMode === "month"
-                          ? "Chọn tháng nhanh"
-                          : "Chọn ngày nhanh"
+                          ? t("selectMonthQuick")
+                          : t("selectDateQuick")
                       }
                     />
                   </div>
@@ -364,7 +366,7 @@ export default function Calendar() {
                       }
                     `}
                   >
-                    Ngày
+                    {t("day")}
                   </div>
                   <div
                     onClick={() => setViewMode("week")}
@@ -377,7 +379,7 @@ export default function Calendar() {
                       }
                     `}
                   >
-                    Tuần
+                    {t("week")}
                   </div>
                   <div
                     onClick={() => setViewMode("month")}
@@ -390,14 +392,14 @@ export default function Calendar() {
                       }
                     `}
                   >
-                    Tháng
+                    {t("month")}
                   </div>
                 </div>
 
                 {/* Create Button */}
                 <Button onClick={handleCreateEvent} className="text-sm">
                   <Plus className="h-4 w-4 mr-2" />
-                  Tạo lịch
+                  {t("createSchedule")}
                 </Button>
               </div>
             </div>
@@ -413,7 +415,7 @@ export default function Calendar() {
               <div className="h-full">
                 {/* Day Headers */}
                 <div className="grid grid-cols-7 gap-0 mb-2">
-                  {["CN", "T2", "T3", "T4", "T5", "T6", "T7"].map((day) => (
+                  {[t("sunday"), t("monday"), t("tuesday"), t("wednesday"), t("thursday"), t("friday"), t("saturday")].map((day) => (
                     <div
                       key={day}
                       className="text-center text-sm font-semibold text-gray-600 py-2"
@@ -466,7 +468,7 @@ export default function Calendar() {
                     <div>
                       <CalendarIcon className="h-12 w-12 mx-auto mb-3 text-gray-300" />
                       <p className="text-sm">
-                        Chưa có sự kiện nào trong ngày này
+                        {t("noEventsToday")}
                       </p>
                     </div>
                   </div>
@@ -492,7 +494,7 @@ export default function Calendar() {
           <div className="w-80 bg-white rounded-xl shadow p-6 flex flex-col">
             <div className="mb-4">
               <h3 className="text-lg font-semibold text-gray-900 mb-1">
-                Chi tiết ngày
+                {t("dayDetails")}
               </h3>
               <p className="text-sm text-gray-600">
                 {formatDate(selectedDate, "full")}
@@ -513,14 +515,14 @@ export default function Calendar() {
                   getSchedulesForDate(selectedDate).length === 0) && (
                   <div className="text-center text-gray-400 py-10">
                     <CalendarIcon className="h-12 w-12 mx-auto mb-3 text-gray-300" />
-                    <p className="text-sm">Chưa có sự kiện nào</p>
+                    <p className="text-sm">{t("noEvents")}</p>
                   </div>
                 )}
               </div>
             </div>
 
             <Button onClick={handleCreateEvent} className="mt-4 w-full text-sm">
-              Thêm sự kiện
+              {t("addEvent")}
             </Button>
           </div>
         )}

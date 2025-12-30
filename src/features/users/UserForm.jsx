@@ -60,15 +60,15 @@ export default function UserForm() {
 
     const requiredFieldsMap = isAddMode
       ? {
-          email: t("email", { defaultValue: "Email" }),
-          password: t("password", { defaultValue: "Password" }),
-          roleId: t("role", { defaultValue: "Role" }),
-          employeeId: t("chooseEmployee", { defaultValue: "Chọn nhân sự" }),
+          email: t("email"),
+          password: t("password"),
+          roleId: t("role"),
+          employeeId: t("chooseEmployee"),
         }
       : {
-          email: t("email", { defaultValue: "Email" }),
-          roleId: t("role", { defaultValue: "Role" }),
-          employeeId: t("chooseEmployee", { defaultValue: "Chọn nhân sự" }),
+          email: t("email"),
+          roleId: t("role"),
+          employeeId: t("chooseEmployee"),
         };
 
     for (const [field, label] of Object.entries(requiredFieldsMap)) {
@@ -79,7 +79,7 @@ export default function UserForm() {
         String(value).trim() === ""
       ) {
         toast.error(
-          `${label} ${t("isRequired", { defaultValue: "is required" })}`
+          `${label} ${t("isRequired")}`
         );
         return;
       }
@@ -121,11 +121,11 @@ export default function UserForm() {
     
     showConfirm({
       title: newActiveState
-        ? t("confirmActivate", { defaultValue: "Xác nhận kích hoạt" })
-        : t("confirmDeactivate", { defaultValue: "Xác nhận vô hiệu hóa" }),
+        ? t("confirmActivate")
+        : t("confirmDeactivate"),
       message: newActiveState
-        ? t("confirmActivateMessage", { defaultValue: "Bạn có chắc chắn muốn kích hoạt tài khoản này?" })
-        : t("confirmDeactivateMessage", { defaultValue: "Bạn có chắc chắn muốn vô hiệu hóa tài khoản này?" }),
+        ? t("confirmActivateMessage")
+        : t("confirmDeactivateMessage"),
       onConfirm: () => {
         updateUser.mutate(
           { id, data: { isActive: newActiveState } },
@@ -133,12 +133,12 @@ export default function UserForm() {
             onSuccess: () => {
               toast.success(
                 newActiveState
-                  ? t("accountActivated", { defaultValue: "Đã kích hoạt tài khoản" })
-                  : t("accountDeactivated", { defaultValue: "Đã vô hiệu hóa tài khoản" })
+                  ? t("accountActivated")
+                  : t("accountDeactivated")
               );
             },
             onError: (error) => {
-              const message = error.response?.data?.message || t("error", { defaultValue: "Có lỗi xảy ra" });
+              const message = error.response?.data?.message || t("error");
               toast.error(message);
             },
           }
@@ -155,25 +155,25 @@ export default function UserForm() {
         <ContentHeader
           title={
             isAddMode
-              ? t("addAccount", { defaultValue: "Thêm tài khoản" })
-              : t("accountDetail", { defaultValue: "Chi tiết tài khoản" })
+              ? t("addAccount")
+              : t("accountDetail")
           }
           actions={
             <>
               <Button variant="outline" onClick={() => navigate(-1)}>
-                {t("cancel", { defaultValue: "Hủy" })}
+                {t("cancel")}
               </Button>
               {isAddMode ? (
                 <Button onClick={() => formRef.current?.requestSubmit()}>
-                  {t("save", { defaultValue: "Lưu" })}
+                  {t("save")}
                 </Button>
               ) : isEditMode ? (
                 <Button onClick={() => formRef.current?.requestSubmit()}>
-                  {t("save", { defaultValue: "Lưu" })}
+                  {t("save")}
                 </Button>
               ) : (
                 <Button onClick={() => setIsEditMode(true)}>
-                  {t("edit", { defaultValue: "Sửa" })}
+                  {t("edit")}
                 </Button>
               )}
             </>
@@ -191,21 +191,21 @@ export default function UserForm() {
       <ContentHeader
         title={
           isAddMode
-            ? t("addAccount", { defaultValue: "Thêm tài khoản" })
-            : t("accountDetail", { defaultValue: "Chi tiết tài khoản" })
+            ? t("addAccount")
+            : t("accountDetail")
         }
         actions={
           <>
             {isAddMode ? (
               <>
                 <Button variant="outline" onClick={() => navigate(-1)}>
-                  {t("cancel", { defaultValue: "Hủy" })}
+                  {t("cancel")}
                 </Button>
                 <Button
                   onClick={() => formRef.current?.requestSubmit()}
                   disabled={isPending}
                 >
-                  {t("save", { defaultValue: "Lưu" })}
+                  {t("save")}
                 </Button>
               </>
             ) : isEditMode ? (
@@ -224,19 +224,19 @@ export default function UserForm() {
                     }
                   }}
                 >
-                  {t("cancel", { defaultValue: "Hủy" })}
+                  {t("cancel")}
                 </Button>
                 <Button
                   onClick={() => formRef.current?.requestSubmit()}
                   disabled={isPending}
                 >
-                  {t("save", { defaultValue: "Lưu" })}
+                  {t("save")}
                 </Button>
               </>
             ) : (
               <>
                 <Button variant="outline" onClick={() => navigate(-1)}>
-                  {t("cancel", { defaultValue: "Hủy" })}
+                  {t("cancel")}
                 </Button>
                 <Button
                   variant={userData?._active ? "outline" : "primary"}
@@ -244,11 +244,11 @@ export default function UserForm() {
                   disabled={isPending}
                 >
                   {userData?._active
-                    ? t("deactivate", { defaultValue: "Vô hiệu hóa" })
-                    : t("activate", { defaultValue: "Kích hoạt" })}
+                    ? t("deactivate")
+                    : t("activate")}
                 </Button>
                 <Button onClick={() => setIsEditMode(true)}>
-                  {t("edit", { defaultValue: "Sửa" })}
+                  {t("edit")}
                 </Button>
               </>
             )}
@@ -263,7 +263,7 @@ export default function UserForm() {
               <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <TextInput
-                    label={t("email", { defaultValue: "Email" })}
+                    label={t("email")}
                     type="email"
                     value={form.email}
                     onChange={onChange("email")}
@@ -271,7 +271,7 @@ export default function UserForm() {
                     disabled={!isEditMode}
                   />
                   <TextInput
-                    label={t("password", { defaultValue: "Mật khẩu" })}
+                    label={t("password")}
                     type="password"
                     value={form.password}
                     onChange={onChange("password")}
@@ -279,9 +279,7 @@ export default function UserForm() {
                     disabled={!isEditMode}
                     placeholder={
                       !isAddMode && isEditMode
-                        ? t("passwordOptional", {
-                            defaultValue: "Để trống nếu không đổi",
-                          })
+                        ? t("passwordOptional")
                         : ""
                     }
                   />
@@ -289,22 +287,20 @@ export default function UserForm() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <SelectDropdown
-                    label={t("chooseEmployee", { defaultValue: "Chọn nhân sự" })}
+                    label={t("chooseEmployee")}
                     options={employees.map((e) => ({ id: e.id, name: e.name }))}
                     value={form.employeeId}
                     onChange={(v) => setForm((s) => ({ ...s, employeeId: v }))}
-                    placeholder={t("chooseEmployee", {
-                      defaultValue: "Chọn nhân sự",
-                    })}
+                    placeholder={t("chooseEmployee")}
                     disabled={!isEditMode}
                   />
 
                   <SelectDropdown
-                    label={t("role", { defaultValue: "Vai trò" })}
+                    label={t("role")}
                     options={rolesData.map((r) => ({ id: r.id, name: r.name }))}
                     value={form.roleId}
                     onChange={(v) => setForm((s) => ({ ...s, roleId: v }))}
-                    placeholder={t("chooseRole", { defaultValue: "Chọn vai trò" })}
+                    placeholder={t("chooseRole")}
                     disabled={!isEditMode}
                   />
                 </div>

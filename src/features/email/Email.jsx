@@ -4,6 +4,7 @@ import { Send, Mail, Star, Inbox, FileText } from "lucide-react";
 import ContentHeader from "../../components/ui/ContentHeader";
 import TextInput from "../../components/ui/TextInput";
 import TextArea from "../../components/ui/TextArea";
+import RichTextEditor from "../../components/ui/RichTextEditor";
 import Button from "../../components/ui/Button";
 import LoadingContent from "../../components/ui/LoadingContent";
 import EmptyState from "../../components/ui/EmptyState";
@@ -43,15 +44,15 @@ export default function Email() {
     e?.preventDefault();
 
     const requiredFieldsMap = {
-      toEmail: t("toEmail", { defaultValue: "Email người nhận" }),
-      subject: t("subject", { defaultValue: "Tiêu đề" }),
-      content: t("content", { defaultValue: "Nội dung" }),
+      toEmail: t("toEmail"),
+      subject: t("subject"),
+      content: t("content"),
     };
 
     for (const [field, label] of Object.entries(requiredFieldsMap)) {
       const value = form[field];
       if (value === null || value === undefined || String(value).trim() === "") {
-        toast.error(`${label} ${t("isRequired", { defaultValue: "là bắt buộc" })}`);
+        toast.error(`${label} ${t("isRequired")}`);
         return;
       }
     }
@@ -59,7 +60,7 @@ export default function Email() {
     
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(form.toEmail)) {
-      toast.error(t("invalidEmail", { defaultValue: "Email không hợp lệ" }));
+      toast.error(t("invalidEmail"));
       return;
     }
 
@@ -92,10 +93,32 @@ export default function Email() {
     });
   };
 
+  const renderContent = (content) => {
+    if (!content) return "";
+    
+    // Convert markdown-style formatting to HTML
+    let html = content
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>') // Bold
+      .replace(/_(.+?)_/g, '<em>$1</em>') // Italic
+      .replace(/^• (.+)$/gm, '<li>$1</li>') // Bullet points
+      .replace(/^(\d+)\. (.+)$/gm, '<li>$2</li>') // Numbered lists
+      .replace(/\n/g, '<br/>'); // Line breaks
+    
+    // Wrap consecutive <li> in <ul>
+    html = html.replace(/(<li>.*?<\/li>\s*)+/g, (match) => {
+      if (match.includes('<li>')) {
+        return `<ul class="list-disc list-inside space-y-1 ml-4">${match}</ul>`;
+      }
+      return match;
+    });
+    
+    return html;
+  };
+
   return (
     <div className="flex flex-col h-full">
       <ContentHeader
-        title={t("email", { defaultValue: "Email" })}
+        title={t("email")}
         actions={
           <Button
             onClick={() => {
@@ -104,7 +127,7 @@ export default function Email() {
             }}
           >
             <Send className="h-4 w-4 mr-2" />
-            {t("composeEmail", { defaultValue: "Soạn email" })}
+            {t("composeEmail")}
           </Button>
         }
       />
@@ -159,7 +182,7 @@ export default function Email() {
             <div className="relative">
               <input
                 type="text"
-                placeholder={t("searchEmail", { defaultValue: "Tìm kiếm email..." })}
+                placeholder={t("searchEmail")}
                 className="w-full px-3 py-2 pl-9 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -275,16 +298,18 @@ export default function Email() {
                       })}
                     />
 
-                    <TextArea
-                      label={t("content", { defaultValue: "Nội dung" })}
-                      value={form.content}
-                      onChange={onChange("content")}
-                      rows={12}
-                      required
-                      placeholder={t("contentPlaceholder", {
-                        defaultValue: "Nhập nội dung email...",
-                      })}
-                    />
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        {t("content", { defaultValue: "Nội dung" })}
+                      </label>
+                      <RichTextEditor
+                        value={form.content}
+                        onChange={onChange("content")}
+                        placeholder={t("contentPlaceholder", {
+                          defaultValue: "Nhập nội dung email...",
+                        })}
+                      />
+                    </div>
                   </div>
                 </form>
               )}
@@ -323,7 +348,10 @@ export default function Email() {
                 </div>
               </div>
               <div className="flex-1 p-6 overflow-auto">
-                <p className="text-gray-700 whitespace-pre-wrap">{selectedEmail.preview}</p>
+                <div 
+                  className="text-gray-700 prose prose-sm max-w-none"
+                  dangerouslySetInnerHTML={{ __html: renderContent(selectedEmail.preview) }}
+                />
               </div>
             </div>
           ) : selectedTab === "compose" ? (
@@ -380,18 +408,15 @@ export default function Email() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
                         {t("content", { defaultValue: "Nội dung" })}
                       </label>
-                      <textarea
+                      <RichTextEditor
                         value={form.content}
                         onChange={onChange("content")}
-                        rows={12}
-                        required
                         placeholder={t("contentPlaceholder", {
                           defaultValue: "Nhập nội dung email...",
                         })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
                       />
                     </div>
                   </div>

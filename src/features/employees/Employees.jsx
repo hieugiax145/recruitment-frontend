@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import ContentHeader from "../../components/ui/ContentHeader";
 import Button from "../../components/ui/Button";
-import { Plus } from "lucide-react";
+import TextInput from "../../components/ui/TextInput";
+import { Plus, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import LoadingContent from "../../components/ui/LoadingContent";
 import Pagination from "../../components/ui/Pagination";
@@ -18,6 +19,7 @@ export default function Employees() {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedDepartmentId, setSelectedDepartmentId] = useState(null);
   const [selectedPositionId, setSelectedPositionId] = useState(null);
+  const [keyword, setKeyword] = useState("");
   const itemsPerPage = 10;
   const navigate = useNavigate();
 
@@ -26,6 +28,7 @@ export default function Employees() {
     size: itemsPerPage,
     departmentId: selectedDepartmentId,
     positionId: selectedPositionId,
+    keyword: keyword || undefined,
   });
   const employees = Array.isArray(data?.data?.result) ? data.data.result : [];
   const meta = data?.data?.meta;
@@ -63,10 +66,23 @@ export default function Employees() {
         <ContentHeader
           title={t("employeeManagement")}
           actions={
-            <Button onClick={() => navigate("/employees/new")}>
-              {" "}
-              <Plus className="h-4 w-4 mr-2" /> {t("addEmployee")}
-            </Button>
+            <div className="flex items-center gap-3">
+              <TextInput
+                placeholder={t("common.search")}
+                value={keyword}
+                onChange={(e) => {
+                  setKeyword(e.target.value);
+                  setCurrentPage(1);
+                }}
+                icon={Search}
+                hideLabel
+                className="w-[300px]"
+              />
+              <Button onClick={() => navigate("/employees/new")}>
+                {" "}
+                <Plus className="h-4 w-4 mr-2" /> {t("addEmployee")}
+              </Button>
+            </div>
           }
         />
         <div className="flex-1 flex items-center justify-center mt-4">
@@ -81,7 +97,18 @@ export default function Employees() {
       <ContentHeader
         title={t("employeeManagement")}
         actions={
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
+            <TextInput
+              placeholder={t("common.search")}
+              value={keyword}
+              onChange={(e) => {
+                setKeyword(e.target.value);
+                setCurrentPage(1);
+              }}
+              icon={Search}
+              hideLabel
+              className="w-[300px]"
+            />
             <SelectDropdown
               value={selectedDepartmentId}
               onChange={setSelectedDepartmentId}
@@ -131,10 +158,10 @@ export default function Employees() {
                     {t("phone")}
                   </th>
                   <th className="p-4 text-left text-sm font-medium text-gray-600">
-                    {t("gender", { defaultValue: "Gender" })}
+                    {t("gender")}
                   </th>
                   <th className="p-4 text-left text-sm font-medium text-gray-600">
-                    {t("idNumber", { defaultValue: "ID Number" })}
+                    {t("idNumber")}
                   </th>
                   <th className="p-4 text-left text-sm font-medium text-gray-600">
                     {t("department")}
@@ -152,7 +179,7 @@ export default function Employees() {
                 {employees.length === 0 ? (
                   <tr>
                     <td colSpan="9" className="p-8">
-                      <EmptyState title={t("noData", { defaultValue: "Không có dữ liệu" })} />
+                      <EmptyState title={t("noData")} />
                     </td>
                   </tr>
                 ) : (
