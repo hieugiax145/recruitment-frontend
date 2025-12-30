@@ -1,6 +1,8 @@
 import { Clock, Calendar } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function UpcomingScheduleCard({ schedules = [] }) {
+  const { t } = useTranslation();
   const formatDate = (date) => {
     if (!date) return "-";
     try {
@@ -62,7 +64,7 @@ export default function UpcomingScheduleCard({ schedules = [] }) {
                 className={`border rounded-lg p-4 ${color.bg} ${color.border}`}
               >
                 <div className={`font-medium mb-1 truncate ${color.text}`}>
-                  {sch.title || "(Không có tiêu đề)"}
+                  {sch.title || t("common.noTitle")}
                 </div>
                 <div className="text-sm text-gray-700 mb-1">
                   <span className="text-gray-500">Ngày: </span>

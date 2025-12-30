@@ -2,8 +2,10 @@ import { useEffect } from "react";
 import { createPortal } from "react-dom";
 import { X, Calendar, Clock, MapPin, Users, Video, Monitor } from "lucide-react";
 import Button from "../../../components/ui/Button";
+import { useTranslation } from "react-i18next";
 
 export default function ScheduleDetailModal({ schedule, isOpen, onClose }) {
+  const { t } = useTranslation();
   // Handle ESC key
   useEffect(() => {
     if (!isOpen) return;
@@ -68,16 +70,16 @@ export default function ScheduleDetailModal({ schedule, isOpen, onClose }) {
 
   const getFormatLabel = (format) => {
     const formatMap = {
-      ONLINE: "Trực tuyến",
-      OFFLINE: "Trực tiếp",
+      ONLINE: t("calendarSchedule.formats.online"),
+      OFFLINE: t("calendarSchedule.formats.offline"),
     };
     return formatMap[format] || format;
   };
 
   const getMeetingTypeLabel = (meetingType) => {
     const typeMap = {
-      INTERVIEW: "Phỏng vấn",
-      MEETING: "Họp",
+      INTERVIEW: t("calendarSchedule.meetingTypes.interview"),
+      MEETING: t("calendarSchedule.meetingTypes.meeting"),
       OTHER: "Khác",
     };
     return typeMap[meetingType] || meetingType;
@@ -121,7 +123,7 @@ export default function ScheduleDetailModal({ schedule, isOpen, onClose }) {
           {/* Title */}
           <div>
             <h3 className="text-xl font-semibold text-gray-900">
-              {schedule.title || "Không có tiêu đề"}
+              {schedule.title || t("common.noTitle")}
             </h3>
           </div>
 
@@ -142,7 +144,7 @@ export default function ScheduleDetailModal({ schedule, isOpen, onClose }) {
                 <Calendar className="h-5 w-5" />
               </div>
               <div className="flex-1 pt-1">
-                <div className="text-xs text-gray-500 mb-1">Ngày</div>
+                <div className="text-xs text-gray-500 mb-1">{t("calendarSchedule.date")}</div>
                 <div className="text-sm text-gray-900 font-medium">{startDateTime.date}</div>
               </div>
             </div>
@@ -153,7 +155,7 @@ export default function ScheduleDetailModal({ schedule, isOpen, onClose }) {
                 <Clock className="h-5 w-5" />
               </div>
               <div className="flex-1 pt-1">
-                <div className="text-xs text-gray-500 mb-1">Thời gian</div>
+                <div className="text-xs text-gray-500 mb-1">{t("calendarSchedule.time")}</div>
                 <div className="text-sm text-gray-900 font-medium">
                   {startDateTime.time}
                   {schedule.endTime && ` - ${endTime}`}
@@ -174,7 +176,7 @@ export default function ScheduleDetailModal({ schedule, isOpen, onClose }) {
                 )}
               </div>
               <div className="flex-1 pt-1">
-                <div className="text-xs text-gray-500 mb-1">Hình thức</div>
+                <div className="text-xs text-gray-500 mb-1">{t("calendarSchedule.format")}</div>
                 <div className="text-sm text-gray-900 font-medium">
                   {getFormatLabel(schedule.format)}
                 </div>
@@ -187,7 +189,7 @@ export default function ScheduleDetailModal({ schedule, isOpen, onClose }) {
                 <Calendar className="h-5 w-5" />
               </div>
               <div className="flex-1 pt-1">
-                <div className="text-xs text-gray-500 mb-1">Loại cuộc họp</div>
+                <div className="text-xs text-gray-500 mb-1">{t("calendarSchedule.type")}</div>
                 <div className="text-sm text-gray-900 font-medium">
                   {getMeetingTypeLabel(schedule.meetingType)}
                 </div>
@@ -202,7 +204,7 @@ export default function ScheduleDetailModal({ schedule, isOpen, onClose }) {
                 <MapPin className="h-5 w-5" />
               </div>
               <div className="flex-1 pt-1">
-                <div className="text-xs text-gray-500 mb-1">Địa điểm</div>
+                <div className="text-xs text-gray-500 mb-1">{t("calendarSchedule.location")}</div>
                 <div className="text-sm text-gray-900 font-medium">
                   {schedule.location}
                 </div>
@@ -217,7 +219,7 @@ export default function ScheduleDetailModal({ schedule, isOpen, onClose }) {
                 <Users className="h-5 w-5" />
               </div>
               <div className="flex-1 pt-1">
-                <div className="text-xs text-gray-500 mb-2">Người tham dự</div>
+                <div className="text-xs text-gray-500 mb-2">{t("calendarSchedule.participants")}</div>
                 <div className="flex flex-wrap gap-2">
                   {schedule.participants.map((participant, index) => (
                     <div

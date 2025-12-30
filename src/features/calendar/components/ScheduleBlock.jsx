@@ -1,4 +1,7 @@
+import { useTranslation } from "react-i18next";
+
 export default function ScheduleBlock({ schedule, position, paddingTop, onClick }) {
+  const { t } = useTranslation();
   const formatTime = (timeString) => {
     if (!timeString) return "";
     try {
@@ -26,7 +29,7 @@ export default function ScheduleBlock({ schedule, position, paddingTop, onClick 
       onClick={onClick}
     >
       <div className="font-medium text-sm truncate">
-        {schedule.title || "Không có tiêu đề"}
+        {schedule.title || t("common.noTitle")}
       </div>
       <div className="text-xs opacity-90">
         {formatTime(schedule.startTime)}

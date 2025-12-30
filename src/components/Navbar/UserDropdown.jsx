@@ -17,7 +17,7 @@ const UserDropdown = () => {
         <div className="flex flex-col items-start">
           <div className="text-sm font-medium text-gray-900">{user?.name}</div>
           <div className="text-xs text-gray-600">
-            {user?.department?.name || "Không có phòng ban"}
+            {user?.department?.name || t("common.noDepartment")}
           </div>
         </div>
       </div>

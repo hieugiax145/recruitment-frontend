@@ -2,8 +2,10 @@ import { useNotifications, useMarkNotificationAsRead, useMarkAllNotificationsAsR
 import { Bell, CheckCheck } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { useSocket } from "../../context/SocketContext";
+import { useTranslation } from "react-i18next";
 
 export default function NotificationsDropdown() {
+  const { t } = useTranslation();
   const { data: notifications = [], isLoading, refetch } = useNotifications();
   const markAsRead = useMarkNotificationAsRead();
   const markAllAsRead = useMarkAllNotificationsAsRead();
@@ -56,7 +58,7 @@ export default function NotificationsDropdown() {
       <button
         onClick={toggleDropdown}
         className="relative p-2 rounded-lg hover:bg-gray-100 focus:outline-none transition-colors duration-200"
-        title={isConnected ? "Đã kết nối real-time" : "Chưa kết nối"}
+        title={isConnected ? t("common.connectedRealtime") : t("common.notConnected")}
       >
         <Bell className="w-5 h-5 text-gray-700" />
         {unreadCount > 0 && (
@@ -70,9 +72,9 @@ export default function NotificationsDropdown() {
       {isOpen && (
         <div className="absolute right-0 mt-2 w-96 bg-white shadow-lg rounded-lg z-50 max-h-96 overflow-hidden border border-gray-200">
           <div className="px-4 py-3 bg-gray-50 border-b border-gray-200 rounded-t-lg">
-            <h3 className="text-base font-semibold text-gray-900">Thông báo</h3>
+            <h3 className="text-base font-semibold text-gray-900">{t("common.notifications")}</h3>
             {unreadCount > 0 && (
-              <p className="text-sm text-gray-600 mt-1">{unreadCount} thông báo chưa đọc</p>
+              <p className="text-sm text-gray-600 mt-1">{unreadCount} {t("common.unreadNotifications")}</p>
             )}
           </div>
 
@@ -85,7 +87,7 @@ export default function NotificationsDropdown() {
             ) : notifications.length === 0 ? (
               <div className="px-4 py-6 text-center">
                 <Bell className="w-10 h-10 text-gray-300 mx-auto mb-2" />
-                <p className="text-sm text-gray-500">Không có thông báo nào</p>
+                <p className="text-sm text-gray-500">{t("common.noNotifications")}</p>
               </div>
             ) : (
               <ul className="divide-y divide-gray-100">
@@ -102,7 +104,7 @@ export default function NotificationsDropdown() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-2">
                           <h4 className="text-sm font-medium text-gray-900 line-clamp-2 leading-5">
-                            {n.title || n.message || "(Không có tiêu đề)"}
+                            {n.title || n.message || t("common.noTitle")}
                           </h4>
                           <span className="text-xs text-gray-400 flex-shrink-0">
                             {n.createdAt ? new Date(n.createdAt).toLocaleDateString("vi-VN") : ""}
@@ -130,10 +132,10 @@ export default function NotificationsDropdown() {
                   className="flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed disabled:text-gray-400"
                 >
                   <CheckCheck className="w-4 h-4" />
-                  {markAllAsRead.isPending ? "Đang xử lý..." : "Đánh dấu tất cả đã đọc"}
+                  {markAllAsRead.isPending ? t("common.processing") : t("common.markAllAsRead")}
                 </button>
                 <button className="text-sm text-gray-600 hover:text-gray-700 font-medium transition-colors duration-150 ml-auto">
-                  Xem tất cả thông báo
+                  {t("common.viewAllNotifications")}
                 </button>
               </div>
             </div>

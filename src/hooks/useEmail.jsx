@@ -3,6 +3,8 @@ import { emailServices } from "../services/emailServices";
 import { toast } from "react-toastify";
 
 export const useSendEmail = () => {
+  const { t } = useTranslation();
+
   return useMutation({
     mutationFn: async (data) => {
       const response = await emailServices.sendEmail(data);
@@ -11,7 +13,7 @@ export const useSendEmail = () => {
     onSuccess: () => {
     },
     onError: (error) => {
-      const message = error.response?.data?.message || "Có lỗi khi gửi email";
+      const message = error.response?.data?.message || t("toasts.errorSendEmail");
       toast.error(message);
     },
   });

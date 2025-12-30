@@ -223,7 +223,7 @@ export default function Email() {
                 const id = email.id || email._id || email.uuid || `${email.subject}-${email.createdAt || email.date || email.sentAt || email.receivedAt}`;
                 const from = email.fromEmail || email.from || email.sender || email.userFrom || "";
                 const to = email.toEmail || email.to || email.receiver || email.userTo || "";
-                const subject = email.subject || email.title || "(Không có tiêu đề)";
+                const subject = email.subject || email.title || t("common.noTitle");
                 const preview = email.preview || email.content || email.body || "";
                 const date = email.createdAt || email.date || email.sentAt || email.receivedAt || "";
                 const starred = email.starred || false;

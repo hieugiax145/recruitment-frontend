@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { userServices } from "../services/userServices";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
 
 export const userKeys = {
   all: ["users"],
@@ -35,6 +36,7 @@ export const useUser = (id, options = {}) => {
 
 export const useCreateUser = () => {
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   return useMutation({
     mutationFn: async (data) => {
@@ -45,7 +47,7 @@ export const useCreateUser = () => {
       queryClient.invalidateQueries({ queryKey: userKeys.all });
     },
     onError: (error) => {
-      const message = error.response?.data?.message || "Có lỗi khi tạo tài khoản";
+      const message = error.response?.data?.message || t("toasts.errorCreateUser");
       toast.error(message);
     },
   });
@@ -53,6 +55,7 @@ export const useCreateUser = () => {
 
 export const useUpdateUser = () => {
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   return useMutation({
     mutationFn: async ({ id, data }) => {
@@ -63,7 +66,7 @@ export const useUpdateUser = () => {
       queryClient.invalidateQueries({ queryKey: userKeys.all });
     },
     onError: (error) => {
-      const message = error.response?.data?.message || "Có lỗi khi cập nhật tài khoản";
+      const message = error.response?.data?.message || t("toasts.errorUpdateUser");
       toast.error(message);
     },
   });

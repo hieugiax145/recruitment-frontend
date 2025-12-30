@@ -1,5 +1,6 @@
 import { Briefcase } from "lucide-react";
 import { formatSalary } from "../../../utils/utils";
+import { useTranslation } from "react-i18next";
 
 export default function JobPositionInfoCard({
   jobPositionTitle,
@@ -10,11 +11,12 @@ export default function JobPositionInfoCard({
   experienceLevel,
   yearsOfExperience,
 }) {
+  const { t } = useTranslation();
   const salaryText =
     salaryMin || salaryMax
       ? `${currency === "VND" ? "₫" : ""} ${
-          salaryMin ? formatSalary(salaryMin) : "?"
-        } - ${salaryMax ? formatSalary(salaryMax) : "?"}`
+          salaryMin ? formatSalary(salaryMin, t("common.notAvailable")) : "?"
+        } - ${salaryMax ? formatSalary(salaryMax, t("common.notAvailable")) : "?"}`
       : "-";
 
   return (

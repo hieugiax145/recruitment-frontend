@@ -18,8 +18,8 @@ export function parseFormattedNumber(formattedValue) {
   return isNaN(num) || num < 0 ? null : num;
 }
 
-export function formatSalary(amount) {
-  if (!amount && amount !== 0) return "N/A";
+export function formatSalary(amount, notAvailableText = "N/A") {
+  if (!amount && amount !== 0) return notAvailableText;
 
   if (amount >= 1000000) {
     const millions = amount / 1000000;

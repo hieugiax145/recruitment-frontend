@@ -91,7 +91,7 @@ export default function OfferForm({ initialData, onSubmit, isLoading = false, mo
               {...field}
               label="Ứng viên"
               options={candidates.map((c) => ({ id: c.id, name: c.fullName }))}
-              placeholder="Chọn ứng viên"
+              placeholder={t("common.selectCandidate")}
               error={errors.candidateId?.message}
               disabled={isViewMode || isLoadingCandidates || (isEditMode && !!initialData) || isLoading}
             />
@@ -107,7 +107,7 @@ export default function OfferForm({ initialData, onSubmit, isLoading = false, mo
               {...field}
               label="Luồng duyệt"
               options={workflows.map((w) => ({ id: w.id, name: w.name }))}
-              placeholder="Chọn luồng duyệt"
+              placeholder={t("common.selectWorkflow")}
               error={errors.workflowId?.message}
               disabled={isViewMode || isLoading}
             />

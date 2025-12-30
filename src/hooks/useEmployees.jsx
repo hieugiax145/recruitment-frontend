@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { employeeServices } from "../services/employeeServices";
 import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
 
 export const employeeKeys = {
   all: ["employees"],
@@ -43,7 +44,7 @@ export const useCreateEmployee = () => {
       qc.invalidateQueries({ queryKey: employeeKeys.all });
     },
     onError: (err) => {
-      const msg = err.response?.data?.message || "Có lỗi khi thêm nhân sự";
+      const msg = err.response?.data?.message || t("toasts.errorCreateEmployee");
       toast.error(msg);
     },
   });
@@ -60,7 +61,7 @@ export const useUpdateEmployee = () => {
       qc.invalidateQueries({ queryKey: employeeKeys.all });
     },
     onError: (err) => {
-      const msg = err.response?.data?.message || "Có lỗi khi cập nhật";
+      const msg = err.response?.data?.message || t("toasts.errorUpdateEmployee");
       toast.error(msg);
     },
   });
@@ -77,7 +78,7 @@ export const useDeleteEmployee = () => {
       qc.invalidateQueries({ queryKey: employeeKeys.all });
     },
     onError: (err) => {
-      const msg = err.response?.data?.message || "Có lỗi khi xóa";
+      const msg = err.response?.data?.message || t("toasts.errorDeleteEmployee");
       toast.error(msg);
     },
   });

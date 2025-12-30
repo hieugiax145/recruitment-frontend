@@ -10,10 +10,12 @@ import { toast } from "react-toastify";
 import { useCreateSchedule } from "../hooks/useCalendar";
 import { useCandidates } from "../../candidate/hooks/useCandidates";
 import { useUsers } from "../../../hooks/useUsers";
+import { useTranslation } from "react-i18next";
 
 // moved to components/ui/MultiSelectDropdown.jsx
 
 export default function CreateEventModal({ isOpen, onClose, defaultDate }) {
+  const { t } = useTranslation();
   const createSchedule = useCreateSchedule();
   const [formData, setFormData] = useState({
     title: "",
@@ -63,10 +65,10 @@ export default function CreateEventModal({ isOpen, onClose, defaultDate }) {
   }, [isCandidatesError, candidatesError]);
 
   const meetingTypeOptions = [
-    { id: "INTERVIEW", name: "Phỏng vấn" },
-    { id: "MEETING", name: "Họp" },
-    { id: "TRAINING", name: "Đào tạo" },
-    { id: "OTHER", name: "Khác" },
+    { id: "INTERVIEW", name: t("calendarSchedule.meetingTypes.interview") },
+    { id: "MEETING", name: t("calendarSchedule.meetingTypes.meeting") },
+    { id: "TRAINING", name: t("calendarSchedule.meetingTypes.training") },
+    { id: "OTHER", name: t("calendarSchedule.meetingTypes.other") },
   ];
 
   const formatOptions = [
@@ -292,7 +294,7 @@ export default function CreateEventModal({ isOpen, onClose, defaultDate }) {
                   options={availableCandidates}
                   value={formData.candidate}
                   onChange={handleSelectChange("candidate")}
-                  placeholder={isLoadingCandidates ? t("loading") : "Chọn ứng viên"}
+                  placeholder={isLoadingCandidates ? t("loading") : t("common.selectCandidate")}
                   required
                 />
                 {/* Meeting Type */}
@@ -301,7 +303,7 @@ export default function CreateEventModal({ isOpen, onClose, defaultDate }) {
                   options={meetingTypeOptions}
                   value={formData.meetingType}
                   onChange={handleSelectChange("meetingType")}
-                  placeholder="Chọn loại cuộc họp"
+                  placeholder={t("common.selectMeetingType")}
                   required
                 />
 
@@ -311,7 +313,7 @@ export default function CreateEventModal({ isOpen, onClose, defaultDate }) {
                   options={formatOptions}
                   value={formData.format}
                   onChange={handleSelectChange("format")}
-                  placeholder="Chọn hình thức"
+                  placeholder={t("common.selectFormat")}
                 />
 
                 {/* Reminder Time */}
@@ -331,12 +333,12 @@ export default function CreateEventModal({ isOpen, onClose, defaultDate }) {
                   onChange={handleMultiSelectChange("participants")}
                   placeholder={
                     !formData.candidate
-                      ? "Chọn ứng viên trước"
+                      ? t("common.selectCandidate") + " trước"
                       : isLoadingParticipants
                       ? t("loading")
                       : availableParticipants.length === 0
-                      ? "Không có người tham dự trong phòng này"
-                      : "Chọn người tham dự"
+                      ? t("common.noParticipants")
+                      : t("common.selectParticipants")
                   }
                   disabled={!formData.candidate || isLoadingParticipants}
                 />
@@ -349,7 +351,7 @@ export default function CreateEventModal({ isOpen, onClose, defaultDate }) {
                   label="Tiêu đề"
                   name="title"
                   type="text"
-                  placeholder="VD: Phỏng vấn ứng viên"
+                  placeholder={t("common.exampleTitle")}
                   value={formData.title}
                   onChange={handleInputChange}
                   required

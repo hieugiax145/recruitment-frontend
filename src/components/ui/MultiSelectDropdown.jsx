@@ -2,13 +2,14 @@ import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { ChevronDown, X } from "lucide-react";
 import { cn } from "../../utils/utils";
+import { useTranslation } from "react-i18next";
 
 export default function MultiSelectDropdown({
   label,
   options = [],
   selectedValues = [],
   onChange,
-  placeholder = "Chọn",
+  placeholder,
   required = false,
   disabled = false,
   isRow = false,
@@ -16,6 +17,8 @@ export default function MultiSelectDropdown({
   compact = false,
   className,
 }) {
+  const { t } = useTranslation();
+  const displayPlaceholder = placeholder || t("common.select");
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
   const [menuPos, setMenuPos] = useState({ top: 0, left: 0, width: 0 });
@@ -138,7 +141,7 @@ export default function MultiSelectDropdown({
                   );
                 })()
               ) : (
-                <span className="text-gray-400">{placeholder}</span>
+                <span className="text-gray-400">{displayPlaceholder}</span>
               )}
             </div>
             <ChevronDown

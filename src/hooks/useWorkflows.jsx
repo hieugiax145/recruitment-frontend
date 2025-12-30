@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { workflowServices } from "../services/workflowServices";
 import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
 
 export const workflowKeys = {
   all: ["workflows"],
@@ -34,6 +35,7 @@ export const useWorkflow = (id, options = {}) => {
 
 export const useCreateWorkflow = () => {
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   return useMutation({
     mutationFn: async (data) => {
@@ -44,7 +46,7 @@ export const useCreateWorkflow = () => {
       queryClient.invalidateQueries({ queryKey: workflowKeys.all });
     },
     onError: (error) => {
-      const message = error.response?.data?.message || "Có lỗi khi tạo luồng phê duyệt";
+      const message = error.response?.data?.message || t("toasts.errorCreateWorkflow");
       toast.error(message);
     },
   });
@@ -52,6 +54,7 @@ export const useCreateWorkflow = () => {
 
 export const useUpdateWorkflow = () => {
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   return useMutation({
     mutationFn: async ({ id, data }) => {
@@ -62,7 +65,7 @@ export const useUpdateWorkflow = () => {
       queryClient.invalidateQueries({ queryKey: workflowKeys.all });
     },
     onError: (error) => {
-      const message = error.response?.data?.message || "Có lỗi khi cập nhật luồng phê duyệt";
+      const message = error.response?.data?.message || t("toasts.errorUpdateWorkflow");
       toast.error(message);
     },
   });
@@ -70,6 +73,7 @@ export const useUpdateWorkflow = () => {
 
 export const useDeleteWorkflow = () => {
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   return useMutation({
     mutationFn: async (id) => {
@@ -80,7 +84,7 @@ export const useDeleteWorkflow = () => {
       queryClient.invalidateQueries({ queryKey: workflowKeys.all });
     },
     onError: (error) => {
-      const message = error.response?.data?.message || "Có lỗi khi xóa luồng phê duyệt";
+      const message = error.response?.data?.message || t("toasts.errorDeleteWorkflow");
       toast.error(message);
     },
   });

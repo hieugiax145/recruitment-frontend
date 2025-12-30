@@ -113,10 +113,10 @@ export default function Employees() {
               value={selectedDepartmentId}
               onChange={setSelectedDepartmentId}
               options={[
-                { id: null, name: "Tất cả phòng ban" },
+                { id: null, name: t("common.allDepartments") },
                 ...departments.map((d) => ({ id: d.id, name: d.name })),
               ]}
-              placeholder="Tất cả phòng ban"
+              placeholder={t("common.allDepartments")}
               hideLabel
               compact
               className="min-w-[200px]"
@@ -125,10 +125,10 @@ export default function Employees() {
               value={selectedPositionId}
               onChange={setSelectedPositionId}
               options={[
-                { id: null, name: "Tất cả vị trí" },
+                { id: null, name: t("common.allPositions") },
                 ...positions.map((p) => ({ id: p.id, name: p.name })),
               ]}
-              placeholder="Tất cả vị trí"
+              placeholder={t("common.allPositions")}
               hideLabel
               compact
               className="min-w-[200px]"

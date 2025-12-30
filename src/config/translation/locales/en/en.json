@@ -479,6 +479,7 @@
     "next": "Next",
     "previous": "Previous",
     "confirm": "Confirm",
+    "cancel": "Cancel",
     "success": "Success",
     "warning": "Warning",
     "info": "Information",
@@ -486,11 +487,37 @@
     "to": "To",
     "startDate": "Start Date",
     "endDate": "End Date",
-    "selectDate": "Select Date"
+    "selectDate": "Select Date",
+    "select": "Select",
+    "noDepartment": "No department",
+    "allDepartments": "All Departments",
+    "allPositions": "All Positions",
+    "notAvailable": "N/A",
+    "noTitle": "No title",
+    "untitled": "(Untitled)",
+    "processing": "Processing...",
+    "clickToSelect": "Click to select file",
+    "selectCandidate": "Select candidate",
+    "selectCandidateFirst": "Select candidate first",
+    "selectMeetingType": "Select meeting type",
+    "selectFormat": "Select format",
+    "selectParticipants": "Select participants",
+    "selectWorkflow": "Select workflow",
+    "noParticipants": "No participants in this department",
+    "exampleTitle": "Example: Interview candidate",
+    "connectedRealtime": "Connected real-time",
+    "notConnected": "Not connected",
+    "unreadNotifications": "unread notifications",
+    "noNotifications": "No notifications",
+    "markAllAsRead": "Mark all as read",
+    "viewAllNotifications": "View all notifications",
+    "notifications": "Notifications",
+    "confirmDeleteRequest": "Are you sure you want to delete this request?"
   },
 
   "toasts": {
     "loginSuccess": "Login successful",
+    "loginFailed": "Login failed",
     "createEventSuccess": "Event created successfully!",
     "fillFromRequestSuccess": "Information filled from recruitment request",
     "createSuccess": "Created successfully",
@@ -517,17 +544,19 @@
     "pleaseEnterCancellationReason": "Please enter cancellation reason",
     "cannotLoadPositionInfo": "Cannot load position information",
     "pleaseEnterPositionTitle": "Please enter position title",
-    "pleaseChooseRecruitmentRequest": "Please choose recruitment request"
-  },
-
-  "buttons": {
-    "submit": "Submit",
-    "submitting": "Submitting...",
-    "withdraw": "Withdraw",
-    "withdrawing": "Withdrawing...",
-    "return": "Return",
-    "returning": "Returning...",
-    "processing": "Processing..."
+    "pleaseChooseRecruitmentRequest": "Please choose recruitment request",
+    "errorCreateUser": "Error creating user account",
+    "errorUpdateUser": "Error updating user account",
+    "errorCreateEmployee": "Error adding employee",
+    "errorUpdateEmployee": "Error updating employee",
+    "errorDeleteEmployee": "Error deleting employee",
+    "errorUpdatePermissions": "Error updating permissions",
+    "errorCreateRole": "Error creating role",
+    "errorUpdateRole": "Error updating role",
+    "errorCreateWorkflow": "Error creating workflow",
+    "errorUpdateWorkflow": "Error updating workflow",
+    "errorDeleteWorkflow": "Error deleting workflow",
+    "errorSendEmail": "Error sending email"
   },
 
   "recruitmentRequests": {
@@ -571,5 +600,25 @@
     "errorCreate": "Failed to create request",
     "errorUpdate": "Failed to update request",
     "errorDelete": "Failed to delete request"
+  },
+
+  "calendarSchedule": {
+    "scheduleDetail": "Schedule Details",
+    "date": "Date",
+    "time": "Time",
+    "location": "Location",
+    "type": "Type",
+    "format": "Format",
+    "participants": "Participants",
+    "meetingTypes": {
+      "interview": "Interview",
+      "meeting": "Meeting",
+      "training": "Training",
+      "other": "Other"
+    },
+    "formats": {
+      "online": "Online",
+      "offline": "Offline"
+    }
   }
 }

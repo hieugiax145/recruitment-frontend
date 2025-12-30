@@ -75,10 +75,10 @@ export default function Workflows() {
                 value={selectedDepartmentId}
                 onChange={setSelectedDepartmentId}
                 options={[
-                  { id: null, name: "Tất cả phòng ban" },
+                  { id: null, name: t("common.allDepartments") },
                   ...departments.map((d) => ({ id: d.id, name: d.name })),
                 ]}
-                placeholder="Tất cả phòng ban"
+                placeholder={t("common.allDepartments")}
                 hideLabel
                 compact
                 className="min-w-[200px]"
@@ -107,10 +107,10 @@ export default function Workflows() {
               value={selectedDepartmentId}
               onChange={setSelectedDepartmentId}
               options={[
-                { id: null, name: "Tất cả phòng ban" },
+                { id: null, name: t("common.allDepartments") },
                 ...departments.map((d) => ({ id: d.id, name: d.name })),
               ]}
-              placeholder="Tất cả phòng ban"
+              placeholder={t("common.allDepartments")}
               hideLabel
               compact
               className="min-w-[200px]"

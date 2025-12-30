@@ -97,7 +97,7 @@ const PositionDetail = forwardRef(
               <h3 className="text-sm font-medium text-gray-500 mb-2">
                 {t("deadline")}
               </h3>
-              <p className="text-gray-900">{position.deadline || "N/A"}</p>
+              <p className="text-gray-900">{position.deadline || t("common.notAvailable")}</p>
             </div>
             <div>
               <h3 className="text-sm font-medium text-gray-500 mb-2">

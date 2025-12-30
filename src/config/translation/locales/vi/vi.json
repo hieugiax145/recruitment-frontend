@@ -491,6 +491,7 @@
     "next": "Tiếp theo",
     "previous": "Trước",
     "confirm": "Xác nhận",
+    "cancel": "Hủy",
     "success": "Thành công",
     "warning": "Cảnh báo",
     "info": "Thông tin",
@@ -498,11 +499,37 @@
     "to": "Đến",
     "startDate": "Ngày bắt đầu",
     "endDate": "Ngày kết thúc",
-    "selectDate": "Chọn ngày"
+    "selectDate": "Chọn ngày",
+    "select": "Chọn",
+    "noDepartment": "Không có phòng ban",
+    "allDepartments": "Tất cả phòng ban",
+    "allPositions": "Tất cả vị trí",
+    "notAvailable": "N/A",
+    "noTitle": "Không có tiêu đề",
+    "untitled": "(Không có tiêu đề)",
+    "processing": "Đang xử lý...",
+    "clickToSelect": "Click để chọn file",
+    "selectCandidate": "Chọn ứng viên",
+    "selectCandidateFirst": "Chọn ứng viên trước",
+    "selectMeetingType": "Chọn loại cuộc họp",
+    "selectFormat": "Chọn hình thức",
+    "selectParticipants": "Chọn người tham dự",
+    "selectWorkflow": "Chọn luồng duyệt",
+    "noParticipants": "Không có người tham dự trong phòng này",
+    "exampleTitle": "VD: Phỏng vấn ứng viên",
+    "connectedRealtime": "Đã kết nối real-time",
+    "notConnected": "Chưa kết nối",
+    "unreadNotifications": "thông báo chưa đọc",
+    "noNotifications": "Không có thông báo nào",
+    "markAllAsRead": "Đánh dấu tất cả đã đọc",
+    "viewAllNotifications": "Xem tất cả thông báo",
+    "notifications": "Thông báo",
+    "confirmDeleteRequest": "Bạn có chắc chắn muốn xóa yêu cầu này?"
   },
 
   "toasts": {
     "loginSuccess": "Đăng nhập thành công",
+    "loginFailed": "Đăng nhập thất bại",
     "createEventSuccess": "Tạo sự kiện thành công!",
     "fillFromRequestSuccess": "Đã điền thông tin từ yêu cầu tuyển dụng",
     "createSuccess": "Tạo mới thành công",
@@ -529,17 +556,19 @@
     "pleaseEnterCancellationReason": "Vui lòng nhập lý do hủy",
     "cannotLoadPositionInfo": "Không thể tải thông tin vị trí tuyển dụng",
     "pleaseEnterPositionTitle": "Vui lòng nhập tên vị trí",
-    "pleaseChooseRecruitmentRequest": "Vui lòng chọn yêu cầu tuyển dụng"
-  },
-
-  "buttons": {
-    "submit": "Nộp",
-    "submitting": "Đang nộp...",
-    "withdraw": "Thu hồi",
-    "withdrawing": "Đang thu hồi...",
-    "return": "Trả về",
-    "returning": "Đang trả về...",
-    "processing": "Đang xử lý..."
+    "pleaseChooseRecruitmentRequest": "Vui lòng chọn yêu cầu tuyển dụng",
+    "errorCreateUser": "Có lỗi khi tạo tài khoản",
+    "errorUpdateUser": "Có lỗi khi cập nhật tài khoản",
+    "errorCreateEmployee": "Có lỗi khi thêm nhân sự",
+    "errorUpdateEmployee": "Có lỗi khi cập nhật",
+    "errorDeleteEmployee": "Có lỗi khi xóa",
+    "errorUpdatePermissions": "Có lỗi khi cập nhật phân quyền",
+    "errorCreateRole": "Có lỗi khi tạo vai trò",
+    "errorUpdateRole": "Có lỗi khi cập nhật vai trò",
+    "errorCreateWorkflow": "Có lỗi khi tạo luồng phê duyệt",
+    "errorUpdateWorkflow": "Có lỗi khi cập nhật luồng phê duyệt",
+    "errorDeleteWorkflow": "Có lỗi khi xóa luồng phê duyệt",
+    "errorSendEmail": "Có lỗi khi gửi email"
   },
 
   "recruitmentRequests": {
@@ -583,5 +612,25 @@
     "errorCreate": "Lỗi khi tạo yêu cầu",
     "errorUpdate": "Lỗi khi cập nhật yêu cầu",
     "errorDelete": "Lỗi khi xóa yêu cầu"
+  },
+
+  "calendarSchedule": {
+    "scheduleDetail": "Chi tiết lịch",
+    "date": "Ngày",
+    "time": "Thời gian",
+    "location": "Địa điểm",
+    "type": "Loại cuộc họp",
+    "format": "Hình thức",
+    "participants": "Người tham dự",
+    "meetingTypes": {
+      "interview": "Phỏng vấn",
+      "meeting": "Họp",
+      "training": "Đào tạo",
+      "other": "Khác"
+    },
+    "formats": {
+      "online": "Trực tuyến",
+      "offline": "Trực tiếp"
+    }
   }
 }

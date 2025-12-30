@@ -78,7 +78,7 @@ export default function RecruitmentRequests() {
   const startIndex = (currentPage - 1) * itemsPerPage;
 
   const handleDelete = (id) => {
-    if (window.confirm("Are you sure you want to delete this request?")) {
+    if (window.confirm(t("common.confirmDeleteRequest"))) {
       deleteMutation.mutate(id, {
         onSuccess: () => {
           toast.success(t("toasts.deleteSuccess"));
@@ -230,24 +230,24 @@ export default function RecruitmentRequests() {
                         {startIndex + index + 1}
                       </td>
                       <td className="p-4 text-sm whitespace-nowrap max-w-[150px] truncate">
-                        {request.requester?.name || "N/A"}
+                        {request.requester?.name || t("common.notAvailable")}
                       </td>
                       <td
                         className="p-4 text-sm whitespace-nowrap max-w-[200px] truncate"
                         title={request.title}
                       >
-                        {request.title || "N/A"}
+                        {request.title || t("common.notAvailable")}
                       </td>
                       <td className="p-4 text-sm whitespace-nowrap text-center">
                         {request.quantity || 0}
                       </td>
                       <td className="p-4 text-sm whitespace-nowrap max-w-[150px] truncate">
-                        {request.department?.name || "N/A"}
+                        {request.department?.name || t("common.notAvailable")}
                       </td>
                       <td className="p-4 text-sm whitespace-nowrap">
                         {request.createdAt
                           ? formatDateTime(request.createdAt)
-                          : "N/A"}
+                          : t("common.notAvailable")}
                       </td>
                       <td className="p-4 whitespace-nowrap">
                         <StatusBadge status={request.status} />

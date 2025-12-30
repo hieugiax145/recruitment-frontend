@@ -22,11 +22,11 @@ const Login = () => {
       return await login(credentials.username, credentials.password);
     },
     onSuccess: () => {
-      toast.success(t("loginSuccess"));
+      toast.success(t("toasts.loginSuccess"));
       navigate("/");
     },
     onError: (error) => {
-      const errorMessage = error.response?.data?.message || t("loginFailed");
+      const errorMessage = error.response?.data?.message || t("toasts.loginFailed");
       console.error(error);
       toast.error(errorMessage);
     },

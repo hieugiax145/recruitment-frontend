@@ -75,16 +75,16 @@ export default function JobPositions() {
     requirements: pos.requirements,
     qualifications: pos.qualifications,
     benefits: pos.benefits,
-    salary: `₫ ${formatSalary(pos.salaryMin)} - ${formatSalary(pos.salaryMax)}`,
+    salary: `₫ ${formatSalary(pos.salaryMin, t("common.notAvailable"))} - ${formatSalary(pos.salaryMax, t("common.notAvailable"))}`,
     type: pos.employmentType || "Full-time",
-    location: pos.location || "N/A",
+    location: pos.location || t("common.notAvailable"),
     quantity: pos.quantity,
     applicants: pos.applicationCount || 0,
     deadline: pos.deadline,
     status: pos.status?.toUpperCase() || "DRAFT",
     recruitmentRequestId: pos.recruitmentRequest?.id,
     department: pos.departmentName || "",
-    experience: pos.yearsOfExperience || "N/A",
+    experience: pos.yearsOfExperience || t("common.notAvailable"),
     remote: pos.remote || false,
     publishedAt: pos.publishedAt
   })).filter((pos) => {
@@ -197,8 +197,8 @@ export default function JobPositions() {
                 <SelectDropdown
                   value={selectedDepartmentId}
                   onChange={setSelectedDepartmentId}
-                  options={[{ id: null, name: "Tất cả phòng ban" }, ...departments.map(d => ({ id: d.id, name: d.name }))]}
-                  placeholder="Tất cả phòng ban"
+                  options={[{ id: null, name: t("common.allDepartments") }, ...departments.map(d => ({ id: d.id, name: d.name }))]}
+                  placeholder={t("common.allDepartments")}
                   hideLabel
                   compact
                   className="min-w-[200px]"

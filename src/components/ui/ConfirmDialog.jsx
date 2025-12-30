@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { createPortal } from "react-dom";
 import Button from "./Button";
 import { AlertTriangle, Info, CheckCircle, X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function ConfirmDialog({
   isOpen,
@@ -9,11 +10,14 @@ export default function ConfirmDialog({
   onConfirm,
   title,
   message,
-  confirmText = "Xác nhận",
-  cancelText = "Hủy",
+  confirmText,
+  cancelText,
   variant = "default", // default, danger, success, info
   loading = false,
 }) {
+  const { t } = useTranslation();
+  const displayConfirmText = confirmText || t("common.confirm");
+  const displayCancelText = cancelText || t("common.cancel");
   // Handle ESC key
   useEffect(() => {
     if (!isOpen) return;
@@ -142,7 +146,7 @@ export default function ConfirmDialog({
             disabled={loading}
             className="flex-1"
           >
-            {cancelText}
+            {displayCancelText}
           </Button>
           <Button
             onClick={() => {
@@ -154,7 +158,7 @@ export default function ConfirmDialog({
             disabled={loading}
             className="flex-1"
           >
-            {loading ? "Đang xử lý..." : confirmText}
+            {loading ? t("common.processing") : displayConfirmText}
           </Button>
         </div>
       </div>

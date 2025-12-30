@@ -72,8 +72,8 @@ export default function CandidateDetail() {
   if (isError) {
     return (
       <div className="flex flex-col items-center justify-center h-full gap-4">
-        <div className="text-red-500">Lỗi: {error?.message}</div>
-        <Button onClick={() => navigate("/candidates")}>Quay lại</Button>
+        <div className="text-red-500">{t("error")}: {error?.message}</div>
+        <Button onClick={() => navigate("/candidates")}>{t("common.back")}</Button>
       </div>
     );
   }
@@ -81,8 +81,8 @@ export default function CandidateDetail() {
   if (!candidate) {
     return (
       <div className="flex flex-col items-center justify-center h-full gap-4">
-        <div className="text-gray-500">Không tìm thấy ứng viên</div>
-        <Button onClick={() => navigate("/candidates")}>Quay lại</Button>
+        <div className="text-gray-500">{t("candidates.notFound", { defaultValue: "Không tìm thấy ứng viên" })}</div>
+        <Button onClick={() => navigate("/candidates")}>{t("common.back")}</Button>
       </div>
     );
   }
@@ -146,11 +146,11 @@ export default function CandidateDetail() {
                   onClick={() => setShowEmailModal(true)}
                 >
                   <Mail className="h-4 w-4 mr-2" />
-                  Gửi email
+                  {t("sendEmail", { defaultValue: "Gửi email" })}
                 </Button>
                 <Button onClick={() => setShowCreateEventModal(true)}>
                   <Calendar className="h-4 w-4 mr-2" />
-                  Tạo lịch
+                  {t("createSchedule")}
                 </Button>
               </>
             )}
