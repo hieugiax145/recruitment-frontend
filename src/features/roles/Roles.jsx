@@ -48,7 +48,7 @@ export default function Roles() {
                 ) : (
                   roles.map((r) => (
                     <tr key={r.id} className="hover:bg-gray-50 cursor-pointer" onClick={() => navigate(`/roles/${r.id}`)}>
-                      <td className="p-4 text-sm text-gray-900">#{r.id}</td>
+                      <td className="p-4 text-sm text-gray-900">{r.id}</td>
                       <td className="p-4 text-sm text-gray-900">{r.name}</td>
                       <td className="p-4 text-sm text-gray-600">{Array.isArray(r.permissions) ? r.permissions.length : r.permissionCount ?? "-"}</td>
                     </tr>

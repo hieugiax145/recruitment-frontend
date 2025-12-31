@@ -80,7 +80,7 @@ export default function ScheduleDetailModal({ schedule, isOpen, onClose }) {
     const typeMap = {
       INTERVIEW: t("calendarSchedule.meetingTypes.interview"),
       MEETING: t("calendarSchedule.meetingTypes.meeting"),
-      OTHER: "Khác",
+      OTHER: t("calendarSchedule.meetingTypes.other"),
     };
     return typeMap[meetingType] || meetingType;
   };
@@ -114,7 +114,7 @@ export default function ScheduleDetailModal({ schedule, isOpen, onClose }) {
         {/* Header */}
         <div className="p-6 pr-12 border-b border-gray-200">
           <h2 className="text-2xl font-bold text-gray-900">
-            Chi tiết lịch
+            {t("modals.scheduleDetail")}
           </h2>
         </div>
 
@@ -242,7 +242,7 @@ export default function ScheduleDetailModal({ schedule, isOpen, onClose }) {
             onClick={onClose}
             className="px-6"
           >
-            Đóng
+            {t("modals.close")}
           </Button>
         </div>
       </div>

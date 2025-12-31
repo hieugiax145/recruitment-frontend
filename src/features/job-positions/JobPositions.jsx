@@ -71,9 +71,7 @@ export default function JobPositions() {
     id: pos.id.toString(),
     title: pos.title,
     description: pos.description,
-    responsibilities: pos.responsibilities,
     requirements: pos.requirements,
-    qualifications: pos.qualifications,
     benefits: pos.benefits,
     salary: `₫ ${formatSalary(pos.salaryMin, t("common.notAvailable"))} - ${formatSalary(pos.salaryMax, t("common.notAvailable"))}`,
     type: pos.employmentType || "Full-time",
@@ -84,7 +82,8 @@ export default function JobPositions() {
     status: pos.status?.toUpperCase() || "DRAFT",
     recruitmentRequestId: pos.recruitmentRequest?.id,
     department: pos.departmentName || "",
-    experience: pos.yearsOfExperience || t("common.notAvailable"),
+    experienceLevel: pos.experienceLevel || t("common.notAvailable"),
+    yearsOfExperience: pos.yearsOfExperience || t("common.notAvailable"),
     remote: pos.remote || false,
     publishedAt: pos.publishedAt
   })).filter((pos) => {
@@ -181,7 +180,7 @@ export default function JobPositions() {
         <ContentHeader
           title={t("listJobPosition")}
           actions={
-            <div className="flex gap-3 items-center">
+            <>
               <TextInput
                 placeholder={t("common.search")}
                 value={keyword}
@@ -214,7 +213,7 @@ export default function JobPositions() {
                   {t("createNewPosition")}
                 </Button>
               )}
-            </div>
+            </>
           }
         />
         <div className="flex-1 flex items-center justify-center mt-4">
@@ -229,7 +228,7 @@ export default function JobPositions() {
       <ContentHeader
         title={t("listJobPosition")}
         actions={
-          <div className="flex gap-3 items-center">
+          <>
             <TextInput
               placeholder={t("common.search")}
               value={keyword}
@@ -262,7 +261,7 @@ export default function JobPositions() {
                 {t("createNewPosition")}
               </Button>
             )}
-          </div>
+          </>
         }
       />
       
@@ -317,7 +316,10 @@ export default function JobPositions() {
                           <td className="p-4 text-sm text-gray-900">{position.id}</td>
                           <td className="p-4">
                             <div className="text-sm font-medium text-gray-900">{position.title}</div>
-                            <div className="text-xs text-gray-500">{position.type} • {position.location}</div>
+                            <div className="text-xs text-gray-500">
+                              {position.type} • {position.experienceLevel}
+                              {position.remote && <span className="ml-1">• {t("jobPositions.remote")}</span>}
+                            </div>
                           </td>
                           <td className="p-4 text-sm text-gray-600">{position.department}</td>
                           <td className="p-4 text-sm text-gray-600">{position.quantity}</td>
@@ -330,42 +332,64 @@ export default function JobPositions() {
                         {isExpanded && (
                           <tr>
                             <td colSpan="7" className="p-0">
-                              <div className="bg-gray-50 px-6 py-4 space-y-4">
-                                <div>
-                                  <h4 className="text-sm font-semibold text-gray-900 mb-2">{t("jobPositions.jobDescription")}</h4>
-                                  <p className="text-sm text-gray-700 whitespace-pre-wrap">{position.description}</p>
+                              <div className="bg-gray-50 px-6 py-5 space-y-5">
+                                {/* Info Section */}
+                                <div className="bg-white rounded-lg px-4 py-3 shadow-sm">
+                                  <div className="grid grid-cols-4 gap-4 text-sm text-gray-700">
+                                    <div>
+                                      <span className="font-medium text-gray-500">{t("jobPositions.location")}:</span> {position.location}
+                                    </div>
+                                    <div>
+                                      <span className="font-medium text-gray-500">{t("jobPositions.experience")}:</span> {position.yearsOfExperience}
+                                    </div>
+                                    {position.deadline && (
+                                      <div>
+                                        <span className="font-medium text-gray-500">{t("jobPositions.deadline")}:</span> {new Date(position.deadline).toLocaleDateString('vi-VN')}
+                                      </div>
+                                    )}
+                                    {position.publishedAt && (
+                                      <div>
+                                        <span className="font-medium text-gray-500">{t("jobPositions.publishedAt")}:</span> {new Date(position.publishedAt).toLocaleDateString('vi-VN')}
+                                      </div>
+                                    )}
+                                  </div>
                                 </div>
                                 
-                                {position.responsibilities && (
-                                  <div>
-                                    <h4 className="text-sm font-semibold text-gray-900 mb-2">{t("jobPositions.responsibilities")}</h4>
-                                    <p className="text-sm text-gray-700 whitespace-pre-wrap">{position.responsibilities}</p>
-                                  </div>
-                                )}
-                                
-                                {position.requirements && (
-                                  <div>
-                                    <h4 className="text-sm font-semibold text-gray-900 mb-2">{t("jobPositions.requirements")}</h4>
-                                    <p className="text-sm text-gray-700 whitespace-pre-wrap">{position.requirements}</p>
-                                  </div>
-                                )}
-                                
-                                {position.qualifications && (
-                                  <div>
-                                    <h4 className="text-sm font-semibold text-gray-900 mb-2">{t("jobPositions.qualifications")}</h4>
-                                    <p className="text-sm text-gray-700 whitespace-pre-wrap">{position.qualifications}</p>
-                                  </div>
-                                )}
-                                
-                                {position.benefits && (
-                                  <div>
-                                    <h4 className="text-sm font-semibold text-gray-900 mb-2">{t("jobPositions.benefits")}</h4>
-                                    <p className="text-sm text-gray-700 whitespace-pre-wrap">{position.benefits}</p>
-                                  </div>
-                                )}
+                                {/* Content Grid */}
+                                <div className="grid grid-cols-3 gap-4">
+                                  {position.description && (
+                                    <div className="bg-white rounded-lg p-4 shadow-sm">
+                                      <h4 className="text-base font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                                        <FileText className="h-4 w-4 text-red-600" />
+                                        {t("jobPositions.jobDescription")}
+                                      </h4>
+                                      <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{position.description}</p>
+                                    </div>
+                                  )}
+                                  
+                                  {position.requirements && (
+                                    <div className="bg-white rounded-lg p-4 shadow-sm">
+                                      <h4 className="text-base font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                                        <CheckCircle className="h-4 w-4 text-red-600" />
+                                        {t("jobPositions.requirements")}
+                                      </h4>
+                                      <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{position.requirements}</p>
+                                    </div>
+                                  )}
+                                  
+                                  {position.benefits && (
+                                    <div className="bg-white rounded-lg p-4 shadow-sm">
+                                      <h4 className="text-base font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                                        <Plus className="h-4 w-4 text-red-600" />
+                                        {t("jobPositions.benefits")}
+                                      </h4>
+                                      <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{position.benefits}</p>
+                                    </div>
+                                  )}
+                                </div>
                                 
                                 {isHR && (
-                                  <div className="flex items-center justify-end flex-wrap gap-2 pt-2 border-t border-gray-200">
+                                  <div className="flex items-center justify-end flex-wrap gap-2 pt-3">
                                     <Button onClick={() => navigate(`/job-positions/${position.id}/candidates`)}>
                                       <User className="h-4 w-4 mr-2" />
                                       {t("jobPositions.viewCandidates")} ({position.applicants})

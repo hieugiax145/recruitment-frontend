@@ -10,13 +10,13 @@ import FeedbackCard from "./components/FeedbackCard";
 import NotesCard from "./components/NotesCard";
 import ApplicationProgress from "./components/ApplicationProgress";
 import ResumeViewer from "./components/ResumeViewer";
-import { useTranslation } from "react-i18next";
 import { Calendar, Mail } from "lucide-react";
 import LoadingContent from "../../components/ui/LoadingContent";
 import { useState } from "react";
 import SendEmailModal from "./components/SendEmailModal";
 import CreateEventModal from "../calendar/components/CreateEventModal";
 import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
 
 export default function CandidateDetail() {
   const { t } = useTranslation();
@@ -52,15 +52,8 @@ export default function CandidateDetail() {
       <div className="flex flex-col h-full">
         <ContentHeader
           title={t("candidateDetail")}
-          subtitle="..."
+          subtitle={t("loading")}
           onBack={() => navigate("/candidates")}
-          actions={
-            <div className="flex gap-2">
-              <Button variant="outline" onClick={() => navigate("/candidates")}>
-                {t("close")}
-              </Button>
-            </div>
-          }
         />
         <div className="flex-1 flex items-center justify-center mt-4">
           <LoadingContent />
@@ -81,7 +74,7 @@ export default function CandidateDetail() {
   if (!candidate) {
     return (
       <div className="flex flex-col items-center justify-center h-full gap-4">
-        <div className="text-gray-500">{t("candidates.notFound", { defaultValue: "Không tìm thấy ứng viên" })}</div>
+        <div className="text-gray-500">{t("candidates.notFound")}</div>
         <Button onClick={() => navigate("/candidates")}>{t("common.back")}</Button>
       </div>
     );
@@ -116,45 +109,21 @@ export default function CandidateDetail() {
         subtitle={displayName}
         onBack={() => navigate("/candidates")}
         actions={
-          <div className="flex gap-2">
-            {isHR && (
-              <div className="relative">
-                <select
-                  value={candidate.status}
-                  onChange={(e) => handleStatusChange(e.target.value)}
-                  disabled={updateStatus.isPending}
-                  className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                  style={{
-                    color: CANDIDATE_STATUSES.find(s => s.id === candidate.status)?.color || "#6B7280"
-                  }}
-                >
-                  {CANDIDATE_STATUSES.map((status) => (
-                    <option key={status.id} value={status.id}>
-                      {status.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
-            <Button variant="outline" onClick={() => navigate("/candidates")}>
-              {t("close")}
-            </Button>
-            {isHR && (
-              <>
-                <Button
-                  variant="outline"
-                  onClick={() => setShowEmailModal(true)}
-                >
-                  <Mail className="h-4 w-4 mr-2" />
-                  {t("sendEmail", { defaultValue: "Gửi email" })}
-                </Button>
-                <Button onClick={() => setShowCreateEventModal(true)}>
-                  <Calendar className="h-4 w-4 mr-2" />
-                  {t("createSchedule")}
-                </Button>
-              </>
-            )}
-          </div>
+          isHR && (
+            <>
+              <Button
+                variant="outline"
+                onClick={() => setShowEmailModal(true)}
+              >
+                <Mail className="h-4 w-4 mr-2" />
+                {t("candidates.sendEmail")}
+              </Button>
+              <Button onClick={() => setShowCreateEventModal(true)}>
+                <Calendar className="h-4 w-4 mr-2" />
+                {t("createSchedule")}
+              </Button>
+            </>
+          )
         }
       />
 
@@ -197,7 +166,13 @@ export default function CandidateDetail() {
           </div>
 
           <div className="col-span-8 space-y-4">
-            <ApplicationProgress status={candidate.status} />
+            <ApplicationProgress 
+              status={candidate.status}
+              isHR={isHR}
+              onStatusChange={handleStatusChange}
+              isUpdating={updateStatus.isPending}
+              statuses={CANDIDATE_STATUSES}
+            />
 
             <ResumeViewer resumeUrl={candidate.resumeUrl} />
           </div>

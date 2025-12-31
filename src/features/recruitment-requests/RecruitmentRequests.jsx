@@ -103,7 +103,7 @@ export default function RecruitmentRequests() {
         <ContentHeader
           title={t("listRequest")}
           actions={
-            <div className="flex items-center gap-3">
+            <>
               <TextInput
                 placeholder={t("common.search")}
                 value={keyword}
@@ -137,7 +137,7 @@ export default function RecruitmentRequests() {
                 <Plus className="h-4 w-4 mr-2" />
                 {t("createNewRequest")}
               </Button>
-            </div>
+            </>
           }
         />
         <div className="flex-1 flex items-center justify-center mt-4">
@@ -152,7 +152,7 @@ export default function RecruitmentRequests() {
       <ContentHeader
         title={t("listRequest")}
         actions={
-          <div className="flex items-center gap-3">
+          <>
             <TextInput
               placeholder={t("common.search")}
               value={keyword}
@@ -186,7 +186,7 @@ export default function RecruitmentRequests() {
               <Plus className="h-4 w-4 mr-2" />
               {t("createNewRequest")}
             </Button>
-          </div>
+          </>
         }
       />
       <div className="flex-1 flex flex-col mt-4 min-h-0">

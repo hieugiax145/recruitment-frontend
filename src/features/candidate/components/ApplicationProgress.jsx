@@ -1,7 +1,7 @@
 import { FileText, CheckCircle2, MessageSquare } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-export default function ApplicationProgress({ status }) {
+export default function ApplicationProgress({ status, isHR, onStatusChange, isUpdating, statuses }) {
   const { t } = useTranslation();
 
   const steps = [
@@ -38,10 +38,30 @@ export default function ApplicationProgress({ status }) {
 
   return (
     <div className="bg-white rounded-xl shadow p-6">
-      <h3 className="font-semibold text-gray-900 mb-6 flex items-center gap-2">
-        <CheckCircle2 size={18} />
-        {t("applicationProgress")}
-      </h3>
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="font-semibold text-gray-900 flex items-center gap-2">
+          <CheckCircle2 size={18} />
+          {t("applicationProgress")}
+        </h3>
+        {isHR && statuses && (
+          <select
+            value={status}
+            onChange={(e) => onStatusChange(e.target.value)}
+            disabled={isUpdating}
+            className="text-sm font-medium rounded-lg px-3 py-2 border-0 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{
+              backgroundColor: `${statuses.find(s => s.id === status)?.color}15`,
+              color: statuses.find(s => s.id === status)?.color
+            }}
+          >
+            {statuses.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.label}
+              </option>
+            ))}
+          </select>
+        )}
+      </div>
 
       <div className="relative">
         {/* Progress Bar Background */}

@@ -5,9 +5,12 @@ import TextInput from "../../../components/ui/TextInput";
 import TextArea from "../../../components/ui/TextArea";
 import { useSendEmail } from "../../../hooks/useEmail";
 import { Mail } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function SendEmailModal({ isOpen, onClose, recipientEmail, recipientName }) {
-  const [subject, setSubject] = useState(`Thư từ công ty - Ứng viên ${recipientName}`);
+  const { t } = useTranslation();
+  const defaultSubject = t("modals.emailSubjectTemplate", { name: recipientName });
+  const [subject, setSubject] = useState(defaultSubject);
   const [message, setMessage] = useState("");
   const sendEmail = useSendEmail();
 
@@ -27,7 +30,7 @@ export default function SendEmailModal({ isOpen, onClose, recipientEmail, recipi
         sendViaGmail: true,
       });
       // Reset form
-      setSubject(`Thư từ công ty - Ứng viên ${recipientName}`);
+      setSubject(defaultSubject);
       setMessage("");
       onClose();
     } catch (error) {
@@ -37,7 +40,7 @@ export default function SendEmailModal({ isOpen, onClose, recipientEmail, recipi
   };
 
   const handleClose = () => {
-    setSubject(`Thư từ công ty - Ứng viên ${recipientName}`);
+    setSubject(defaultSubject);
     setMessage("");
     onClose();
   };
@@ -52,8 +55,8 @@ export default function SendEmailModal({ isOpen, onClose, recipientEmail, recipi
               <Mail className="w-5 h-5 text-blue-600" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900">Gửi email</h3>
-              <p className="text-sm text-gray-600">Gửi đến: {recipientEmail}</p>
+              <h3 className="text-lg font-semibold text-gray-900">{t("modals.emailModalTitle")}</h3>
+              <p className="text-sm text-gray-600">{t("modals.sendTo")}: {recipientEmail}</p>
             </div>
           </div>
         </div>
@@ -61,18 +64,18 @@ export default function SendEmailModal({ isOpen, onClose, recipientEmail, recipi
         {/* Body */}
         <div className="px-6 py-6 space-y-4">
           <TextInput
-            label="Tiêu đề"
+            label={t("modals.emailSubject")}
             value={subject}
             onChange={(e) => setSubject(e.target.value)}
-            placeholder="Nhập tiêu đề email"
+            placeholder={t("modals.emailSubjectPlaceholder")}
             required
           />
 
           <TextArea
-            label="Nội dung"
+            label={t("modals.emailContent")}
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            placeholder="Nhập nội dung email..."
+            placeholder={t("modals.emailContentPlaceholder")}
             rows={10}
             required
           />
@@ -85,13 +88,13 @@ export default function SendEmailModal({ isOpen, onClose, recipientEmail, recipi
             onClick={handleClose}
             disabled={sendEmail.isPending}
           >
-            Hủy
+            {t("common.cancel")}
           </Button>
           <Button
             onClick={handleSend}
             disabled={sendEmail.isPending || !subject.trim() || !message.trim()}
           >
-            {sendEmail.isPending ? "Đang gửi..." : "Gửi email"}
+            {sendEmail.isPending ? t("modals.sending") : t("candidates.sendEmail")}
           </Button>
         </div>
       </div>

@@ -66,7 +66,7 @@ export default function Employees() {
         <ContentHeader
           title={t("employeeManagement")}
           actions={
-            <div className="flex items-center gap-3">
+            <>
               <TextInput
                 placeholder={t("common.search")}
                 value={keyword}
@@ -82,7 +82,7 @@ export default function Employees() {
                 {" "}
                 <Plus className="h-4 w-4 mr-2" /> {t("addEmployee")}
               </Button>
-            </div>
+            </>
           }
         />
         <div className="flex-1 flex items-center justify-center mt-4">
@@ -97,7 +97,7 @@ export default function Employees() {
       <ContentHeader
         title={t("employeeManagement")}
         actions={
-          <div className="flex items-center gap-3">
+          <>
             <TextInput
               placeholder={t("common.search")}
               value={keyword}
@@ -136,7 +136,7 @@ export default function Employees() {
             <Button onClick={() => navigate("/employees/new")}>
               <Plus className="h-4 w-4 mr-2" /> {t("addEmployee")}
             </Button>
-          </div>
+          </>
         }
       />
       <div className="flex-1 flex flex-col mt-4 min-h-0">
@@ -158,12 +158,6 @@ export default function Employees() {
                     {t("phone")}
                   </th>
                   <th className="p-4 text-left text-sm font-medium text-gray-600">
-                    {t("gender")}
-                  </th>
-                  <th className="p-4 text-left text-sm font-medium text-gray-600">
-                    {t("idNumber")}
-                  </th>
-                  <th className="p-4 text-left text-sm font-medium text-gray-600">
                     {t("department")}
                   </th>
                   <th className="p-4 text-left text-sm font-medium text-gray-600">
@@ -178,7 +172,7 @@ export default function Employees() {
               <tbody className="divide-y divide-gray-200">
                 {employees.length === 0 ? (
                   <tr>
-                    <td colSpan="9" className="p-8">
+                    <td colSpan="7" className="p-8">
                       <EmptyState title={t("noData")} />
                     </td>
                   </tr>
@@ -191,7 +185,7 @@ export default function Employees() {
                         className="hover:bg-gray-50 cursor-pointer"
                         onClick={() => navigate(`/employees/${e.id}`)}
                       >
-                        <td className="p-4 text-sm text-gray-900">#{e.id}</td>
+                        <td className="p-4 text-sm text-gray-900">{e.id}</td>
                         <td className="p-4 text-sm text-gray-900">
                           {e.name || "-"}
                         </td>
@@ -200,12 +194,6 @@ export default function Employees() {
                         </td>
                         <td className="p-4 text-sm text-gray-600">
                           {e.phone || "-"}
-                        </td>
-                        <td className="p-4 text-sm text-gray-600">
-                          {e.gender || "-"}
-                        </td>
-                        <td className="p-4 text-sm text-gray-600">
-                          {e.idNumber || "-"}
                         </td>
                         <td className="p-4 text-sm text-gray-600">
                           {e.department?.name || "-"}

@@ -48,7 +48,7 @@ export default function Users() {
         <ContentHeader
           title={t("accountManagement")}
           actions={
-            <div className="flex gap-3 items-center">
+            <>
               <TextInput
                 placeholder={t("common.search")}
                 value={keyword}
@@ -64,7 +64,7 @@ export default function Users() {
                 <Plus className="h-4 w-4 mr-2" />
                 {t("addAccount")}
               </Button>
-            </div>
+            </>
           }
         />
         <div className="flex-1 flex items-center justify-center mt-4">
@@ -79,7 +79,7 @@ export default function Users() {
       <ContentHeader
         title={t("accountManagement")}
         actions={
-          <div className="flex gap-3 items-center">
+          <>
             <TextInput
               placeholder={t("common.search")}
               value={keyword}
@@ -95,7 +95,7 @@ export default function Users() {
               <Plus className="h-4 w-4 mr-2" />
               {t("addAccount")}
             </Button>
-          </div>
+          </>
         }
       />
 
@@ -122,14 +122,14 @@ export default function Users() {
                   </tr>
                 ) : (
                   users.map((u) => {
-                    const isActive = u._active !== undefined ? u._active : true;
+                    const isActive = u.active !== undefined ? u.active : true;
                     return (
                       <tr key={u.id} className="hover:bg-gray-50 cursor-pointer" onClick={() => navigate(`/users/${u.id}`)}>
-                        <td className="p-4 text-sm text-gray-900">#{u.id}</td>
+                        <td className="p-4 text-sm text-gray-900">{u.id}</td>
                         <td className="p-4 text-sm text-gray-900">{u.employee?.name || "-"}</td>
                         <td className="p-4 text-sm text-gray-600">{u.email || "-"}</td>
                         <td className="p-4 text-sm text-gray-600">{u.employee?.department?.name || "-"}</td>
-                        <td className="p-4 text-sm text-gray-600">{u.role?.name || "-"}</td>
+                        <td className="p-4 text-sm text-gray-600">{u.employee?.position?.name || "-"}</td>
                         <td className="p-4 text-sm text-gray-600">{isActive ? t("active") : t("inactive")}</td>
                       </tr>
                     );

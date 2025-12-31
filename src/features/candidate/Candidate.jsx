@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import ContentHeader from "../../components/ui/ContentHeader";
 import Button from "../../components/ui/Button";
 import TextInput from "../../components/ui/TextInput";
-import { Search } from "lucide-react";
+import { Search, UsersRound } from "lucide-react";
 import Pagination from "../../components/ui/Pagination";
 import CandidateStatus from "./components/CandidateStatus";
 import { useCandidates } from "./hooks/useCandidates";
@@ -108,7 +108,7 @@ export default function Candidate() {
         <ContentHeader
           title={t("listCandidate")}
           actions={
-            <div className="flex items-center gap-3">
+            <>
               <TextInput
                 placeholder={t("common.search")}
                 value={keyword}
@@ -150,7 +150,7 @@ export default function Candidate() {
                 compact
                 className="min-w-[200px]"
               />
-            </div>
+            </>
           }
         />
         <div className="flex-1 flex items-center justify-center mt-4">
@@ -165,7 +165,7 @@ export default function Candidate() {
       <ContentHeader
         title={t("listCandidate")}
         actions={
-          <div className="flex items-center gap-3">
+          <>
             <TextInput
               placeholder={t("common.search")}
               value={keyword}
@@ -207,7 +207,7 @@ export default function Candidate() {
               compact
               className="min-w-[200px]"
             />
-          </div>
+          </>
         }
       />
 
@@ -231,7 +231,7 @@ export default function Candidate() {
                 {currentCandidates.length === 0 ? (
                   <tr>
                     <td colSpan="8" className="p-8">
-                      <EmptyState title={t("noCandidatesFound", { defaultValue: "Không có ứng viên" })} />
+                      <EmptyState title={t("noCandidatesFound", { defaultValue: "Không có ứng viên" })} icon={UsersRound}/>
                     </td>
                   </tr>
                 ) : (
@@ -246,7 +246,7 @@ export default function Candidate() {
                       }
                     >
                       <td className="p-4 text-sm text-gray-900">
-                        #{candidate.id}
+                        {candidate.id}
                       </td>
                       <td className="p-4 text-sm text-gray-900 font-medium">
                         {candidate.name || "-"}

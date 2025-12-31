@@ -97,7 +97,7 @@ export default function Offers() {
         <ContentHeader
           title={t("offers.title")}
         actions={
-          <div className="flex gap-3">
+          <>
             
             <SelectDropdown
               value={selectedJobPositionId}
@@ -129,7 +129,7 @@ export default function Offers() {
             <Button onClick={() => navigate("/offers/new")}>
               <Plus className="h-4 w-4 mr-2" /> {t("offers.newOfferButton")}
             </Button>
-          </div>
+          </>
         }
         />
         <div className="flex-1 flex items-center justify-center mt-4">
@@ -144,7 +144,7 @@ export default function Offers() {
       <ContentHeader
         title={t("offers.title")}
         actions={
-          <div className="flex gap-3">
+          <>
          
             <SelectDropdown
               value={selectedJobPositionId}
@@ -176,7 +176,7 @@ export default function Offers() {
             <Button onClick={() => navigate("/offers/new")}>
               <Plus className="h-4 w-4 mr-2" /> {t("offers.newOfferButton")}
             </Button>
-          </div>
+          </>
         }
       />
 
@@ -217,7 +217,7 @@ export default function Offers() {
                       }
                     >
                       <td className="p-4 text-sm text-gray-900">
-                        #{offer.id}
+                        {offer.id}
                       </td>
                       <td className="p-4 text-sm text-gray-900 font-medium">
                         {offer.candidate?.name || "-"}

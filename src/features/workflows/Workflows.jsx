@@ -70,7 +70,7 @@ export default function Workflows() {
         <ContentHeader
           title={t("workflowManagement")}
           actions={
-            <div className="flex items-center gap-4">
+            <>
               <SelectDropdown
                 value={selectedDepartmentId}
                 onChange={setSelectedDepartmentId}
@@ -87,7 +87,7 @@ export default function Workflows() {
                 <Plus className="h-4 w-4 mr-2" />
                 {t("addWorkflow")}
               </Button>
-            </div>
+            </>
           }
         />
         <div className="flex-1 flex items-center justify-center mt-4">
@@ -102,7 +102,7 @@ export default function Workflows() {
       <ContentHeader
         title={t("workflowManagement")}
         actions={
-          <div className="flex items-center gap-4">
+          <>
             <SelectDropdown
               value={selectedDepartmentId}
               onChange={setSelectedDepartmentId}
@@ -119,7 +119,7 @@ export default function Workflows() {
               <Plus className="h-4 w-4 mr-2" />
               {t("addWorkflow")}
             </Button>
-          </div>
+          </>
         }
       />
 
@@ -139,9 +139,6 @@ export default function Workflows() {
                     {t("description")}
                   </th>
                   <th className="p-4 text-left text-sm font-medium text-gray-600">
-                    {t("type")}
-                  </th>
-                  <th className="p-4 text-left text-sm font-medium text-gray-600">
                     {t("steps")}
                   </th>
                   <th className="p-4 text-left text-sm font-medium text-gray-600">
@@ -155,7 +152,7 @@ export default function Workflows() {
               <tbody className="divide-y divide-gray-200">
                 {workflows.length === 0 ? (
                   <tr>
-                    <td colSpan="7" className="p-8">
+                    <td colSpan="6" className="p-8">
                       <EmptyState title={t("noData")} />
                     </td>
                   </tr>
@@ -166,20 +163,15 @@ export default function Workflows() {
                       className="hover:bg-gray-50 cursor-pointer"
                       onClick={() => navigate(`/workflows/${workflow.id}`)}
                     >
-                      <td className="p-4 text-sm text-gray-900">#{workflow.id}</td>
+                      <td className="p-4 text-sm text-gray-900">{workflow.id}</td>
                       <td className="p-4 text-sm font-medium text-gray-900">
                         {workflow.name || "-"}
                       </td>
-                      <td className="p-4 text-sm text-gray-600">
+                      <td className="p-4 text-sm text-gray-600 max-w-xs truncate">
                         {workflow.description || "-"}
                       </td>
                       <td className="p-4 text-sm text-gray-600">
-                        <span className="px-2 py-1 rounded-full bg-blue-100 text-blue-800 text-xs">
-                          {workflow.type || "RECRUITMENT"}
-                        </span>
-                      </td>
-                      <td className="p-4 text-sm text-gray-600">
-                        {workflow.steps?.length || 0} {t("steps")}
+                        {workflow.steps?.length || 0}
                       </td>
                       <td className="p-4 text-sm text-gray-600">
                         {workflow.isActive ? (

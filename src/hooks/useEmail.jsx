@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { emailServices } from "../services/emailServices";
 import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
 
 export const useSendEmail = () => {
   const { t } = useTranslation();

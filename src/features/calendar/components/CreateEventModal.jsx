@@ -272,10 +272,10 @@ export default function CreateEventModal({ isOpen, onClose, defaultDate }) {
             </div>
             <div className="flex-1">
               <h2 className="text-xl font-semibold text-gray-900">
-                Thêm sự kiện
+                {t("modals.addEventTitle")}
               </h2>
               <p className="text-sm text-gray-500 mt-0.5">
-                Tạo sự kiện mới trong lịch làm việc
+                {t("modals.addEventSubtitle")}
               </p>
             </div>
           </div>
@@ -348,7 +348,7 @@ export default function CreateEventModal({ isOpen, onClose, defaultDate }) {
               <div className="space-y-4">
                 {/* Title */}
                 <TextInput
-                  label="Tiêu đề"
+                  label={t("modals.title")}
                   name="title"
                   type="text"
                   placeholder={t("common.exampleTitle")}
@@ -392,10 +392,10 @@ export default function CreateEventModal({ isOpen, onClose, defaultDate }) {
 
                 {/* Description */}
                 <div className="flex flex-col gap-2">
-                  <label className="block text-gray-700">Mô tả</label>
+                  <label className="block text-gray-700">{t("modals.description")}</label>
                   <textarea
                     name="description"
-                    placeholder="Mô tả chi tiết về sự kiện"
+                    placeholder={t("modals.descriptionPlaceholder")}
                     value={formData.description}
                     onChange={handleInputChange}
                     rows={5}
@@ -409,10 +409,10 @@ export default function CreateEventModal({ isOpen, onClose, defaultDate }) {
           {/* Footer */}
           <div className="px-6 py-4 border-t border-gray-200 flex gap-3 justify-end">
             <Button type="button" variant="outline" onClick={handleClose}>
-              Hủy
+              {t("common.cancel")}
             </Button>
             <Button type="submit" onClick={handleSubmit}>
-              Tạo sự kiện
+              {t("modals.createEvent")}
             </Button>
           </div>
         </form>

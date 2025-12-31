@@ -34,7 +34,6 @@ const Sidebar = ({ isVisible, toggleSidebar, sidebarWidth }) => {
     { text: t("recruitmentReq"), link: "/recruitment-requests", icon: <ClipboardList /> },
     { text: t("jobPosition"), link: "/job-positions", icon: <Briefcase /> },
     { text: t("candidate"), link: "/candidates", icon: <UsersRound /> },
-    { text: t("offers.title"), link: "/offers", icon: <FileText /> },
     { text: t("calendar"), link: "/calendar", icon: <CalendarDays /> },
     { text: t("email"), link: "/email", icon: <Mail /> },
   ];

@@ -5,6 +5,7 @@ import Button from "../../../components/ui/Button";
 import TextInput from "../../../components/ui/TextInput";
 import { toast } from "react-toastify";
 import { useCreateCandidate } from "../hooks/useCandidates";
+import { useTranslation } from "react-i18next";
 
 export default function AddCandidateModal({
   isOpen,
@@ -12,6 +13,7 @@ export default function AddCandidateModal({
   jobPosition,
   onSuccess,
 }) {
+  const { t } = useTranslation();
   const createMutation = useCreateCandidate();
 
   const [formData, setFormData] = useState({
@@ -184,11 +186,11 @@ export default function AddCandidateModal({
             {/* Title & Subtitle */}
             <div className="flex-1 pt-1">
               <h2 className="text-xl font-semibold text-gray-900 mb-1">
-                Thêm ứng viên mới
+                {t("modals.addCandidateTitle")}
               </h2>
               {jobPosition && (
                 <p className="text-sm text-gray-600">
-                  Vị trí:{" "}
+                  {t("modals.position")}:{" "}
                   <span className="font-medium text-gray-900">
                     {jobPosition.title}
                   </span>
@@ -210,8 +212,8 @@ export default function AddCandidateModal({
               <div className="col-span-2 space-y-4">
                 {/* Full Name */}
                 <TextInput
-                  label="Họ và tên"
-                  placeholder="Nhập họ và tên ứng viên"
+                  label={t("modals.fullName")}
+                  placeholder={t("modals.fullNamePlaceholder")}
                   name="fullName"
                   value={formData.fullName}
                   onChange={handleChange}
@@ -222,9 +224,9 @@ export default function AddCandidateModal({
                 {/* Email & Phone - Grid */}
                 <div className="grid grid-cols-2 gap-4">
                   <TextInput
-                    label="Email"
+                    label={t("modals.email")}
                     type="email"
-                    placeholder="example@email.com"
+                    placeholder={t("modals.emailPlaceholder")}
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
@@ -233,9 +235,9 @@ export default function AddCandidateModal({
                   />
 
                   <TextInput
-                    label="Số điện thoại"
+                    label={t("modals.phone")}
                     type="tel"
-                    placeholder="0123456789"
+                    placeholder={t("modals.phonePlaceholder")}
                     name="phone"
                     value={formData.phone}
                     onChange={handleChange}
@@ -247,10 +249,10 @@ export default function AddCandidateModal({
                 {/* Notes */}
                 <div className="flex flex-col gap-2">
                   <label className="block text-gray-700">
-                    Ghi chú
+                    {t("modals.notes")}
                   </label>
                   <textarea
-                    placeholder="Nhập ghi chú về ứng viên (nếu có)"
+                    placeholder={t("modals.notesPlaceholder")}
                     name="notes"
                     value={formData.notes}
                     onChange={handleChange}
@@ -269,7 +271,7 @@ export default function AddCandidateModal({
               <div className="col-span-1 flex flex-col">
                 <div className="flex flex-col gap-2 flex-1">
                   <label className="block text-gray-700">
-                    CV/Hồ sơ (PDF) <span className="text-red-500">*</span>
+                    {t("modals.cvFileRequired")}
                   </label>
 
                   {!cvFile ? (
@@ -287,10 +289,10 @@ export default function AddCandidateModal({
                       <Upload className="h-10 w-10 text-gray-400" />
                       <div className="text-center">
                         <p className="text-sm font-medium text-gray-700">
-                          Click để chọn file
+                          {t("modals.clickToSelectFile")}
                         </p>
                         <p className="text-xs text-gray-500 mt-1">
-                          PDF • Max 5MB
+                          {t("modals.pdfMaxSize")}
                         </p>
                       </div>
                       <input
@@ -341,7 +343,7 @@ export default function AddCandidateModal({
               disabled={createMutation.isPending}
               className="flex-1"
             >
-              Hủy
+              {t("common.cancel")}
             </Button>
             <Button
               type="submit"
@@ -349,7 +351,7 @@ export default function AddCandidateModal({
               onClick={handleSubmit}
               className="flex-1"
             >
-              {createMutation.isPending ? "Đang thêm..." : "Thêm ứng viên"}
+              {createMutation.isPending ? t("modals.adding") : t("modals.addCandidate")}
             </Button>
           </div>
         </form>

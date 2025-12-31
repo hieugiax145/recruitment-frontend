@@ -47,12 +47,12 @@ export default function UpcomingScheduleCard({ schedules = [] }) {
     <div className="bg-white rounded-xl shadow p-6">
       <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
         <Clock size={18} />
-        Lịch sắp tới
+        {t("candidates.upcomingSchedules")}
       </h3>
       {!schedules || schedules.length === 0 ? (
         <div className="text-center py-8 text-gray-400">
           <Calendar size={32} className="mx-auto mb-2 opacity-50" />
-          <p className="text-sm">Chưa có lịch hẹn</p>
+          <p className="text-sm">{t("candidates.noSchedules")}</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -67,11 +67,11 @@ export default function UpcomingScheduleCard({ schedules = [] }) {
                   {sch.title || t("common.noTitle")}
                 </div>
                 <div className="text-sm text-gray-700 mb-1">
-                  <span className="text-gray-500">Ngày: </span>
+                  <span className="text-gray-500">{t("candidates.date")}: </span>
                   {formatDate(sch.startTime)}
                 </div>
                 <div className="text-sm text-gray-700">
-                  <span className="text-gray-500">Giờ: </span>
+                  <span className="text-gray-500">{t("candidates.time")}: </span>
                   {formatTimeRange(sch.startTime, sch.endTime)}
                 </div>
               </div>

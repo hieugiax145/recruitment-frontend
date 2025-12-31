@@ -1,6 +1,8 @@
 import { FileText, Download } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function ResumeViewer({ resumeUrl }) {
+  const { t } = useTranslation();
   const handleDownload = () => {
     if (!resumeUrl) return;
     
@@ -21,7 +23,7 @@ export default function ResumeViewer({ resumeUrl }) {
     <div className="bg-white rounded-xl shadow p-6">
       <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
         <FileText size={18} />
-        Hồ sơ ứng tuyển
+        {t("candidates.resume")}
       </h3>
       {resumeUrl ? (
         <div className="space-y-4">
@@ -33,14 +35,14 @@ export default function ResumeViewer({ resumeUrl }) {
               className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-sm font-medium text-gray-700"
             >
               <FileText size={16} />
-              Mở trong tab mới
+              {t("candidates.openInNewTab")}
             </a>
             <button
               onClick={handleDownload}
               className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors text-sm font-medium text-blue-700"
             >
               <Download size={16} />
-              Tải xuống
+              {t("candidates.download")}
             </button>
           </div>
           <div
@@ -53,7 +55,7 @@ export default function ResumeViewer({ resumeUrl }) {
       ) : (
         <div className="text-center py-12 text-gray-400 border-2 border-dashed border-gray-200 rounded-lg">
           <FileText size={48} className="mx-auto mb-3 opacity-50" />
-          <p className="text-sm">Chưa có hồ sơ đính kèm</p>
+          <p className="text-sm">{t("candidates.noResume")}</p>
         </div>
       )}
     </div>

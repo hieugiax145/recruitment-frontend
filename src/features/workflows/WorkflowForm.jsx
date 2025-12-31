@@ -22,7 +22,6 @@ const LEVEL_OPTIONS = [
 
 const TYPE_OPTIONS = [
   { id: "REQUEST", name: "Yêu cầu tuyển dụng" },
-  { id: "OFFER", name: "Offer" },
 ];
 
 export default function WorkflowForm() {
@@ -40,8 +39,6 @@ export default function WorkflowForm() {
     type: "REQUEST",
     applyConditions: {
       department_id: null,
-      level: null,
-      isReplacement: false,
     },
     steps: [],
   });
@@ -63,8 +60,6 @@ export default function WorkflowForm() {
         type: workflowData.type || "REQUEST",
         applyConditions: {
           department_id: workflowData.applyConditions?.department_id || null,
-          level: workflowData.applyConditions?.level || null,
-          isReplacement: workflowData.applyConditions?.type === "REPLACEMENT",
         },
         steps: workflowData.steps
           ? workflowData.steps.map((s) => ({
@@ -180,8 +175,6 @@ export default function WorkflowForm() {
         ...(form.applyConditions.department_id && {
           department_id: Number(form.applyConditions.department_id),
         }),
-        ...(form.applyConditions.level && { level: form.applyConditions.level }),
-        ...(form.applyConditions.isReplacement && { isReplacement: form.applyConditions.isReplacement }),
       },
       steps: form.steps.map((s) => ({
         stepOrder: s.stepOrder,
@@ -242,8 +235,6 @@ export default function WorkflowForm() {
                           type: workflowData.type || "REQUEST",
                           applyConditions: {
                             department_id: workflowData.applyConditions?.department_id || null,
-                            level: workflowData.applyConditions?.level || null,
-                            isReplacement: workflowData.applyConditions?.type === "REPLACEMENT",
                           },
                           steps: workflowData.steps
                             ? workflowData.steps.map((s) => ({
@@ -317,7 +308,6 @@ export default function WorkflowForm() {
                         type: workflowData.type || "RECRUITMENT",
                         applyConditions: {
                           department_id: workflowData.applyConditions?.department_id || null,
-                          level: workflowData.applyConditions?.level || null,
                         },
                         steps: workflowData.steps
                           ? workflowData.steps.map((s) => ({
@@ -392,37 +382,14 @@ export default function WorkflowForm() {
                 <h3 className="text-lg font-semibold text-gray-900">
                   {t("applyConditions")}
                 </h3>
-                <div className="flex items-center gap-2 mb-4">
-                  <input
-                    type="checkbox"
-                    id="isReplacement"
-                    checked={form.applyConditions.isReplacement}
-                    onChange={(e) => onConditionChange("isReplacement")(e.target.checked)}
-                    disabled={!isEditMode}
-                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                  />
-                  <label htmlFor="isReplacement" className="text-sm text-gray-700">
-                    {t("isReplacement")}
-                  </label>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <SelectDropdown
-                    label={t("department")}
-                    options={[{ id: null, name: t("allDepartments") }, ...departmentsData.map((d) => ({ id: d.id, name: d.name }))]}
-                    value={form.applyConditions.department_id}
-                    onChange={onConditionChange("department_id")}
-                    placeholder={t("allDepartments")}
-                    disabled={!isEditMode}
-                  />
-                  <SelectDropdown
-                    label={t("level")}
-                    options={LEVEL_OPTIONS}
-                    value={form.applyConditions.level}
-                    onChange={onConditionChange("level")}
-                    placeholder={t("selectLevel")}
-                    disabled={!isEditMode}
-                  />
-                </div>
+                <SelectDropdown
+                  label={t("department")}
+                  options={[{ id: null, name: t("allDepartments") }, ...departmentsData.map((d) => ({ id: d.id, name: d.name }))]}
+                  value={form.applyConditions.department_id}
+                  onChange={onConditionChange("department_id")}
+                  placeholder={t("allDepartments")}
+                  disabled={!isEditMode}
+                />
               </div>
 
               {/* Approval Steps */}
@@ -452,7 +419,7 @@ export default function WorkflowForm() {
                             {t("order")}
                           </th>
                           <th className="p-3 text-left text-sm font-medium text-gray-600">
-                            {t("approver")}
+                            {t("recruitmentRequests.approver")}
                           </th>
                           {isEditMode && (
                             <th className="p-3 text-center text-sm font-medium text-gray-600 w-32">

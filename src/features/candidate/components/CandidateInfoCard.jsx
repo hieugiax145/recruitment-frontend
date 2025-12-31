@@ -1,4 +1,5 @@
 import { Mail, Phone, Calendar } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function CandidateInfoCard({
   displayName,
@@ -6,6 +7,7 @@ export default function CandidateInfoCard({
   displayPhone,
   appliedDate,
 }) {
+  const { t } = useTranslation();
   const formatDate = (dateString) => {
     if (!dateString) return "-";
     const date = new Date(dateString);
@@ -38,7 +40,7 @@ export default function CandidateInfoCard({
         )}
         <div className="flex items-center gap-2 text-sm text-gray-600">
           <Calendar size={16} className="flex-shrink-0" />
-          <span>Ngày ứng tuyển: {formatDate(appliedDate)}</span>
+          <span>{t("appliedDate")}: {formatDate(appliedDate)}</span>
         </div>
       </div>
     </div>

@@ -37,16 +37,16 @@ export default function JobPositionInfoCard({
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <div className="text-sm text-gray-500 mb-1">Level</div>
+            <div className="text-sm text-gray-500 mb-1">{t("experienceLevel")}</div>
             <div className="text-gray-900">{experienceLevel || "-"}</div>
           </div>
           <div>
-            <div className="text-sm text-gray-500 mb-1">Kinh nghiệm</div>
+            <div className="text-sm text-gray-500 mb-1">{t("yearsExperience")}</div>
             <div className="text-gray-900">{yearsOfExperience || "-"}</div>
           </div>
         </div>
         <div>
-          <div className="text-sm text-gray-500 mb-1">Mức lương</div>
+          <div className="text-sm text-gray-500 mb-1">{t("salary")}</div>
           <div className="text-gray-900">{salaryText}</div>
         </div>
       </div>

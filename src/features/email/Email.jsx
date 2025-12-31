@@ -96,6 +96,50 @@ export default function Email() {
   const renderContent = (content) => {
     if (!content) return "";
     
+    // If content contains HTML tags, strip out styles and unnecessary attributes
+    if (content.includes('<') && content.includes('>')) {
+      // Remove DOCTYPE, HTML structure, and all unwanted tags
+      let cleaned = content
+        .replace(/<!DOCTYPE[^>]*>/gi, '')
+        .replace(/<html[^>]*>/gi, '')
+        .replace(/<\/html>/gi, '')
+        .replace(/<head[^>]*>[\s\S]*?<\/head>/gi, '')
+        .replace(/<meta[^>]*>/gi, '')
+        .replace(/<link[^>]*>/gi, '')
+        .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
+        .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
+        .replace(/<body[^>]*>/gi, '')
+        .replace(/<\/body>/gi, '')
+        .replace(/style="[^"]*"/gi, '')
+        .replace(/bgcolor="[^"]*"/gi, '')
+        .replace(/class="[^"]*"/gi, '')
+        .replace(/border="[^"]*"/gi, '')
+        .replace(/cellpadding="[^"]*"/gi, '')
+        .replace(/cellspacing="[^"]*"/gi, '')
+        .replace(/width="[^"]*"/gi, '')
+        .replace(/height="[^"]*"/gi, '')
+        .replace(/align="[^"]*"/gi, '')
+        .replace(/valign="[^"]*"/gi, '')
+        .replace(/<table[^>]*>/gi, '')
+        .replace(/<\/table>/gi, '')
+        .replace(/<tbody[^>]*>/gi, '')
+        .replace(/<\/tbody>/gi, '')
+        .replace(/<tr[^>]*>/gi, '')
+        .replace(/<\/tr>/gi, '')
+        .replace(/<td[^>]*>/gi, '')
+        .replace(/<\/td>/gi, '<br/>')
+        .replace(/<div[^>]*>/gi, '')
+        .replace(/<\/div>/gi, '<br/>')
+        .replace(/<span[^>]*>/gi, '')
+        .replace(/<\/span>/gi, '')
+        .replace(/<font[^>]*>/gi, '')
+        .replace(/<\/font>/gi, '')
+        .replace(/(<br\s*\/?>\s*){3,}/gi, '<br/><br/>') // Remove excessive line breaks
+        .trim();
+      
+      return cleaned;
+    }
+    
     // Convert markdown-style formatting to HTML
     let html = content
       .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>') // Bold
@@ -147,7 +191,7 @@ export default function Email() {
                   }
                 `}
               >
-                {t("inbox", { defaultValue: "Hộp thư" })}
+                {t("inbox")}
               </div>
               <div
                 onClick={() => setSelectedTab("sent")}
@@ -160,7 +204,7 @@ export default function Email() {
                   }
                 `}
               >
-                {t("sent", { defaultValue: "Đã gửi" })}
+                {t("sent")}
               </div>
               <div
                 onClick={() => setSelectedTab("drafts")}
@@ -173,7 +217,7 @@ export default function Email() {
                   }
                 `}
               >
-                {t("drafts", { defaultValue: "Lưu nháp" })}
+                {t("drafts")}
               </div>
             </div>
           </div>
@@ -206,7 +250,7 @@ export default function Email() {
               if (error) {
                 return (
                   <div className="p-4 text-sm text-red-600">
-                    {t("failedToLoadEmails", { defaultValue: "Tải email thất bại" })}
+                    {t("failedToLoadEmails")}
                   </div>
                 );
               }
@@ -214,7 +258,7 @@ export default function Email() {
               if (!emails || emails.length === 0) {
                 return (
                   <div className="p-4">
-                    <EmptyState title={t("noEmails", { defaultValue: "Không có email" })} />
+                    <EmptyState title={t("noEmails")} />
                   </div>
                 );
               }
@@ -224,11 +268,16 @@ export default function Email() {
                 const from = email.fromEmail || email.from || email.sender || email.userFrom || "";
                 const to = email.toEmail || email.to || email.receiver || email.userTo || "";
                 const subject = email.subject || email.title || t("common.noTitle");
-                const preview = email.preview || email.content || email.body || "";
+                const rawPreview = email.preview || email.content || email.body || "";
+                // Clean HTML from preview
+                const preview = rawPreview.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
                 const date = email.createdAt || email.date || email.sentAt || email.receivedAt || "";
                 const starred = email.starred || false;
 
                 const item = { id, from, to, subject, preview, date, starred };
+                
+                // Show from for inbox, to for sent
+                const displayName = selectedTab === "sent" ? item.to : item.from;
 
                 return (
                   <div
@@ -239,7 +288,7 @@ export default function Email() {
                     }`}
                   >
                     <div className="flex items-start justify-between mb-1">
-                      <span className="text-sm font-medium text-gray-900">{item.from || item.to}</span>
+                      <span className="text-sm font-medium text-gray-900">{displayName}</span>
                       {item.starred && (
                         <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
                       )}
@@ -259,15 +308,15 @@ export default function Email() {
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-semibold text-gray-900">
-                  {t("composeNewEmail", { defaultValue: "Tin nhắn mới" })}
+                  {t("composeNewEmail")}
                 </h2>
                 <div className="flex gap-2">
                   <Button variant="outline" onClick={handleReset} type="button" disabled={sendEmail.isPending}>
-                    {t("reset", { defaultValue: "Đặt lại" })}
+                    {t("reset")}
                   </Button>
                   <Button onClick={() => formRef.current?.requestSubmit()} disabled={sendEmail.isPending}>
                     <Send className="h-4 w-4 mr-2" />
-                    {t("send", { defaultValue: "Gửi" })}
+                    {t("send")}
                   </Button>
                 </div>
               </div>
@@ -279,7 +328,7 @@ export default function Email() {
                 <form ref={formRef} onSubmit={handleSubmit}>
                   <div className="space-y-4">
                     <TextInput
-                      label={t("to", { defaultValue: "Đến" })}
+                      label={t("to")}
                       type="email"
                       value={form.toEmail}
                       onChange={onChange("toEmail")}
@@ -288,26 +337,22 @@ export default function Email() {
                     />
 
                     <TextInput
-                      label={t("subject", { defaultValue: "Tiêu đề" })}
+                      label={t("subject")}
                       type="text"
                       value={form.subject}
                       onChange={onChange("subject")}
                       required
-                      placeholder={t("subjectPlaceholder", {
-                        defaultValue: "Tiêu đề tin nhắn email",
-                      })}
+                      placeholder={t("subjectPlaceholder")}
                     />
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        {t("content", { defaultValue: "Nội dung" })}
+                        {t("content")}
                       </label>
                       <RichTextEditor
                         value={form.content}
                         onChange={onChange("content")}
-                        placeholder={t("contentPlaceholder", {
-                          defaultValue: "Nhập nội dung email...",
-                        })}
+                        placeholder={t("contentPlaceholder")}
                       />
                     </div>
                   </div>
@@ -342,7 +387,7 @@ export default function Email() {
                         setSelectedEmail(null);
                       }}
                     >
-                      {t("reply", { defaultValue: "Trả lời" })}
+                      {t("reply")}
                     </Button>
                   </div>
                 </div>
@@ -358,15 +403,15 @@ export default function Email() {
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-semibold text-gray-900">
-                  {t("composeNewEmail", { defaultValue: "Tin nhắn mới" })}
+                  {t("composeNewEmail")}
                 </h2>
                 <div className="flex gap-2">
                   <Button variant="outline" onClick={handleReset} type="button" disabled={sendEmail.isPending}>
-                    {t("reset", { defaultValue: "Đặt lại" })}
+                    {t("reset")}
                   </Button>
                   <Button onClick={() => formRef.current?.requestSubmit()} disabled={sendEmail.isPending}>
                     <Send className="h-4 w-4 mr-2" />
-                    {t("send", { defaultValue: "Gửi" })}
+                    {t("send")}
                   </Button>
                 </div>
               </div>
@@ -379,7 +424,7 @@ export default function Email() {
                   <div className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        {t("to", { defaultValue: "Đến" })}
+                        {t("to")}
                       </label>
                       <input
                         type="email"
@@ -393,30 +438,26 @@ export default function Email() {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        {t("subject", { defaultValue: "Tiêu đề" })}
+                        {t("subject")}
                       </label>
                       <input
                         type="text"
                         value={form.subject}
                         onChange={onChange("subject")}
                         required
-                        placeholder={t("subjectPlaceholder", {
-                          defaultValue: "Tiêu đề tin nhắn email",
-                        })}
+                        placeholder={t("subjectPlaceholder")}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
                     </div>
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        {t("content", { defaultValue: "Nội dung" })}
+                        {t("content")}
                       </label>
                       <RichTextEditor
                         value={form.content}
                         onChange={onChange("content")}
-                        placeholder={t("contentPlaceholder", {
-                          defaultValue: "Nhập nội dung email...",
-                        })}
+                        placeholder={t("contentPlaceholder")}
                       />
                     </div>
                   </div>
@@ -428,7 +469,7 @@ export default function Email() {
             <div className="flex-1 flex items-center justify-center">
               <div className="text-center text-gray-500">
                 <FileText className="h-12 w-12 mx-auto mb-2 text-gray-400" />
-                <p>{t("noEmailsFound", { defaultValue: "Không có email nào" })}</p>
+                <p>{t("noEmails")}</p>
               </div>
             </div>
           )}
