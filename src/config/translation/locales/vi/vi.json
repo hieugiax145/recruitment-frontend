@@ -1,5 +1,31 @@
 {
   "appName": "HR System",
+  "dashboard": "Trang chủ",
+  "users": "Tài khoản",
+  "addUser": "Thêm tài khoản",
+  "editUser": "Sửa tài khoản",
+  "roles": "Vai trò",
+  "addRole": "Thêm vai trò",
+  "editRole": "Sửa vai trò",
+  "workflows": "Quy trình",
+  "addWorkflow": "Thêm quy trình",
+  "editWorkflow": "Sửa quy trình",
+  "employees": "Nhân sự",
+  "addEmployee": "Thêm nhân sự",
+  "editEmployee": "Sửa nhân sự",
+  "recruitmentRequestsPage": "Yêu cầu tuyển dụng",
+  "addRecruitmentRequest": "Thêm yêu cầu tuyển dụng",
+  "editRecruitmentRequest": "Sửa yêu cầu tuyển dụng",
+  "jobPositionsPage": "Vị trí tuyển dụng",
+  "addJobPosition": "Thêm vị trí tuyển dụng",
+  "jobPositionCandidates": "Ứng viên vị trí",
+  "calendar": "Lịch",
+  "candidatesPage": "Ứng viên",
+  "candidateDetail": "Chi tiết ứng viên",
+  "emailPage": "Email",
+  "offersPage": "Thư mời nhận việc",
+  "addOffer": "Thêm thư mời",
+  "editOffer": "Sửa thư mời",
   "login": "Đăng nhập",
   "register": "Đăng ký",
   "username": "Tên đăng nhập",
@@ -40,7 +66,7 @@
   "invalidEmail": "Email không hợp lệ",
   "composeEmail": "Soạn email",
   "composeNewEmail": "Tin nhắn mới",
-  "inbox": "Hộp thư đến",
+  "inbox": "Hộp thư",
   "sent": "Đã gửi",
   "drafts": "Nháp",
   "searchEmail": "Tìm kiếm email...",
@@ -113,32 +139,6 @@
     }
   },
 
-  "services": {
-    "user": "Người dùng",
-    "job": "Công việc",
-    "candidate": "Ứng viên",
-    "communications": "Giao tiếp"
-  },
-
-  "resources": {
-    "permission": "Quyền",
-    "role": "Vai trò",
-    "user": "Tài khoản",
-    "department": "Phòng ban",
-    "employee": "Nhân viên",
-    "position": "Chức vụ",
-    "job-position": "Vị trí tuyển dụng",
-    "recruitment-request": "Yêu cầu tuyển dụng",
-    "application": "Đơn ứng tuyển",
-    "candidate": "Ứng viên",
-    "comment": "Bình luận",
-    "schedule": "Lịch hẹn",
-    "job-skill": "Kỹ năng",
-    "job-category": "Danh mục công việc"
-  },
-
-  
-
   "welcomeMessage": "Chào mừng bạn đến với React và react-i18next",
   "countSheepMessage_one": "Có <1>{{count}}</1> con cừu",
   "countSheepMessage_other": "Có <1>{{count}}</1> con cừu",
@@ -147,7 +147,6 @@
   "accountManagement": "Quản lý tài khoản",
   "employeeManagement": "Quản lý nhân sự",
   "workflowManagement": "Luồng phê duyệt",
-  "addWorkflow": "Thêm luồng phê duyệt",
   "workflowName": "Tên luồng phê duyệt",
   "workflowType": "Loại luồng",
   "workflowDetail": "Chi tiết luồng phê duyệt",
@@ -172,7 +171,6 @@
   "steps": "Số bước",
   "description": "Mô tả",
   "employeesList": "Danh sách nhân viên",
-  "addEmployee": "Thêm nhân sự",
   "employeeCode": "Mã nhân sự",
   "hasAccount": "Có tài khoản",
   "startDate": "Ngày bắt đầu",
@@ -184,8 +182,6 @@
   "inactive": "Không hoạt động",
   "recruitmentReq": "Yêu cầu tuyển dụng",
   "jobPosition": "Vị trí tuyển dụng",
-  "candidate": "Ứng viên",
-  "calendar": "Lịch",
   "day": "Ngày",
   "week": "Tuần",
   "month": "Tháng",
@@ -204,7 +200,6 @@
   "friday": "T6",
   "saturday": "T7",
   "roleManagement": "Quản lý vai trò",
-  "addRole": "Thêm vai trò",
   "roleDetail": "Chi tiết vai trò",
   "roleInformation": "Thông tin vai trò",
   "roleName": "Tên vai trò",
@@ -266,7 +261,6 @@
   "appliedDate": "Ngày ứng tuyển",
 
   "updateStatus": "Cập nhật trạng thái",
-  "candidateDetail": "Chi tiết ứng viên",
   "candidateInfo": "Thông tin ứng viên",
   "positionInfo": "Vị trí ứng tuyển",
   "upcomingSchedule": "Lịch sắp tới",
@@ -311,7 +305,6 @@
   "applicantsApplied": "ứng viên đã ứng tuyển",
   "viewCandidateList": "Xem danh sách ứng viên",
 
-  "addRecruitmentRequest": "Thêm yêu cầu tuyển dụng",
   "requestDetail": "Chi tiết yêu cầu tuyển dụng",
   "updating": "Đang cập nhật...",
   "saving": "Đang lưu...",
@@ -454,6 +447,7 @@
     "allStatuses": "Tất cả trạng thái",
     "changedStatus": "Đã chuyển {{name}} sang {{status}}",
     "errorLoadingData": "Có lỗi xảy ra khi tải dữ liệu",
+    "cannotMoveBackward": "Không thể chuyển ứng viên về trạng thái trước đó",
     "notUpdated": "Chưa cập nhật",
     "backToList": "Quay lại danh sách",
     "notFound": "Không tìm thấy ứng viên",
@@ -503,6 +497,15 @@
     "approved": "Đã phê duyệt",
     "cancelled": "Đã hủy",
     "completed": "Hoàn thành"
+  },
+
+  "buttons": {
+    "submitting": "Đang nộp...",
+    "withdrawing": "Đang thu hồi...",
+    "returning": "Đang trả về...",
+    "processing": "Đang xử lý...",
+    "withdraw": "Thu hồi",
+    "return": "Trả về"
   },
 
   "common": {
@@ -564,6 +567,7 @@
     "updateStatusSuccess": "Cập nhật trạng thái thành công",
     "deleteCandidateSuccess": "Xóa ứng viên thành công",
     "submitFeedbackSuccess": "Gửi nhận xét thành công",
+    "sendEmailSuccess": "Gửi email thành công",
     "pleaseSelectPdfFile": "Vui lòng chọn file PDF",
     "fileSizeExceeded": "Kích thước file không được vượt quá 5MB",
     "pleaseEnterFullName": "Vui lòng nhập họ tên",

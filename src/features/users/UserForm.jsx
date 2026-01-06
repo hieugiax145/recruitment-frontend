@@ -117,7 +117,7 @@ export default function UserForm() {
 
   const handleToggleActive = () => {
     if (!userData) return;
-    const newActiveState = !userData._active;
+    const newActiveState = !userData.active;
     
     showConfirm({
       title: newActiveState
@@ -239,12 +239,12 @@ export default function UserForm() {
                   {t("cancel")}
                 </Button>
                 <Button
-                  variant={userData?._active ? "outline" : "primary"}
+                  variant={userData?.active ? "outline" : "primary"}
                   onClick={handleToggleActive}
                   disabled={isPending}
                 >
-                  {userData?._active
-                    ? t("deactivate")
+                  {userData?.active
+                    ? t("inactive")
                     : t("activate")}
                 </Button>
                 <Button onClick={() => setIsEditMode(true)}>
@@ -261,6 +261,33 @@ export default function UserForm() {
           <form ref={formRef} onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 gap-6">
               <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <SelectDropdown
+                    label={t("chooseEmployee")}
+                    options={employees.map((e) => ({ id: e.id, name: e.name }))}
+                    value={form.employeeId}
+                    onChange={(v) => {
+                      const selectedEmployee = employees.find(e => e.id === v);
+                      setForm((s) => ({ 
+                        ...s, 
+                        employeeId: v,
+                        email: selectedEmployee?.email || s.email
+                      }));
+                    }}
+                    placeholder={t("chooseEmployee")}
+                    disabled={!isEditMode}
+                  />
+
+                  <SelectDropdown
+                    label={t("role")}
+                    options={rolesData.map((r) => ({ id: r.id, name: r.name }))}
+                    value={form.roleId}
+                    onChange={(v) => setForm((s) => ({ ...s, roleId: v }))}
+                    placeholder={t("chooseRole")}
+                    disabled={!isEditMode}
+                  />
+                </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <TextInput
                     label={t("email")}
@@ -282,26 +309,6 @@ export default function UserForm() {
                         ? t("passwordOptional")
                         : ""
                     }
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <SelectDropdown
-                    label={t("chooseEmployee")}
-                    options={employees.map((e) => ({ id: e.id, name: e.name }))}
-                    value={form.employeeId}
-                    onChange={(v) => setForm((s) => ({ ...s, employeeId: v }))}
-                    placeholder={t("chooseEmployee")}
-                    disabled={!isEditMode}
-                  />
-
-                  <SelectDropdown
-                    label={t("role")}
-                    options={rolesData.map((r) => ({ id: r.id, name: r.name }))}
-                    value={form.roleId}
-                    onChange={(v) => setForm((s) => ({ ...s, roleId: v }))}
-                    placeholder={t("chooseRole")}
-                    disabled={!isEditMode}
                   />
                 </div>
               </div>

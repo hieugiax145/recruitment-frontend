@@ -39,7 +39,7 @@ export default function CandidateDetail() {
     { id: "SUBMITTED", label: t("statuses.submitted"), color: "#3B82F6" },
     { id: "REVIEWING", label: t("statuses.reviewing"), color: "#6366F1" },
     { id: "INTERVIEW", label: t("statuses.interview"), color: "#F59E0B" },
-    { id: "OFFER", label: t("statuses.offer"), color: "#8B5CF6" },
+    // { id: "OFFER", label: t("statuses.offer"), color: "#8B5CF6" },
     { id: "HIRED", label: t("statuses.hired"), color: "#10B981" },
     { id: "ARCHIVED", label: t("statuses.archived"), color: "#6B7280" },
     { id: "REJECTED", label: t("statuses.rejected"), color: "#EF4444" },
@@ -109,7 +109,7 @@ export default function CandidateDetail() {
         subtitle={displayName}
         onBack={() => navigate("/candidates")}
         actions={
-          isHR && (
+          isHR && candidate.status !== "REJECTED" && candidate.status !== "ARCHIVED" && (
             <>
               <Button
                 variant="outline"

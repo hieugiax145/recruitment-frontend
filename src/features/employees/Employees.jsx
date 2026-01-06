@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import ContentHeader from "../../components/ui/ContentHeader";
 import Button from "../../components/ui/Button";
 import TextInput from "../../components/ui/TextInput";
-import { Plus, Search } from "lucide-react";
+import { Plus, Search, UserRound } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import LoadingContent from "../../components/ui/LoadingContent";
 import Pagination from "../../components/ui/Pagination";
@@ -64,7 +64,7 @@ export default function Employees() {
     return (
       <div className="flex flex-col h-full">
         <ContentHeader
-          title={t("employeeManagement")}
+          title={t("employees")}
           actions={
             <>
               <TextInput
@@ -173,7 +173,7 @@ export default function Employees() {
                 {employees.length === 0 ? (
                   <tr>
                     <td colSpan="7" className="p-8">
-                      <EmptyState title={t("noData")} />
+                      <EmptyState title={t("noData")} icon={UserRound} />
                     </td>
                   </tr>
                 ) : (

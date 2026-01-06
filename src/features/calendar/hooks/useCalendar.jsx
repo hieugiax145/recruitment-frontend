@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { calendarServices } from "../services/calendarServices";
 import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
 
 export const calendarKeys = {
   all: ["calendar"],
@@ -20,6 +21,7 @@ export const useCalendar = (params = {}) => {
 
 export const useCreateSchedule = () => {
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   return useMutation({
     mutationFn: async (payload) => {

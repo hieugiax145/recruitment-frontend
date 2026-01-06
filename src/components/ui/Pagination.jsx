@@ -10,14 +10,14 @@ export default function Pagination({ currentPage, totalPages, onPageChange }) {
   return (
     <div className="flex items-center gap-1">
       {/* Previous Button */}
-      {hasMultiplePages && (
+      {hasMultiplePages && !isFirstPage && (
         <Button
           variant="outline"
-          className="h-8 w-8 p-0"
+          className="h-8 w-8 p-0 ql"
           onClick={() => onPageChange(currentPage - 1)}
           disabled={isFirstPage}
         >
-          <ChevronLeft size={16} />
+          {"<"}
         </Button>
       )}
 
@@ -60,14 +60,14 @@ export default function Pagination({ currentPage, totalPages, onPageChange }) {
       })}
 
       {/* Next Button */}
-      {hasMultiplePages && (
+      {hasMultiplePages && !isLastPage && (
         <Button
           variant="outline"
           className="h-8 w-8 p-0"
           onClick={() => onPageChange(currentPage + 1)}
           disabled={isLastPage}
         >
-          <ChevronRight size={16} />
+          {">"}
         </Button>
       )}
     </div>

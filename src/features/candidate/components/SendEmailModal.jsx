@@ -3,9 +3,11 @@ import Modal from "../../../components/ui/Modal";
 import Button from "../../../components/ui/Button";
 import TextInput from "../../../components/ui/TextInput";
 import TextArea from "../../../components/ui/TextArea";
+import LoadingOverlay from "../../../components/ui/LoadingOverlay";
 import { useSendEmail } from "../../../hooks/useEmail";
 import { Mail } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { toast } from "react-toastify";
 
 export default function SendEmailModal({ isOpen, onClose, recipientEmail, recipientName }) {
   const { t } = useTranslation();
@@ -29,12 +31,11 @@ export default function SendEmailModal({ isOpen, onClose, recipientEmail, recipi
         replyToId: null,
         sendViaGmail: true,
       });
-      // Reset form
+      toast.success(t("toasts.sendEmailSuccess"));
       setSubject(defaultSubject);
       setMessage("");
       onClose();
     } catch (error) {
-      // Error is handled by the mutation's onError
       console.error("Failed to send email:", error);
     }
   };
@@ -47,7 +48,9 @@ export default function SendEmailModal({ isOpen, onClose, recipientEmail, recipi
 
   return (
     <Modal isOpen={isOpen} onClose={handleClose} size="lg">
-      <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-2xl overflow-hidden relative">
+        {sendEmail.isPending && <LoadingOverlay show={true} />}
+        
         {/* Header */}
         <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
           <div className="flex items-center gap-3">

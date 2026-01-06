@@ -7,6 +7,7 @@ export default function CandidateColumn({
   onCandidateClick,
   onChangeStatus,
   allStatuses = [],
+  canChangeStatus,
 }) {
   const { setNodeRef } = useSortable({
     id: status.id,
@@ -62,9 +63,9 @@ export default function CandidateColumn({
             </div>
           ) : (
             candidates.map((candidate) => {
-              // Create status options excluding current status
+              // Create status options excluding current status and invalid transitions
               const statusOptions = allStatuses
-                .filter((s) => s.id !== candidate.status)
+                .filter((s) => s.id !== candidate.status && (!canChangeStatus || canChangeStatus(candidate.status, s.id)))
                 .map((s) => ({
                   label: s.label,
                   icon: null,

@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
-import { X, UserPlus, Upload, FileText, Trash2 } from "lucide-react";
+import { X, UserPlus, Upload, FileText, Trash2, Loader2 } from "lucide-react";
 import Modal from "../../../components/ui/Modal";
 import Button from "../../../components/ui/Button";
 import TextInput from "../../../components/ui/TextInput";
 import { toast } from "react-toastify";
 import { useCreateCandidate } from "../hooks/useCandidates";
 import { useTranslation } from "react-i18next";
+import { uploadServices } from "../../../services/uploadServices";
 
 export default function AddCandidateModal({
   isOpen,
@@ -25,6 +26,8 @@ export default function AddCandidateModal({
   });
 
   const [cvFile, setCvFile] = useState(null);
+  const [cvFileData, setCvFileData] = useState(null); // Dữ liệu trả về từ server
+  const [uploading, setUploading] = useState(false);
 
   // Update jobPositionId when jobPosition changes
   useEffect(() => {
@@ -44,7 +47,7 @@ export default function AddCandidateModal({
     }));
   };
 
-  const handleFileChange = (e) => {
+  const handleFileChange = async (e) => {
     const file = e.target.files[0];
 
     if (file) {
@@ -63,12 +66,30 @@ export default function AddCandidateModal({
         return;
       }
 
+      // Lưu thông tin file để hiển thị
       setCvFile(file);
+
+      // Upload file lên server
+      setUploading(true);
+      try {
+        const response = await uploadServices.uploadFile(file);
+        setCvFileData(response.data); // Lưu dữ liệu trả về từ server
+      } catch (error) {
+        console.error("Error uploading CV file:", error);
+        toast.error(error.response?.data?.message || t("toasts.uploadFailed"));
+        // Xóa file nếu upload thất bại
+        setCvFile(null);
+        setCvFileData(null);
+        e.target.value = "";
+      } finally {
+        setUploading(false);
+      }
     }
   };
 
   const handleRemoveFile = () => {
     setCvFile(null);
+    setCvFileData(null);
     // Reset file input
     const fileInput = document.getElementById("cv-file-input");
     if (fileInput) {
@@ -108,22 +129,21 @@ export default function AddCandidateModal({
     }
 
     // CV file validation
-    if (!cvFile) {
+    if (!cvFileData) {
       toast.error(t("toasts.pleaseUploadCV"));
       return;
     }
 
-    // Prepare data with CV file
+    // Prepare data với CV file đã upload
     const submitData = {
-      ...formData,
+      name: formData.fullName,
+      email: formData.email,
+      phone: formData.phone,
+      jobPositionId: formData.jobPositionId,
+      cvUrl: cvFileData.url || cvFileData,
+      notes: formData.notes,
     };
 
-    // Add CV file if exists
-    if (cvFile) {
-      submitData.cvFile = cvFile;
-    }
-
-    // Call API to create candidate
     createMutation.mutate(submitData, {
       onSuccess: () => {
         toast.success(t("toasts.addCandidateSuccess"));
@@ -136,6 +156,7 @@ export default function AddCandidateModal({
           jobPositionId: jobPosition?.id || null,
         });
         setCvFile(null);
+        setCvFileData(null);
 
         if (onSuccess) {
           onSuccess();
@@ -157,6 +178,7 @@ export default function AddCandidateModal({
         jobPositionId: jobPosition?.id || null,
       });
       setCvFile(null);
+      setCvFileData(null);
       onClose();
     }
   };
@@ -274,7 +296,23 @@ export default function AddCandidateModal({
                     {t("modals.cvFileRequired")}
                   </label>
 
-                  {!cvFile ? (
+                  {uploading ? (
+                    <div className="flex-1 border-2 border-dashed border-blue-300 bg-blue-50 rounded-lg p-4 flex flex-col items-center justify-center gap-3">
+                      <div className="relative">
+                        <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center">
+                          <Loader2 className="h-8 w-8 text-blue-600 animate-spin" />
+                        </div>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-sm font-semibold text-blue-900">
+                          {t("modals.uploading")}
+                        </p>
+                        <p className="text-xs text-blue-600 mt-1">
+                          {t("modals.pleaseWait")}
+                        </p>
+                      </div>
+                    </div>
+                  ) : !cvFile ? (
                     <label
                       htmlFor="cv-file-input"
                       className={`

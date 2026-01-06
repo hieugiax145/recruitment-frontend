@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { Outlet } from "react-router-dom";
 import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
+import { useDocumentTitle } from "../hooks/useDocumentTitle";
 
 const EXPANDED = 260;
 const COLLAPSED = 100;
@@ -9,6 +10,7 @@ const APPBAR_HEIGHT = 60;
 
 const Layout = () => {
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
+  useDocumentTitle();
 
   const sidebarWidth = useMemo(
     () => (isSidebarVisible ? EXPANDED : COLLAPSED),

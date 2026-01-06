@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import ContentHeader from "../../components/ui/ContentHeader";
 import Button from "../../components/ui/Button";
 import TextInput from "../../components/ui/TextInput";
-import { Plus, Search } from "lucide-react";
+import { Plus, Search, UserRound } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import LoadingContent from "../../components/ui/LoadingContent";
 import { useUsers } from "../../hooks/useUsers";
@@ -46,7 +46,7 @@ export default function Users() {
     return (
       <div className="flex flex-col h-full">
         <ContentHeader
-          title={t("accountManagement")}
+          title={t("users")}
           actions={
             <>
               <TextInput
@@ -117,7 +117,7 @@ export default function Users() {
                 {users.length === 0 ? (
                   <tr>
                     <td colSpan="6" className="p-8">
-                      <EmptyState title={t("noData")} />
+                      <EmptyState title={t("noData")} icon={UserRound} />
                     </td>
                   </tr>
                 ) : (

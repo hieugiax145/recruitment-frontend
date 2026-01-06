@@ -12,9 +12,7 @@ import { useCandidates } from "../../candidate/hooks/useCandidates";
 import { useUsers } from "../../../hooks/useUsers";
 import { useTranslation } from "react-i18next";
 
-// moved to components/ui/MultiSelectDropdown.jsx
-
-export default function CreateEventModal({ isOpen, onClose, defaultDate }) {
+export default function CreateEventModal({ isOpen, onClose, defaultDate, defaultCandidate }) {
   const { t } = useTranslation();
   const createSchedule = useCreateSchedule();
   const [formData, setFormData] = useState({
@@ -34,15 +32,13 @@ export default function CreateEventModal({ isOpen, onClose, defaultDate }) {
   });
 
   const [availableParticipants, setAvailableParticipants] = useState([]);
-  const [selectedDepartmentId, setSelectedDepartmentId] = useState(null);
 
-  // Load candidates from API (applications list)
   const {
     data: candidateData,
     isLoading: isLoadingCandidates,
     isError: isCandidatesError,
     error: candidatesError,
-  } = useCandidates();
+  } = useCandidates({ status: "REVIEWING" });
 
   const availableCandidates = useMemo(() => {
     const list = Array.isArray(candidateData?.data?.result)
@@ -50,7 +46,7 @@ export default function CreateEventModal({ isOpen, onClose, defaultDate }) {
       : [];
     return list.map((c) => ({
       id: c.id,
-      name: c.fullName || "",
+      name: c.name || "---",
       departmentId: c.departmentId,
     }));
   }, [candidateData]);
@@ -72,7 +68,7 @@ export default function CreateEventModal({ isOpen, onClose, defaultDate }) {
   ];
 
   const formatOptions = [
-    { id: "ONLINE", name: "Online" },
+    // { id: "ONLINE", name: "Online" },
     { id: "OFFLINE", name: "Offline" },
   ];
 
@@ -83,7 +79,6 @@ export default function CreateEventModal({ isOpen, onClose, defaultDate }) {
     return `${year}-${month}-${day}`;
   }
 
-  // Handle change for TextInput (receives event object)
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -92,59 +87,29 @@ export default function CreateEventModal({ isOpen, onClose, defaultDate }) {
     }));
   };
 
-  // Handle change for SelectDropdown (receives value only)
   const handleSelectChange = (name) => (value) => {
-    if (name === "candidate") {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: value,
-        participants: [],
-      }));
-
-      if (value) {
-        const selectedCandidate = availableCandidates.find((c) => c.id === value);
-        setSelectedDepartmentId(selectedCandidate?.departmentId || null);
-      } else {
-        setSelectedDepartmentId(null);
-        setAvailableParticipants([]);
-      }
-      return;
-    }
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
   };
 
-  // Load users by department via hook
   const {
     data: usersData,
     isLoading: isLoadingParticipants,
     isError: isUsersError,
     error: usersError,
     refetch: refetchUsers,
-  } = useUsers(
-    (() => {
-      if (!selectedDepartmentId) return {};
-      const ids = [1, 2, selectedDepartmentId]
-        .map((v) => Number(v))
-        .filter((v, i, arr) => !Number.isNaN(v) && arr.indexOf(v) === i);
-      return { departmentIds: ids.join(",") };
-    })(),
-    { enabled: !!selectedDepartmentId }
-  );
+  } = useUsers({}, { enabled: isOpen });
 
-  // Refetch attendees every time a candidate is selected/changed
   useEffect(() => {
-    if (selectedDepartmentId) {
+    if (isOpen) {
       refetchUsers();
     }
-    // We depend on formData.candidate to refetch even if the department is the same
-  }, [selectedDepartmentId, formData.candidate, refetchUsers]);
+  }, [isOpen, refetchUsers]);
 
   useEffect(() => {
-    if (!formData.candidate) {
-      setAvailableParticipants([]);
+    if (!isOpen) {
       return;
     }
 
@@ -156,7 +121,6 @@ export default function CreateEventModal({ isOpen, onClose, defaultDate }) {
       setAvailableParticipants([]);
       return;
     }
-    // Normalize response: prefer root `data` array from API payload
     const list = Array.isArray(usersData?.data)
       ? usersData.data
       : Array.isArray(usersData)
@@ -169,16 +133,30 @@ export default function CreateEventModal({ isOpen, onClose, defaultDate }) {
 
     if (Array.isArray(list)) {
       setAvailableParticipants(
-        list.map((u) => ({
-          id: u.id,
-          name: (u.employee && (u.employee.name || u.employee.fullName)) || u.name || "",
-          role: "",
-        }))
+        list.map((u) => {
+          const userName = (u.employee && (u.employee.name || u.employee.fullName)) || u.name || "";
+          const departmentName = u.department?.name || u.employee?.department?.name || "";
+          const displayName = departmentName ? `${userName} - ${departmentName}` : userName;
+          
+          return {
+            id: u.id,
+            name: displayName,
+            role: "",
+          };
+        })
       );
     }
-  }, [usersData, isUsersError, usersError, formData.candidate]);
+  }, [usersData, isUsersError, usersError, isOpen]);
 
-  // Handle change for MultiSelectDropdown (receives array of values)
+  useEffect(() => {
+    if (defaultCandidate?.id) {
+      setFormData((prev) => ({
+        ...prev,
+        candidate: defaultCandidate.id,
+      }));
+    }
+  }, [defaultCandidate]);
+
   const handleMultiSelectChange = (name) => (values) => {
     setFormData((prev) => ({
       ...prev,
@@ -254,7 +232,9 @@ export default function CreateEventModal({ isOpen, onClose, defaultDate }) {
 
   return (
     <Modal isOpen={isOpen} onClose={handleClose} size="xl">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl mx-auto max-h-[90vh] flex flex-col">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl mx-auto max-h-[90vh] flex flex-col relative">
+        {createSchedule.isPending && <LoadingOverlay show={true} />}
+        
         {/* Close button */}
         <div
           onClick={handleClose}
@@ -288,15 +268,6 @@ export default function CreateEventModal({ isOpen, onClose, defaultDate }) {
             <div className="grid grid-cols-2 gap-x-6 gap-y-4">
               {/* Left Column */}
               <div className="space-y-4">
-                {/* Candidate */}
-                <SelectDropdown
-                  label="Ứng viên"
-                  options={availableCandidates}
-                  value={formData.candidate}
-                  onChange={handleSelectChange("candidate")}
-                  placeholder={isLoadingCandidates ? t("loading") : t("common.selectCandidate")}
-                  required
-                />
                 {/* Meeting Type */}
                 <SelectDropdown
                   label="Loại cuộc họp"
@@ -306,6 +277,27 @@ export default function CreateEventModal({ isOpen, onClose, defaultDate }) {
                   placeholder={t("common.selectMeetingType")}
                   required
                 />
+                
+                {/* Candidate */}
+                {defaultCandidate ? (
+                  <div className="flex flex-col gap-2">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Ứng viên
+                    </label>
+                    <div className="px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-700">
+                      {defaultCandidate.name}
+                    </div>
+                  </div>
+                ) : (
+                  <SelectDropdown
+                    label="Ứng viên"
+                    options={availableCandidates}
+                    value={formData.candidate}
+                    onChange={handleSelectChange("candidate")}
+                    placeholder={isLoadingCandidates ? t("loading") : t("common.selectCandidate")}
+                    required
+                  />
+                )}
 
                 {/* Format */}
                 <SelectDropdown
@@ -332,15 +324,13 @@ export default function CreateEventModal({ isOpen, onClose, defaultDate }) {
                   selectedValues={formData.participants}
                   onChange={handleMultiSelectChange("participants")}
                   placeholder={
-                    !formData.candidate
-                      ? t("common.selectCandidate") + " trước"
-                      : isLoadingParticipants
+                    isLoadingParticipants
                       ? t("loading")
                       : availableParticipants.length === 0
                       ? t("common.noParticipants")
                       : t("common.selectParticipants")
                   }
-                  disabled={!formData.candidate || isLoadingParticipants}
+                  disabled={isLoadingParticipants}
                 />
               </div>
 

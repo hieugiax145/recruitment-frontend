@@ -48,11 +48,12 @@ export default function JobPositionAdd() {
 
   const { data: requestsData } = useRecruitmentRequests();
   const allRecruitmentRequests = requestsData?.data?.result || [];
+  const currentRequestId = existingPosition?.recruitmentRequest?.id || existingPosition?.recruitmentRequestId;
   const recruitmentRequests = allRecruitmentRequests.filter((req) => {
     if (
       isEditMode &&
-      existingPosition?.recruitmentRequestId &&
-      req.id === existingPosition.recruitmentRequestId
+      currentRequestId &&
+      req.id === currentRequestId
     ) {
       return true;
     }
@@ -70,6 +71,12 @@ export default function JobPositionAdd() {
 
   useEffect(() => {
     if (existingPosition && isEditMode) {
+      if (existingPosition.status && existingPosition.status.toUpperCase() !== 'DRAFT') {
+        navigate(-1);
+        return;
+      }
+
+      const requestId = existingPosition.recruitmentRequest?.id || existingPosition.recruitmentRequestId || null;
       setFormData({
         title: existingPosition.title || "",
         description: existingPosition.description || "",
@@ -85,10 +92,10 @@ export default function JobPositionAdd() {
         yearsOfExperience: existingPosition.yearsOfExperience || "",
         quantity: existingPosition.quantity || 1,
         deadline: existingPosition.deadline || "",
-        recruitmentRequestId: existingPosition.recruitmentRequestId || null,
+        recruitmentRequestId: requestId,
       });
     }
-  }, [existingPosition, isEditMode]);
+  }, [existingPosition, isEditMode, navigate, t]);
 
   const employmentTypes = [
     { id: "Full-time", name: t("employmentTypes.fullTime") },
@@ -123,16 +130,11 @@ export default function JobPositionAdd() {
         ...prev,
         recruitmentRequestId: requestId,
         title: selectedRequest.title || prev.title,
-        description: selectedRequest.description || prev.description,
-        requirements: selectedRequest.requirements || prev.requirements,
-        benefits: selectedRequest.benefits || prev.benefits,
         salaryMin: selectedRequest.salaryMin || prev.salaryMin,
         salaryMax: selectedRequest.salaryMax || prev.salaryMax,
-        location: selectedRequest.location || prev.location,
         quantity: selectedRequest.numberOfPositions || prev.quantity,
       }));
 
-      toast.success(t("toasts.fillFromRequestSuccess"));
     } else {
       setFormData((prev) => ({
         ...prev,
@@ -254,7 +256,7 @@ export default function JobPositionAdd() {
                   id: req.id,
                   name: req.title,
                 }))}
-                disabled={isPending}
+                disabled={isPending || isEditMode}
                 placeholder={t("chooseRecruitmentRequest")}
                 required
               />

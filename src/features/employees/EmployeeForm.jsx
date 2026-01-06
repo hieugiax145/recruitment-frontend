@@ -11,6 +11,8 @@ import { useAllDepartments } from "../../hooks/useDepartments";
 import { useAllPositions } from "../../hooks/usePositions";
 import FileUploader from "../../components/ui/FileUploader";
 import LoadingContent from "../../components/ui/LoadingContent";
+import LoadingOverlay from "../../components/ui/LoadingOverlay";
+import { uploadServices } from "../../services/uploadServices";
 
 export default function EmployeeForm() {
   const { id } = useParams();
@@ -26,6 +28,7 @@ export default function EmployeeForm() {
   const formRef = useRef(null);
 
   const [isEditMode, setIsEditMode] = useState(!isEditPage);
+  const [uploading, setUploading] = useState(false);
   const [form, setForm] = useState({
     name: "",
     phone: "",
@@ -39,7 +42,7 @@ export default function EmployeeForm() {
     positionId: "",
   });
 
-  const [avatarFile, setAvatarFile] = useState(null);
+  const [avatarUrl, setAvatarUrl] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState(null);
 
   const employee = employeeData?.data || {};
@@ -69,6 +72,30 @@ export default function EmployeeForm() {
     setForm((s) => ({ ...s, [field]: value }));
   };
 
+  const handleAvatarChange = async (fileData) => {
+    if (!fileData) {
+      setAvatarUrl(null);
+      return;
+    }
+
+    if (fileData instanceof File) {
+      setUploading(true);
+      try {
+        const response = await uploadServices.uploadFile(fileData);
+        const url = response.data.url || response.data;
+        setAvatarUrl(url);
+        setAvatarPreview(url);
+      } catch (error) {
+        console.error("Failed to upload avatar:", error);
+        toast.error(t("toasts.uploadFailed"));
+      } finally {
+        setUploading(false);
+      }
+    } else {
+      setAvatarUrl(fileData);
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const requiredFieldsMap = {
@@ -92,33 +119,21 @@ export default function EmployeeForm() {
       }
     }
 
-    let payload;
-    if (avatarFile) {
-      payload = new FormData();
-      payload.append("name", form.name?.trim());
-      payload.append("phone", form.phone);
-      payload.append("email", form.email);
-      payload.append("gender", form.gender);
-      payload.append("address", form.address);
-      payload.append("nationality", form.nationality);
-      payload.append("dateOfBirth", form.dateOfBirth);
-      payload.append("idNumber", form.idNumber);
-      if (form.departmentId) payload.append("departmentId", form.departmentId);
-      if (form.positionId) payload.append("positionId", Number(form.positionId));
-      payload.append("avatar", avatarFile);
-    } else {
-      payload = {
-        name: form.name?.trim(),
-        phone: form.phone || undefined,
-        email: form.email || undefined,
-        gender: form.gender || undefined,
-        address: form.address || undefined,
-        nationality: form.nationality || undefined,
-        dateOfBirth: form.dateOfBirth || undefined,
-        idNumber: form.idNumber || undefined,
-        departmentId: form.departmentId ?? undefined,
-        positionId: form.positionId ? Number(form.positionId) : undefined,
-      };
+    const payload = {
+      name: form.name?.trim(),
+      phone: form.phone,
+      email: form.email,
+      gender: form.gender,
+      address: form.address,
+      nationality: form.nationality,
+      dateOfBirth: form.dateOfBirth,
+      idNumber: form.idNumber,
+      departmentId: form.departmentId,
+      positionId: form.positionId ? Number(form.positionId) : null,
+    };
+
+    if (avatarUrl) {
+      payload.avatar = avatarUrl;
     }
 
     if (isEditPage) {
@@ -127,7 +142,7 @@ export default function EmployeeForm() {
         {
           onSuccess: () => {
             setIsEditMode(false);
-            setAvatarFile(null);
+            setAvatarUrl(null);
           },
         }
       );
@@ -146,7 +161,7 @@ export default function EmployeeForm() {
 
   const handleCancelEdit = () => {
     setIsEditMode(false);
-    setAvatarFile(null);
+    setAvatarUrl(null);
     if (employee && Object.keys(employee).length > 0) {
       setForm({
         name: employee.name || "",
@@ -305,13 +320,14 @@ export default function EmployeeForm() {
                   />
                 </div>
               </div>
-              <div className="col-span-1 flex flex-col">
+              <div className="col-span-1 flex flex-col relative">
+                {uploading && <LoadingOverlay show={true} />}
                 <FileUploader
                   label={t("avatar")}
-                  onFileChange={setAvatarFile}
+                  onFileChange={handleAvatarChange}
                   preview={avatarPreview}
                   setPreview={setAvatarPreview}
-                  disabled={(isEditPage && !isEditMode) || isPending}
+                  disabled={(isEditPage && !isEditMode) || isPending || uploading}
                 />
               </div>
             </div>

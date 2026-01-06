@@ -27,6 +27,7 @@ import { formatSalary } from "../../utils/utils";
 import SelectDropdown from "../../components/ui/SelectDropdown";
 import { useAllDepartments } from "../../hooks/useDepartments";
 import LoadingContent from "../../components/ui/LoadingContent";
+import LoadingOverlay from "../../components/ui/LoadingOverlay";
 import EmptyState from "../../components/ui/EmptyState";
 import { useAuth } from "../../context/AuthContext";
 import StatusBadge from "../../components/ui/StatusBadge";
@@ -43,8 +44,8 @@ export default function JobPositions() {
   const [positionForCandidate, setPositionForCandidate] = useState(null);
   const [selectedDepartmentId, setSelectedDepartmentId] = useState(null);
   const [keyword, setKeyword] = useState("");
+  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
 
-  // Determine effective department filter
   const userDeptId = user?.department?.id;
   const isHR = userDeptId === 2;
   const shouldRestrictToUserDept = !!userDeptId && !isHR;
@@ -52,21 +53,19 @@ export default function JobPositions() {
     ? userDeptId
     : selectedDepartmentId ?? undefined;
 
-  // Fetch job positions from API with department filter when applicable
   const { data, isLoading, isError, error } = useJobPositions(
-    effectiveDepartmentId ? { departmentId: effectiveDepartmentId } : {}
+    effectiveDepartmentId 
+      ? { departmentId: effectiveDepartmentId, ...(keyword && { keyword }) } 
+      : (keyword ? { keyword } : {})
   );
   const deleteMutation = useDeleteJobPosition();
   const updateMutation = useUpdateJobPosition();
 
-  // Fetch departments for filter
   const { data: departmentsData } = useAllDepartments();
   const departments = Array.isArray(departmentsData) ? departmentsData : [];
 
-  // Get positions from API response
   const rawPositions = Array.isArray(data?.data?.result) ? data.data.result : [];
 
-  // Map API data to UI format
   const positions = rawPositions.map((pos) => ({
     id: pos.id.toString(),
     title: pos.title,
@@ -86,17 +85,8 @@ export default function JobPositions() {
     yearsOfExperience: pos.yearsOfExperience || t("common.notAvailable"),
     remote: pos.remote || false,
     publishedAt: pos.publishedAt
-  })).filter((pos) => {
-    if (!keyword) return true;
-    const searchLower = keyword.toLowerCase();
-    return (
-      pos.title?.toLowerCase().includes(searchLower) ||
-      pos.description?.toLowerCase().includes(searchLower) ||
-      pos.department?.toLowerCase().includes(searchLower)
-    );
-  });
+  }));
 
-  // Show toast notification when there's an error
   useEffect(() => {
     if (isError) {
       const errorMessage =
@@ -136,6 +126,7 @@ export default function JobPositions() {
   };
 
   const handleUpdateStatus = async (position, newStatus) => {
+    setIsUpdatingStatus(true);
     try {
       if (newStatus === "PUBLISHED") {
         await jobServices.publishJobPosition(position.id);
@@ -146,14 +137,14 @@ export default function JobPositions() {
       } else {
         await jobServices.updateJobPosition(position.id, { status: newStatus });
       }
-      // Refresh list
       updateMutation.reset();
       // Using updateMutation's onSuccess invalidation pattern
       updateMutation.mutate(
         { id: position.id, data: {} },
-        { onSuccess: () => {} }
+        { onSuccess: () => { setIsUpdatingStatus(false); } }
       );
     } catch (error) {
+      setIsUpdatingStatus(false);
       // The hooks already handle toasts; fallback here if direct service fails
     }
   };
@@ -224,7 +215,8 @@ export default function JobPositions() {
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full relative">
+      {isUpdatingStatus && <LoadingOverlay show={true} />}
       <ContentHeader
         title={t("listJobPosition")}
         actions={
@@ -388,7 +380,7 @@ export default function JobPositions() {
                                   )}
                                 </div>
                                 
-                                {isHR && (
+                                {isHR && position.status !== 'CLOSED' && (
                                   <div className="flex items-center justify-end flex-wrap gap-2 pt-3">
                                     <Button onClick={() => navigate(`/job-positions/${position.id}/candidates`)}>
                                       <User className="h-4 w-4 mr-2" />
@@ -420,13 +412,15 @@ export default function JobPositions() {
                                       </Button>
                                     )}
                                     
-                                    <Button variant="outline" onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleEdit(position);
-                                    }}>
-                                      <FileText className="h-4 w-4 mr-2" />
-                                      {t("edit")}
-                                    </Button>
+                                    {position.status === 'DRAFT' && (
+                                      <Button variant="outline" onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleEdit(position);
+                                      }}>
+                                        <FileText className="h-4 w-4 mr-2" />
+                                        {t("edit")}
+                                      </Button>
+                                    )}
                                   </div>
                                 )}
                               </div>

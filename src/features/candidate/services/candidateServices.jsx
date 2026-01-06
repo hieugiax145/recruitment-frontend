@@ -10,20 +10,7 @@ export const candidateServices = {
   },
 
   newCandidate: async (data) => {
-    const formData = new FormData();
-
-    // Append all fields to FormData
-    Object.keys(data).forEach((key) => {
-      if (data[key] !== null && data[key] !== undefined) {
-        formData.append(key, data[key]);
-      }
-    });
-
-    return api.post("/candidate-service/public/upload-cv", formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
+    return api.post("/candidate-service/candidates", data);
   },
 
   updateCandidateStatus: async (id, status) => {

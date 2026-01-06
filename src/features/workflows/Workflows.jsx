@@ -55,7 +55,6 @@ export default function Workflows() {
 
   const handleDelete = (workflow) => {
     showConfirm({
-      title: t("confirmDelete"),
       message: `${t("confirmDeleteWorkflow")} "${workflow.name}"?`,
       variant: "danger",
       onConfirm: () => {
@@ -68,7 +67,7 @@ export default function Workflows() {
     return (
       <div className="flex flex-col h-full">
         <ContentHeader
-          title={t("workflowManagement")}
+          title={t("workflows")}
           actions={
             <>
               <SelectDropdown

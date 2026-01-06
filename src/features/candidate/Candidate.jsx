@@ -34,6 +34,9 @@ export default function Candidate() {
   if (!isHR && !isDirector && user?.department?.id) {
     queryParams.departmentId = user.department.id;
   }
+  if (keyword) {
+    queryParams.keyword = keyword;
+  }
 
   // Fetch candidates with department filtering
   const { data, isLoading, isError, error, refetch } = useCandidates(queryParams);
@@ -53,12 +56,7 @@ export default function Candidate() {
       c.jobPosition?.id === selectedJobPositionId || 
       c.jobPositionId === selectedJobPositionId;
     const matchesStatus = !selectedStatus || c.status === selectedStatus;
-    const matchesKeyword = !keyword || 
-      c.name?.toLowerCase().includes(keyword.toLowerCase()) ||
-      c.email?.toLowerCase().includes(keyword.toLowerCase()) ||
-      c.phone?.toLowerCase().includes(keyword.toLowerCase()) ||
-      c.jobPosition?.title?.toLowerCase().includes(keyword.toLowerCase());
-    return matchesPosition && matchesStatus && matchesKeyword;
+    return matchesPosition && matchesStatus;
   });
 
   // Show toast notification when there's an error

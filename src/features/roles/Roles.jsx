@@ -16,7 +16,7 @@ export default function Roles() {
   if (isLoading) {
     return (
       <div className="flex flex-col h-full">
-        <ContentHeader title={t("roleManagement")} actions={<Button onClick={() => navigate("/roles/new")}><Plus className="h-4 w-4 mr-2" />{t("addRole")}</Button>} />
+        <ContentHeader title={t("roles")} actions={<Button onClick={() => navigate("/roles/new")}><Plus className="h-4 w-4 mr-2" />{t("addRole")}</Button>} />
         <div className="flex-1 flex items-center justify-center mt-4">
           <LoadingContent />
         </div>

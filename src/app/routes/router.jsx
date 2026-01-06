@@ -195,6 +195,14 @@ export const router = createBrowserRouter([
         ),
       },
       {
+        path: "/job-positions/:id/edit",
+        element: (
+          <RoleBasedGuard requiredRoles={["ADMIN", "CEO", "MANAGER", "STAFF"]}>
+            <JobPositionsAdd />
+          </RoleBasedGuard>
+        ),
+      },
+      {
         path: "/job-positions/:id/candidates",
         element: (
           <RoleBasedGuard requiredRoles={["ADMIN", "CEO", "MANAGER", "STAFF"]}>

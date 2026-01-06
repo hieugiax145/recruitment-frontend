@@ -20,7 +20,7 @@ export default function ApplicationProgress({ status, isHR, onStatusChange, isUp
       label: t("applicationSteps.interview"),
       icon: MessageSquare,
     },
-    { key: "OFFER", label: t("applicationSteps.offer"), icon: FileText },
+    // { key: "OFFER", label: t("applicationSteps.offer"), icon: FileText },
     { key: "HIRED", label: t("applicationSteps.hired"), icon: CheckCircle2 },
   ];
 
@@ -28,6 +28,8 @@ export default function ApplicationProgress({ status, isHR, onStatusChange, isUp
     SUBMITTED: 0,
     SCREENING: 1,
     INTERVIEW: 2,
+    // OFFER: 3,
+    HIRED: 3,
     OFFER: 3,
     HIRED: 4,
     REJECTED: -1,
@@ -35,6 +37,8 @@ export default function ApplicationProgress({ status, isHR, onStatusChange, isUp
 
   const currentStep = statusOrder[status] ?? 0;
   const isRejected = status === "REJECTED";
+  const isArchived = status === "ARCHIVED";
+  const isStatusLocked = isRejected || isArchived;
 
   return (
     <div className="bg-white rounded-xl shadow p-6">
@@ -43,7 +47,7 @@ export default function ApplicationProgress({ status, isHR, onStatusChange, isUp
           <CheckCircle2 size={18} />
           {t("applicationProgress")}
         </h3>
-        {isHR && statuses && (
+        {isHR && statuses && !isStatusLocked && (
           <select
             value={status}
             onChange={(e) => onStatusChange(e.target.value)}
@@ -65,13 +69,15 @@ export default function ApplicationProgress({ status, isHR, onStatusChange, isUp
 
       <div className="relative">
         {/* Progress Bar Background */}
-        <div className="absolute top-6 left-0 right-0 h-0.5 bg-gray-200" />
+        <div className="absolute top-6 left-6 right-6 h-0.5 bg-gray-200" />
 
         {/* Progress Bar Fill */}
-        {!isRejected && (
+        {!isRejected && currentStep > 0 && (
           <div
-            className="absolute top-6 left-0 h-0.5 bg-red-600 transition-all duration-500"
-            style={{ width: `${(currentStep / (steps.length - 1)) * 100}%` }}
+            className="absolute top-6 left-6 h-0.5 bg-red-600 transition-all duration-500"
+            style={{ 
+              width: `calc((100% - 48px) * ${currentStep / (steps.length - 1)})` 
+            }}
           />
         )}
 

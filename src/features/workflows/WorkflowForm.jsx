@@ -22,6 +22,7 @@ const LEVEL_OPTIONS = [
 
 const TYPE_OPTIONS = [
   { id: "REQUEST", name: "Yêu cầu tuyển dụng" },
+  { id: "OFFER", name: "Phê duyệt Offer" },
 ];
 
 export default function WorkflowForm() {
@@ -37,9 +38,7 @@ export default function WorkflowForm() {
     name: "",
     description: "",
     type: "REQUEST",
-    applyConditions: {
-      department_id: null,
-    },
+    departmentId: null,
     steps: [],
   });
 
@@ -58,9 +57,7 @@ export default function WorkflowForm() {
         name: workflowData.name || "",
         description: workflowData.description || "",
         type: workflowData.type || "REQUEST",
-        applyConditions: {
-          department_id: workflowData.applyConditions?.department_id || null,
-        },
+        departmentId: workflowData.departmentId || null,
         steps: workflowData.steps
           ? workflowData.steps.map((s) => ({
               stepOrder: s.stepOrder,
@@ -77,13 +74,10 @@ export default function WorkflowForm() {
     setForm((s) => ({ ...s, [field]: value }));
   };
 
-  const onConditionChange = (field) => (value) => {
+  const onDepartmentChange = (value) => {
     setForm((s) => ({
       ...s,
-      applyConditions: {
-        ...s.applyConditions,
-        [field]: value,
-      },
+      departmentId: value,
     }));
   };
 
@@ -171,20 +165,20 @@ export default function WorkflowForm() {
       name: form.name,
       description: form.description,
       type: form.type,
-      applyConditions: {
-        ...(form.applyConditions.department_id && {
-          department_id: Number(form.applyConditions.department_id),
-        }),
-      },
       steps: form.steps.map((s) => ({
         stepOrder: s.stepOrder,
         approverPositionId: Number(s.approverPositionId),
       })),
     };
 
+    if (form.departmentId) {
+      payload.departmentId = Number(form.departmentId);
+    }
+
     if (isAddMode) {
       createWorkflow.mutate(payload, {
         onSuccess: () => {
+          toast.success(t("toasts.createSuccess"));
           navigate("/workflows");
         },
       });
@@ -193,6 +187,7 @@ export default function WorkflowForm() {
         { id, data: payload },
         {
           onSuccess: () => {
+            toast.success(t("toasts.updateSuccess"));
             setIsEditMode(false);
           },
         }
@@ -305,10 +300,8 @@ export default function WorkflowForm() {
                       setForm({
                         name: workflowData.name || "",
                         description: workflowData.description || "",
-                        type: workflowData.type || "RECRUITMENT",
-                        applyConditions: {
-                          department_id: workflowData.applyConditions?.department_id || null,
-                        },
+                        type: workflowData.type || "REQUEST",
+                        departmentId: workflowData.departmentId || null,
                         steps: workflowData.steps
                           ? workflowData.steps.map((s) => ({
                               stepOrder: s.stepOrder,
@@ -385,8 +378,8 @@ export default function WorkflowForm() {
                 <SelectDropdown
                   label={t("department")}
                   options={[{ id: null, name: t("allDepartments") }, ...departmentsData.map((d) => ({ id: d.id, name: d.name }))]}
-                  value={form.applyConditions.department_id}
-                  onChange={onConditionChange("department_id")}
+                  value={form.departmentId}
+                  onChange={onDepartmentChange}
                   placeholder={t("allDepartments")}
                   disabled={!isEditMode}
                 />

@@ -389,85 +389,91 @@ export default function RecruitmentRequestAdd() {
         title={isViewMode ? t("requestDetail") : t("addRecruitmentRequest")}
         actions={
           <>
-            {/* Requester Actions */}
-            {canSubmit && (
-              <Button onClick={handleSubmit} disabled={isPending}>
-                {submitMutation.isPending ? t("buttons.submitting") : t("recruitmentRequests.submitRequest")}
-              </Button>
-            )}
-            
-            {canWithdraw && (
-              <Button 
-                variant="outline" 
-                onClick={handleWithdraw} 
-                disabled={isPending}
-                className="border-orange-600 text-orange-600 hover:bg-orange-50"
-              >
-                {withdrawMutation.isPending ? t("buttons.withdrawing") : t("buttons.withdraw")}
-              </Button>
-            )}
+            {isViewMode && isEditing ? (
+              <>
+                {/* Edit Mode: Only Update and Cancel */}
+                <Button onClick={() => onSubmit()} disabled={isPending}>
+                  {isPending ? t("updating") : t("update")}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => setIsEditing(false)}
+                  disabled={isPending}
+                >
+                  {t("cancel")}
+                </Button>
+              </>
+            ) : (
+              <>
+                {/* Requester Actions */}
+                {canSubmit && (
+                  <Button onClick={handleSubmit} disabled={isPending}>
+                    {submitMutation.isPending ? t("buttons.submitting") : t("recruitmentRequests.submitRequest")}
+                  </Button>
+                )}
+                
+                {canWithdraw && (
+                  <Button 
+                    variant="outline" 
+                    onClick={handleWithdraw} 
+                    disabled={isPending}
+                    className="border-orange-600 text-orange-600 hover:bg-orange-50"
+                  >
+                    {withdrawMutation.isPending ? t("buttons.withdrawing") : t("buttons.withdraw")}
+                  </Button>
+                )}
 
-            {/* Approver Actions */}
-            {canApprove && (
-              <Button onClick={handleApprove} disabled={isPending}>
-                {approveMutation.isPending ? t("approving") : t("approve")}
-              </Button>
-            )}
-            
-            {canRejectRequest && (
-              <Button
-                variant="outline"
-                onClick={handleReject}
-                disabled={isPending}
-                className="border-red-600 text-red-600 hover:bg-red-50"
-              >
-                {rejectMutation.isPending ? t("rejecting") : t("reject")}
-              </Button>
-            )}
-            
-            {canReturn && (
-              <Button
-                variant="outline"
-                onClick={handleReturn}
-                disabled={isPending}
-                className="border-yellow-600 text-yellow-600 hover:bg-yellow-50"
-              >
-                {returnMutation.isPending ? t("buttons.returning") : t("buttons.return")}
-              </Button>
-            )}
+                {/* Approver Actions */}
+                {canApprove && (
+                  <Button onClick={handleApprove} disabled={isPending}>
+                    {approveMutation.isPending ? t("approving") : t("approve")}
+                  </Button>
+                )}
+                
+                {canRejectRequest && (
+                  <Button
+                    variant="outline"
+                    onClick={handleReject}
+                    disabled={isPending}
+                    className="border-red-600 text-red-600 hover:bg-red-50"
+                  >
+                    {rejectMutation.isPending ? t("rejecting") : t("reject")}
+                  </Button>
+                )}
+                
+                {canReturn && (
+                  <Button
+                    variant="outline"
+                    onClick={handleReturn}
+                    disabled={isPending}
+                    className="border-yellow-600 text-yellow-600 hover:bg-yellow-50"
+                  >
+                    {returnMutation.isPending ? t("buttons.returning") : t("buttons.return")}
+                  </Button>
+                )}
 
-            {/* Edit Action */}
-            {canEdit && (
-              <Button onClick={() => setIsEditing(true)}>{t("edit")}</Button>
-            )}
-            
-            {isViewMode && isEditing && (
-              <Button onClick={() => onSubmit()} disabled={isPending}>
-                {isPending ? t("updating") : t("update")}
-              </Button>
-            )}
+                {/* Edit Action */}
+                {canEdit && (
+                  <Button onClick={() => setIsEditing(true)}>{t("edit")}</Button>
+                )}
 
-            {/* Create Mode */}
-            {!isViewMode && (
-              <Button onClick={() => onSubmit()} disabled={isPending}>
-                {isPending ? t("saving") : t("saveRequest")}
-              </Button>
-            )}
+                {/* Create Mode */}
+                {!isViewMode && (
+                  <Button onClick={() => onSubmit()} disabled={isPending}>
+                    {isPending ? t("saving") : t("saveRequest")}
+                  </Button>
+                )}
 
-            {/* Close/Cancel Button */}
-            <Button
-              variant="outline"
-              onClick={() => {
-                if (isEditing) {
-                  setIsEditing(false);
-                } else {
-                  navigate(-1);
-                }
-              }}
-              disabled={isPending}
-            >
-              {isEditing ? t("cancel") : isViewMode ? t("close") : t("cancel")}
-            </Button>
+                {/* Close/Cancel Button */}
+                <Button
+                  variant="outline"
+                  onClick={() => navigate(-1)}
+                  disabled={isPending}
+                >
+                  {isViewMode ? t("close") : t("cancel")}
+                </Button>
+              </>
+            )}
           </>
         }
       />
@@ -551,7 +557,7 @@ export default function RecruitmentRequestAdd() {
                         className={`border-b last:border-b-0 border-gray-200 ${isCurrentStep ? "bg-yellow-50" : "hover:bg-gray-50"}`}
                       >
                         <td className="p-4 text-sm whitespace-nowrap">{step.stepOrder}</td>
-                        <td className={`p-4 text-sm whitespace-nowrap ${isCurrentStep ? "font-semibold" : ""}`}>{step.stepName}</td>
+                        <td className={`p-4 text-sm whitespace-nowrap ${isCurrentStep ? "font-semibold" : ""}`}>{step.approverPositionName}</td>
                         <td className="p-4 text-sm whitespace-nowrap">{trackingStatus}</td>
                         <td className="p-4 text-sm whitespace-nowrap max-w-[150px] truncate">{actionUserName}</td>
                         <td className="p-4 text-sm whitespace-nowrap">{actionTime}</td>

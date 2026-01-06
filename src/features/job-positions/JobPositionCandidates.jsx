@@ -60,12 +60,12 @@ export default function JobPositionCandidates() {
       color: "#F59E0B",
       bgColor: "#FEF3C7",
     },
-    {
-      id: "OFFER",
-      label: t("statuses.offer"),
-      color: "#8B5CF6",
-      bgColor: "#F5F3FF",
-    },
+    // {
+    //   id: "OFFER",
+    //   label: t("statuses.offer"),
+    //   color: "#8B5CF6",
+    //   bgColor: "#F5F3FF",
+    // },
     {
       id: "HIRED",
       label: t("statuses.hired"),
@@ -131,6 +131,33 @@ export default function JobPositionCandidates() {
     name: candidate.name || candidate.fullName || "",
   });
 
+  const getStatusOrder = (statusId) => {
+    const statusOrder = {
+      SUBMITTED: 0,
+      REVIEWING: 1,
+      INTERVIEW: 2,
+      // OFFER: 3,
+      HIRED: 3,
+      REJECTED: -1,
+      ARCHIVED: -1,
+    };
+    return statusOrder[statusId] ?? 0;
+  };
+
+  const canChangeStatus = (currentStatus, newStatus) => {
+    if (newStatus === "REJECTED" || newStatus === "ARCHIVED") {
+      return true;
+    }
+    
+    if (currentStatus === "REJECTED" || currentStatus === "ARCHIVED") {
+      return false;
+    }
+    
+    const currentOrder = getStatusOrder(currentStatus);
+    const newOrder = getStatusOrder(newStatus);
+    return newOrder >= currentOrder;
+  };
+
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -149,6 +176,11 @@ export default function JobPositionCandidates() {
   };
 
   const handleChangeStatus = async (candidate, newStatus) => {
+    if (!canChangeStatus(candidate.status, newStatus)) {
+      toast.error(t("candidates.cannotMoveBackward"));
+      return;
+    }
+    
     const statusLabel = CANDIDATE_STATUSES.find((s) => s.id === newStatus)?.label;
     
     try {
@@ -197,6 +229,11 @@ export default function JobPositionCandidates() {
     }
 
     if (targetStatus && candidate.status !== targetStatus) {
+      if (!canChangeStatus(candidate.status, targetStatus)) {
+        toast.error(t("candidates.cannotMoveBackward"));
+        return;
+      }
+      
       const statusLabel = CANDIDATE_STATUSES.find(
         (s) => s.id === targetStatus
       )?.label;
@@ -302,6 +339,7 @@ export default function JobPositionCandidates() {
                     onCandidateClick={handleCandidateClick}
                     onChangeStatus={isHR ? handleChangeStatus : undefined}
                     allStatuses={CANDIDATE_STATUSES}
+                    canChangeStatus={canChangeStatus}
                   />
                 ))}
               </SortableContext>

@@ -23,23 +23,23 @@ const Sidebar = ({ isVisible, toggleSidebar, sidebarWidth }) => {
 
   // Admin: only management; Non-admin: business functions + employees
   const adminMenus = [
-    { text: t("accountManagement"), link: "/users", icon: <UsersRound /> },
-    { text: t("roleManagement"), link: "/roles", icon: <UsersRound /> },
-    { text: t("employeeManagement"), link: "/employees", icon: <UsersRound /> },
-    { text: t("workflowManagement"), link: "/workflows", icon: <GitBranch /> },
+    { text: t("users"), link: "/users", icon: <UsersRound /> },
+    { text: t("roles"), link: "/roles", icon: <UsersRound /> },
+    { text: t("employees"), link: "/employees", icon: <UsersRound /> },
+    { text: t("workflows"), link: "/workflows", icon: <GitBranch /> },
   ];
 
   const businessMenus = [
-    ...(canAccessEmployees ? [{ text: t("employeeManagement"), link: "/employees", icon: <UsersRound /> }] : []),
-    { text: t("recruitmentReq"), link: "/recruitment-requests", icon: <ClipboardList /> },
-    { text: t("jobPosition"), link: "/job-positions", icon: <Briefcase /> },
-    { text: t("candidate"), link: "/candidates", icon: <UsersRound /> },
+    ...(canAccessEmployees ? [{ text: t("employees"), link: "/employees", icon: <UsersRound /> }] : []),
+    { text: t("recruitmentRequestsPage"), link: "/recruitment-requests", icon: <ClipboardList /> },
+    { text: t("jobPositionsPage"), link: "/job-positions", icon: <Briefcase /> },
+    { text: t("candidatesPage"), link: "/candidates", icon: <UsersRound /> },
     { text: t("calendar"), link: "/calendar", icon: <CalendarDays /> },
-    { text: t("email"), link: "/email", icon: <Mail /> },
+    { text: t("emailPage"), link: "/email", icon: <Mail /> },
   ];
 
   const menuItems = [
-    { text: t("home"), link: "/", icon: <House /> },
+    { text: t("dashboard"), link: "/", icon: <House /> },
     ...(isAdmin ? adminMenus : businessMenus),
   ];
 
@@ -93,6 +93,13 @@ const Sidebar = ({ isVisible, toggleSidebar, sidebarWidth }) => {
             />
           ))}
         </ul>
+        {isVisible && (
+          <div className="p-3 border-t border-gray-200 text-center">
+            <p className="text-xs text-gray-500">
+              © 2026 Đồ án PTIT
+            </p>
+          </div>
+        )}
       </nav>
     </aside>
   );

@@ -17,21 +17,29 @@ const Navbar = ({ isSidebarVisible, title, sidebarWidth }) => {
 
     switch (mainRoute) {
       case "":
-        return t("home");
+        return t("dashboard");
+      case "employees":
+        return t("employees");
+      case "users":
+        return t("users");
+      case "roles":
+        return t("roles");
+      case "workflows":
+        return t("workflows");
       case "recruitment-requests":
-        return t("recruitmentReq");
+        return t("recruitmentRequestsPage");
       case "job-positions":
-        return t("jobPosition");
+        return t("jobPositionsPage");
       case "calendar":
         return t("calendar");
-      case "candidate":
-        return t("candidate");
-      case "orders":
-        return t("orders");
+      case "candidates":
+        return t("candidatesPage");
+      case "offers":
+        return t("offersPage");
       case "email":
-        return t("email");
+        return t("emailPage");
       default:
-        return t("home");
+        return t("dashboard");
     }
   };
 

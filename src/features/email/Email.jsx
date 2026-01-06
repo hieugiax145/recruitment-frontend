@@ -162,7 +162,7 @@ export default function Email() {
   return (
     <div className="flex flex-col h-full">
       <ContentHeader
-        title={t("email")}
+        title={t("emailPage")}
         actions={
           <Button
             onClick={() => {
@@ -183,7 +183,7 @@ export default function Email() {
               <div
                 onClick={() => setSelectedTab("inbox")}
                 className={`
-                  flex-1 px-3 py-1.5 rounded-md text-sm font-medium transition-colors cursor-pointer text-center
+                  flex-1 px-3 py-1.5 rounded-md text-sm font-medium transition-colors cursor-pointer flex items-center justify-center
                   ${
                     selectedTab === "inbox"
                       ? "bg-white text-red-600 shadow-sm"
@@ -196,7 +196,7 @@ export default function Email() {
               <div
                 onClick={() => setSelectedTab("sent")}
                 className={`
-                  flex-1 px-3 py-1.5 rounded-md text-sm font-medium transition-colors cursor-pointer text-center
+                  flex-1 px-3 py-1.5 rounded-md text-sm font-medium transition-colors cursor-pointer flex items-center justify-center
                   ${
                     selectedTab === "sent"
                       ? "bg-white text-red-600 shadow-sm"
@@ -209,7 +209,7 @@ export default function Email() {
               <div
                 onClick={() => setSelectedTab("drafts")}
                 className={`
-                  flex-1 px-3 py-1.5 rounded-md text-sm font-medium transition-colors cursor-pointer text-center
+                  flex-1 px-3 py-1.5 rounded-md text-sm font-medium transition-colors cursor-pointer flex items-center justify-center
                   ${
                     selectedTab === "drafts"
                       ? "bg-white text-red-600 shadow-sm"

@@ -117,7 +117,7 @@ export default function MultiSelectDropdown({
                           className="inline-flex items-center gap-1 pl-2 pr-1 py-0.5 bg-gray-100 text-gray-800 rounded-full text-xs max-w-full border border-transparent hover:border-gray-300 transition"
                           onClick={(e) => e.stopPropagation()}
                         >
-                          <span className="truncate max-w-[140px] leading-4">{option.name}</span>
+                          <span className="truncate max-w-[200px] leading-4">{option.name}</span>
                           {!disabled && (
                             <button
                               type="button"
@@ -125,11 +125,11 @@ export default function MultiSelectDropdown({
                                 e.stopPropagation();
                                 handleRemove(option.id);
                               }}
-                              className="ml-0.5 inline-flex items-center justify-center h-4 w-4 rounded-full text-gray-500 hover:text-gray-700 hover:bg-gray-200 transition"
+                              className="ml-0.5 inline-flex items-center justify-center h-4 w-4 rounded-full text-gray-600 hover:text-white hover:bg-red-500 transition font-bold"
                               aria-label="Remove"
                               title="Remove"
                             >
-                              <X className="h-3 w-3" />
+                              ×
                             </button>
                           )}
                         </div>
