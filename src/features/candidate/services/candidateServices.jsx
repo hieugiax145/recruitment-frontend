@@ -14,9 +14,7 @@ export const candidateServices = {
   },
 
   updateCandidateStatus: async (id, status) => {
-    return api.patch(`/candidate-service/candidates/${id}/status`, {
-      status,
-    });
+    return api.put(`/candidate-service/candidates/status/${id}?status=${status}`);
   },
 
   deleteCandidate: async (id) => {

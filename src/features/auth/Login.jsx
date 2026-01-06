@@ -16,7 +16,6 @@ const Login = () => {
 
   const { login } = useAuth();
 
-  // Using useMutation for login
   const loginMutation = useMutation({
     mutationFn: async (credentials) => {
       return await login(credentials.username, credentials.password);
@@ -62,13 +61,15 @@ const Login = () => {
             required
             disabled={loginMutation.isPending}
           />
-          <Button
-            type="submit"
-            onClick={handleLogin}
-            disabled={loginMutation.isPending}
-          >
-            {loginMutation.isPending ? t("loading") : t("login")}
-          </Button>
+          <div className="flex justify-center pt-2">
+            <Button
+              type="submit"
+              onClick={handleLogin}
+              disabled={loginMutation.isPending}
+            >
+              {loginMutation.isPending ? t("loading") : t("login")}
+            </Button>
+          </div>
         </form>
       </div>
     </div>
