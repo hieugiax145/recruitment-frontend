@@ -1,7 +1,8 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { Outlet } from "react-router-dom";
 import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
+import { useDocumentTitle } from "../hooks/useDocumentTitle";
 
 const EXPANDED = 260;
 const COLLAPSED = 100;
@@ -9,8 +10,7 @@ const APPBAR_HEIGHT = 60;
 
 const Layout = () => {
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
-
- 
+  useDocumentTitle();
 
   const sidebarWidth = useMemo(
     () => (isSidebarVisible ? EXPANDED : COLLAPSED),
@@ -34,10 +34,7 @@ const Layout = () => {
 
   return (
     <div className="flex">
-      <Navbar
-        sidebarWidth={sidebarWidth}
-        isSidebarVisible={isSidebarVisible}
-      />
+      <Navbar sidebarWidth={sidebarWidth} isSidebarVisible={isSidebarVisible} />
       <Sidebar
         sidebarWidth={sidebarWidth}
         isVisible={isSidebarVisible}
@@ -56,7 +53,7 @@ const Layout = () => {
           minHeight: `calc(100vh - ${APPBAR_HEIGHT + 16}px)`,
         }}
       >
-        <div className="min-h-full p-4 bg-white rounded-xl shadow">
+        <div className="h-full max-w-[1600px] mx-auto relative">
           <Outlet />
         </div>
       </main>
