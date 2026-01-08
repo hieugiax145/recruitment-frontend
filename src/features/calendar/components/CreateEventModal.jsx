@@ -184,9 +184,9 @@ export default function CreateEventModal({ isOpen, onClose, defaultDate, default
       return;
     }
 
-    const toIso = (dateStr, timeStr) => {
-      const dt = new Date(`${dateStr}T${timeStr}:00`);
-      return dt.toISOString();
+    // Format datetime in local timezone (GMT+7 for Vietnam)
+    const toLocalDateTime = (dateStr, timeStr) => {
+      return `${dateStr}T${timeStr}:00`;
     };
 
     const payload = {
@@ -196,8 +196,8 @@ export default function CreateEventModal({ isOpen, onClose, defaultDate, default
       meetingType: formData.meetingType,
       status: formData.status,
       location: formData.location || undefined,
-      startTime: toIso(formData.date, formData.startTime),
-      endTime: toIso(formData.date, formData.endTime),
+      startTime: toLocalDateTime(formData.date, formData.startTime),
+      endTime: toLocalDateTime(formData.date, formData.endTime),
       reminderTime: Number(formData.reminderTime) || 0,
       candidateId: formData.candidate || undefined,
       userIds: formData.participants,

@@ -83,3 +83,23 @@ export const useDeleteEmployee = () => {
     },
   });
 };
+
+export const useEvaluateProbation = () => {
+  const qc = useQueryClient();
+  const { t } = useTranslation();
+  
+  return useMutation({
+    mutationFn: async (data) => {
+      const res = await employeeServices.evaluateProbation(data);
+      return res.data;
+    },
+    onSuccess: (_data, variables) => {
+      qc.invalidateQueries({ queryKey: employeeKeys.detail(variables.employeeId) });
+      qc.invalidateQueries({ queryKey: employeeKeys.all });
+    },
+    onError: (err) => {
+      const msg = err.response?.data?.message || t("employeeEvaluation.probationEvaluation.submitError");
+      toast.error(msg);
+    },
+  });
+};

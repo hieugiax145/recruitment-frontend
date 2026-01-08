@@ -220,16 +220,16 @@ export default function Offers() {
                         {offer.id}
                       </td>
                       <td className="p-4 text-sm text-gray-900 font-medium">
-                        {offer.candidate?.name || "-"}
+                        {offer.candidate?.name || offer.candidate?.email || "-"}
                       </td>
                       <td className="p-4 text-sm text-gray-900">
-                        {offer.position?.name || "-"}
+                        {offer.jobPositionTitle || "-"}
                       </td>
                       <td className="p-4 text-sm text-gray-600">
-                        {offer.department?.name || "-"}
+                        {offer.departmentName || "-"}
                       </td>
                       <td className="p-4 text-sm text-gray-900 font-medium">
-                        {formatSalary(offer.position?.salary)}
+                        {formatSalary(offer.basicSalary)}
                       </td>
                       <td className="p-4 text-sm text-gray-600">
                         {formatDate(offer.createdAt)}

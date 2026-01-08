@@ -10,6 +10,7 @@ import {
   UsersRound,
   GitBranch,
   FileText,
+  HandshakeIcon,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
@@ -18,8 +19,9 @@ const Sidebar = ({ isVisible, toggleSidebar, sidebarWidth }) => {
   const { user } = useAuth();
   const isAdmin = user?.role?.name === "ADMIN";
   const isCEO = user?.role?.name === "CEO";
+  const isManager = user?.role?.name === "MANAGER";
   const isHRDepartment = user?.department?.id === 2;
-  const canAccessEmployees = isAdmin || isCEO || isHRDepartment;
+  const canAccessEmployees = isAdmin || isCEO || isManager || isHRDepartment;
 
   // Admin: only management; Non-admin: business functions + employees
   const adminMenus = [
@@ -34,6 +36,7 @@ const Sidebar = ({ isVisible, toggleSidebar, sidebarWidth }) => {
     { text: t("recruitmentRequestsPage"), link: "/recruitment-requests", icon: <ClipboardList /> },
     { text: t("jobPositionsPage"), link: "/job-positions", icon: <Briefcase /> },
     { text: t("candidatesPage"), link: "/candidates", icon: <UsersRound /> },
+    { text: t("offersPage"), link: "/offers", icon: <HandshakeIcon /> },
     { text: t("calendar"), link: "/calendar", icon: <CalendarDays /> },
     { text: t("emailPage"), link: "/email", icon: <Mail /> },
   ];

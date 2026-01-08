@@ -1,12 +1,13 @@
-import { ChevronRight, X, AlertTriangle } from "lucide-react";
+import { ChevronRight, X, AlertTriangle, Copy } from "lucide-react";
 import Button from "../../components/ui/Button";
 import ContentHeader from "../../components/ui/ContentHeader";
 import TextInput from "../../components/ui/TextInput";
 import { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import SelectDropdown from "../../components/ui/SelectDropdown";
 import { useAuth } from "../../context/AuthContext";
 import { useTranslation } from "react-i18next";
+import WorkflowTrackingTable from "../../components/ui/WorkflowTrackingTable";
 import { toast } from "react-toastify";
 import { formatNumber, parseFormattedNumber } from "../../utils/utils";
 import Modal from "../../components/ui/Modal";
@@ -30,7 +31,9 @@ export default function RecruitmentRequestAdd() {
   const { user } = useAuth();
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const isViewMode = !!id;
+  const location = useLocation();
+  const clonedData = location.state?.clonedData;
+  const isViewMode = !!id && !clonedData;
   const [isEditing, setIsEditing] = useState(false);
   const [showRejectDialog, setShowRejectDialog] = useState(false);
   const [rejectionReason, setRejectionReason] = useState("");
@@ -42,12 +45,12 @@ export default function RecruitmentRequestAdd() {
   const [showWithdrawDialog, setShowWithdrawDialog] = useState(false);
 
   const [formData, setFormData] = useState({
-    title: "",
-    quantity: 1,
-    reason: "",
+    title: clonedData?.title || "",
+    quantity: clonedData?.quantity || 1,
+    reason: clonedData?.reason || "",
     requesterId: user?.userId || null,
-    departmentId: user?.department?.id || null,
-    workflowId: null,
+    departmentId: clonedData?.departmentId || user?.department?.id || null,
+    workflowId: clonedData?.workflowId || null,
   });
 
   const {
@@ -302,6 +305,17 @@ export default function RecruitmentRequestAdd() {
     );
   };
 
+  const handleClone = () => {
+    const cloneData = {
+      title: formData.title,
+      quantity: formData.quantity,
+      reason: formData.reason,
+      departmentId: formData.departmentId,
+      workflowId: formData.workflowId,
+    };
+    navigate("/recruitment-requests/new", { state: { clonedData: cloneData } });
+  };
+
   const isPending =
     createMutation.isPending ||
     updateMutation.isPending ||
@@ -457,6 +471,14 @@ export default function RecruitmentRequestAdd() {
                   <Button onClick={() => setIsEditing(true)}>{t("edit")}</Button>
                 )}
 
+                {/* Clone Action */}
+                {isViewMode && !isEditing && (
+                  <Button variant="outline" onClick={handleClone}>
+                    <Copy className="h-4 w-4 mr-2" />
+                    {t("recruitmentRequests.clone")}
+                  </Button>
+                )}
+
                 {/* Create Mode */}
                 {!isViewMode && (
                   <Button onClick={() => onSubmit()} disabled={isPending}>
@@ -496,79 +518,7 @@ export default function RecruitmentRequestAdd() {
         </div>
         {/* Steps & Tracking Table - only in view mode and has workflow */}
         {isViewMode && existingRequest?.workflowInfo?.workflow && (
-          <div className="mb-6 bg-white rounded-xl shadow overflow-hidden">
-            <div className="p-6 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900">{t("recruitmentRequests.approvalStepsTitle")}</h3>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-red-50">
-                  <tr>
-                    <th className="p-4 text-left text-sm font-medium text-gray-600 whitespace-nowrap">{t("recruitmentRequests.stepOrder")}</th>
-                    <th className="p-4 text-left text-sm font-medium text-gray-600 whitespace-nowrap">{t("recruitmentRequests.stepName")}</th>
-                    <th className="p-4 text-left text-sm font-medium text-gray-600 whitespace-nowrap">{t("recruitmentRequests.processingStatus")}</th>
-                    <th className="p-4 text-left text-sm font-medium text-gray-600 whitespace-nowrap">{t("recruitmentRequests.assignedPerson")}</th>
-                    <th className="p-4 text-left text-sm font-medium text-gray-600 whitespace-nowrap">{t("recruitmentRequests.time")}</th>
-                    <th className="p-4 text-left text-sm font-medium text-gray-600 whitespace-nowrap">{t("notes")}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {existingRequest.workflowInfo.workflow.steps.map((step, idx) => {
-                    // Tìm approvalTrackings cho step này
-                    const approvalTrackings = Array.isArray(existingRequest.workflowInfo.approvalTrackings)
-                      ? existingRequest.workflowInfo.approvalTrackings.filter(tr => tr.stepId === step.id)
-                      : [];
-                    
-                    let trackingStatus = t("recruitmentRequests.notProcessed");
-                    let actionUserName = "-";
-                    let actionTime = "-";
-                    let notes = "-";
-                    
-                    // Kiểm tra xem step này có phải là step hiện tại không
-                    const isCurrentStep = existingRequest.workflowInfo.currentStepId === step.id;
-                    
-                    if (approvalTrackings.length > 0) {
-                      // Lấy tracking gần nhất (có thể sắp xếp theo actionAt hoặc lấy phần tử cuối)
-                      const latestTracking = approvalTrackings[approvalTrackings.length - 1];
-                      const status = latestTracking.status;
-                      
-                      if (status === "APPROVED") trackingStatus = t("statuses.approved");
-                      else if (status === "REJECTED") trackingStatus = t("statuses.rejected");
-                      else if (status === "RETURNED") trackingStatus = t("statuses.returned");
-                      else if (status === "CANCELLED") trackingStatus = t("statuses.cancelled");
-                      else if (status === "PENDING") trackingStatus = t("statuses.pending");
-                      else trackingStatus = status;
-                      
-                      // Lấy tên người thao tác
-                      actionUserName = latestTracking.actionUserName || "-";
-                      
-                      // Lấy thời gian thao tác
-                      if (latestTracking.actionAt) {
-                        actionTime = new Date(latestTracking.actionAt).toLocaleString("vi-VN");
-                      }
-                      
-                      // Lấy ghi chú
-                      notes = latestTracking.notes || "-";
-                    }
-                    
-                    return (
-                      <tr 
-                        key={step.id} 
-                        className={`border-b last:border-b-0 border-gray-200 ${isCurrentStep ? "bg-yellow-50" : "hover:bg-gray-50"}`}
-                      >
-                        <td className="p-4 text-sm whitespace-nowrap">{step.stepOrder}</td>
-                        <td className={`p-4 text-sm whitespace-nowrap ${isCurrentStep ? "font-semibold" : ""}`}>{step.approverPositionName}</td>
-                        <td className="p-4 text-sm whitespace-nowrap">{trackingStatus}</td>
-                        <td className="p-4 text-sm whitespace-nowrap max-w-[150px] truncate">{actionUserName}</td>
-                        <td className="p-4 text-sm whitespace-nowrap">{actionTime}</td>
-                        <td className="p-4 text-sm max-w-[200px] truncate" title={notes}>{notes}</td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </div>
+          <WorkflowTrackingTable workflowInfo={existingRequest.workflowInfo} className="mb-4" />
         )}
         {/* form */}
         <div className="flex flex-col gap-4">
@@ -578,16 +528,17 @@ export default function RecruitmentRequestAdd() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
               <TextInput
                 label={t("requester")}
-                placeholder={user.name || t("requesterPlaceholder")}
+                placeholder={isViewMode ? (existingRequest?.requester?.name || "-") : (user.name || t("requesterPlaceholder"))}
+                value={isViewMode ? (existingRequest?.requester?.name || "-") : (user.name || "")}
                 readOnly={true}
               />
 
-              {user?.department?.id ? (
+              {(isViewMode || user?.department?.id) ? (
                 <TextInput
                   label={t("department")}
-                  placeholder={user?.department?.name || t("department")}
+                  placeholder={isViewMode ? (existingRequest?.requester?.department?.name || "-") : (user?.department?.name || t("department"))}
+                  value={isViewMode ? (existingRequest?.requester?.department?.name || "-") : (user?.department?.name || "")}
                   readOnly={true}
-                  value={user?.department?.name || ""}
                 />
               ) : (
                 <SelectDropdown

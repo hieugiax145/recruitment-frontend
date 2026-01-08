@@ -1,11 +1,26 @@
 import { useEffect } from "react";
 import { createPortal } from "react-dom";
-import { X, Calendar, Clock, MapPin, Users, Video, Monitor } from "lucide-react";
+import { X, Calendar, Clock, MapPin, Users, Video, Monitor, CheckCircle, User } from "lucide-react";
 import Button from "../../../components/ui/Button";
 import { useTranslation } from "react-i18next";
+import { useUpdateScheduleStatus } from "../hooks/useCalendar";
 
 export default function ScheduleDetailModal({ schedule, isOpen, onClose }) {
   const { t } = useTranslation();
+  const updateStatusMutation = useUpdateScheduleStatus();
+
+  const handleMarkAsDone = () => {
+    if (!schedule?.id) return;
+    updateStatusMutation.mutate(
+      { id: schedule.id, status: "DONE" },
+      {
+        onSuccess: () => {
+          onClose();
+        },
+      }
+    );
+  };
+
   // Handle ESC key
   useEffect(() => {
     if (!isOpen) return;
@@ -87,6 +102,10 @@ export default function ScheduleDetailModal({ schedule, isOpen, onClose }) {
 
   const startDateTime = formatDateTime(schedule.startTime);
   const endTime = formatTime(schedule.endTime);
+
+  // Separate candidates and users from participants
+  const candidates = schedule.participants?.filter(p => p.participantType === "CANDIDATE") || [];
+  const users = schedule.participants?.filter(p => p.participantType === "USER") || [];
 
   const dialogContent = (
     <div
@@ -212,8 +231,30 @@ export default function ScheduleDetailModal({ schedule, isOpen, onClose }) {
             </div>
           )}
 
-          {/* Participants */}
-          {schedule.participants && schedule.participants.length > 0 && (
+          {/* Candidate */}
+          {candidates.length > 0 && (
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0 w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center">
+                <User className="h-5 w-5" />
+              </div>
+              <div className="flex-1 pt-1">
+                <div className="text-xs text-gray-500 mb-2">{t("calendarSchedule.candidate")}</div>
+                <div className="flex flex-wrap gap-2">
+                  {candidates.map((candidate, index) => (
+                    <div
+                      key={candidate.id || index}
+                      className="px-3 py-1.5 bg-blue-50 text-blue-700 rounded-md text-sm font-medium"
+                    >
+                      {candidate.name || "-"}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Participants (Users) */}
+          {users.length > 0 && (
             <div className="flex items-start gap-3">
               <div className="flex-shrink-0 w-10 h-10 bg-red-50 text-red-600 rounded-xl flex items-center justify-center">
                 <Users className="h-5 w-5" />
@@ -221,7 +262,7 @@ export default function ScheduleDetailModal({ schedule, isOpen, onClose }) {
               <div className="flex-1 pt-1">
                 <div className="text-xs text-gray-500 mb-2">{t("calendarSchedule.participants")}</div>
                 <div className="flex flex-wrap gap-2">
-                  {schedule.participants.map((participant, index) => (
+                  {users.map((participant, index) => (
                     <div
                       key={participant.id || index}
                       className="px-3 py-1.5 bg-red-50 text-red-700 rounded-md text-sm font-medium"
@@ -236,10 +277,21 @@ export default function ScheduleDetailModal({ schedule, isOpen, onClose }) {
         </div>
 
         {/* Footer */}
-        <div className="px-6 pb-6 flex justify-end">
+        <div className="px-6 pb-6 flex justify-end gap-3">
+          {schedule.status === "SCHEDULED" && (
+            <Button
+              onClick={handleMarkAsDone}
+              disabled={updateStatusMutation.isPending}
+              className="px-6"
+            >
+              <CheckCircle className="h-4 w-4 mr-2" />
+              {updateStatusMutation.isPending ? t("buttons.processing") : t("buttons.markAsDone")}
+            </Button>
+          )}
           <Button
             variant="outline"
             onClick={onClose}
+            disabled={updateStatusMutation.isPending}
             className="px-6"
           >
             {t("modals.close")}

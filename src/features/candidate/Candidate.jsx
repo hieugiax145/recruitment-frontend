@@ -6,7 +6,7 @@ import TextInput from "../../components/ui/TextInput";
 import { Search, UsersRound } from "lucide-react";
 import Pagination from "../../components/ui/Pagination";
 import CandidateStatus from "./components/CandidateStatus";
-import { useCandidates } from "./hooks/useCandidates";
+import { useCandidates, useInterviewedCandidates } from "./hooks/useCandidates";
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
 import LoadingContent from "../../components/ui/LoadingContent";
@@ -23,6 +23,7 @@ export default function Candidate() {
   const [selectedJobPositionId, setSelectedJobPositionId] = useState(null);
   const [selectedStatus, setSelectedStatus] = useState(null);
   const [keyword, setKeyword] = useState("");
+  const [showInterviewedOnly, setShowInterviewedOnly] = useState(false);
   const itemsPerPage = 10;
 
   // Determine if user is HR or Director
@@ -40,6 +41,20 @@ export default function Candidate() {
 
   // Fetch candidates with department filtering
   const { data, isLoading, isError, error, refetch } = useCandidates(queryParams);
+  
+  // Fetch interviewed candidates
+  const { 
+    data: interviewedData, 
+    isLoading: isLoadingInterviewed, 
+    isError: isErrorInterviewed, 
+    error: errorInterviewed 
+  } = useInterviewedCandidates(keyword ? { keyword } : {});
+
+  // Choose which data source to use based on toggle
+  const activeData = showInterviewedOnly ? interviewedData : data;
+  const activeIsLoading = showInterviewedOnly ? isLoadingInterviewed : isLoading;
+  const activeIsError = showInterviewedOnly ? isErrorInterviewed : isError;
+  const activeError = showInterviewedOnly ? errorInterviewed : error;
 
   // Fetch job positions for filter
   const { data: jobPositionsData } = useJobPositions();
@@ -48,7 +63,9 @@ export default function Candidate() {
     : [];
 
   // Get candidates from the query data
-  const allCandidates = Array.isArray(data?.data?.result) ? data.data.result : [];
+  const allCandidates = showInterviewedOnly 
+    ? (Array.isArray(activeData?.data) ? activeData.data : [])
+    : (Array.isArray(activeData?.data?.result) ? activeData.data.result : []);
   
   // Filter by selected job position and status
   const candidates = allCandidates.filter((c) => {
@@ -61,12 +78,12 @@ export default function Candidate() {
 
   // Show toast notification when there's an error
   useEffect(() => {
-    if (isError) {
+    if (activeIsError) {
       const errorMessage =
-        error?.response?.data?.message || t("errorLoadingCandidates");
+        activeError?.response?.data?.message || t("errorLoadingCandidates");
       toast.error(errorMessage);
     }
-  }, [isError, error, t]);
+  }, [activeIsError, activeError, t]);
 
   const totalPages = Math.ceil(candidates.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -100,7 +117,7 @@ export default function Candidate() {
     );
   };
 
-  if (isLoading) {
+  if (activeIsLoading) {
     return (
       <div className="flex flex-col h-full">
         <ContentHeader
@@ -151,6 +168,37 @@ export default function Candidate() {
             </>
           }
         />
+        
+        {/* Tabs */}
+        <div className="flex gap-2 bg-gray-50 p-2 mt-4 rounded-lg mx-4">
+          <button
+            onClick={() => {
+              setShowInterviewedOnly(false);
+              setCurrentPage(1);
+            }}
+            className={`flex-1 px-6 py-2.5 text-sm font-medium rounded-lg transition-all ${
+              !showInterviewedOnly
+                ? "bg-white text-gray-900 shadow-sm"
+                : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+            }`}
+          >
+            {t("candidates.showAll")}
+          </button>
+          <button
+            onClick={() => {
+              setShowInterviewedOnly(true);
+              setCurrentPage(1);
+            }}
+            className={`flex-1 px-6 py-2.5 text-sm font-medium rounded-lg transition-all ${
+              showInterviewedOnly
+                ? "bg-white text-gray-900 shadow-sm"
+                : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+            }`}
+          >
+            {t("candidates.showInterviewed")}
+          </button>
+        </div>
+
         <div className="flex-1 flex items-center justify-center mt-4">
           <LoadingContent />
         </div>
@@ -208,6 +256,36 @@ export default function Candidate() {
           </>
         }
       />
+
+      {/* Tabs */}
+      <div className="flex gap-2 bg-gray-50 p-2 mt-4 rounded-lg mx-4">
+        <button
+          onClick={() => {
+            setShowInterviewedOnly(false);
+            setCurrentPage(1);
+          }}
+          className={`flex-1 px-6 py-2.5 text-sm font-medium rounded-lg transition-all ${
+            !showInterviewedOnly
+              ? "bg-white text-gray-900 shadow-sm"
+              : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+          }`}
+        >
+          {t("candidates.showAll")}
+        </button>
+        <button
+          onClick={() => {
+            setShowInterviewedOnly(true);
+            setCurrentPage(1);
+          }}
+          className={`flex-1 px-6 py-2.5 text-sm font-medium rounded-lg transition-all ${
+            showInterviewedOnly
+              ? "bg-white text-gray-900 shadow-sm"
+              : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+          }`}
+        >
+          {t("candidates.showInterviewed")}
+        </button>
+      </div>
 
       <div className="flex-1 flex flex-col mt-4 min-h-0">
         <div className="flex-1 flex flex-col bg-white rounded-xl shadow overflow-hidden">

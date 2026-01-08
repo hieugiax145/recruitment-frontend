@@ -20,4 +20,15 @@ export const calendarServices = {
     );
     return response.data;
   },
+
+  updateScheduleStatus: async (id, status) => {
+    const response = await api.put(
+      `/schedule-service/schedules/${id}`,
+      null,
+      {
+        params: { status }
+      }
+    );
+    return response.data;
+  },
 };

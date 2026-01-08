@@ -6,12 +6,15 @@ import TextInput from "../../components/ui/TextInput";
 import SelectDropdown from "../../components/ui/SelectDropdown";
 import Button from "../../components/ui/Button";
 import { toast } from "react-toastify";
-import { useCreateEmployee, useUpdateEmployee, useEmployee, useDeleteEmployee } from "../../hooks/useEmployees";
+import { useCreateEmployee, useUpdateEmployee, useEmployee, useDeleteEmployee, useEvaluateProbation } from "../../hooks/useEmployees";
+import ProbationEvaluationModal from "./components/ProbationEvaluationModal";
+import { Star } from "lucide-react";
 import { useAllDepartments } from "../../hooks/useDepartments";
 import { useAllPositions } from "../../hooks/usePositions";
 import FileUploader from "../../components/ui/FileUploader";
 import LoadingContent from "../../components/ui/LoadingContent";
 import LoadingOverlay from "../../components/ui/LoadingOverlay";
+import StatusBadge from "../../components/ui/StatusBadge";
 import { uploadServices } from "../../services/uploadServices";
 
 export default function EmployeeForm() {
@@ -29,6 +32,8 @@ export default function EmployeeForm() {
 
   const [isEditMode, setIsEditMode] = useState(!isEditPage);
   const [uploading, setUploading] = useState(false);
+  const [showEvaluationModal, setShowEvaluationModal] = useState(false);
+  const evaluateProbation = useEvaluateProbation();
   const [form, setForm] = useState({
     name: "",
     phone: "",
@@ -61,8 +66,8 @@ export default function EmployeeForm() {
         departmentId: employee.department?.id || null,
         positionId: employee.position?.id || "",
       });
-      if (employee.avatar) {
-        setAvatarPreview(employee.avatar);
+      if (employee.avatarUrl) {
+        setAvatarPreview(employee.avatarUrl);
       }
     }
   }, [employee, isEditPage]);
@@ -133,7 +138,7 @@ export default function EmployeeForm() {
     };
 
     if (avatarUrl) {
-      payload.avatar = avatarUrl;
+      payload.avatarUrl = avatarUrl;
     }
 
     if (isEditPage) {
@@ -175,7 +180,7 @@ export default function EmployeeForm() {
         departmentId: employee.department?.id || null,
         positionId: employee.position?.id || "",
       });
-      setAvatarPreview(employee.avatar || null);
+      setAvatarPreview(employee.avatarUrl || null);
     }
   };
 
@@ -209,18 +214,26 @@ export default function EmployeeForm() {
         title={title}
         actions={
           <>
-            <Button variant="outline" onClick={() => navigate(-1)}>{t("cancel")}</Button>
             {isEditPage && !isEditMode ? (
               <>
+                {employee.status === "PROBATION" && (
+                  <Button onClick={() => setShowEvaluationModal(true)}>
+                    <Star className="h-4 w-4 mr-2" />
+                    {t("employeeEvaluation.evaluateProbation")}
+                  </Button>
+                )}
                 <Button variant="outline" onClick={() => setIsEditMode(true)}>{t("edit")}</Button>
-                <Button variant="outline" onClick={handleDelete} disabled={deleteEmployee.isPending}>{t("delete")}</Button>
+                <Button variant="outline" onClick={() => navigate(-1)}>{t("common.close")}</Button>
               </>
             ) : (
               <>
+                <Button onClick={() => formRef.current?.requestSubmit()}>{t("save")}</Button>
                 {isEditPage && (
                   <Button variant="outline" onClick={handleCancelEdit}>{t("cancel")}</Button>
                 )}
-                <Button onClick={() => formRef.current?.requestSubmit()}>{t("save")}</Button>
+                {!isEditPage && (
+                  <Button variant="outline" onClick={() => navigate(-1)}>{t("cancel")}</Button>
+                )}
               </>
             )}
           </>
@@ -228,6 +241,11 @@ export default function EmployeeForm() {
       />
       <div className="flex-1 mt-4">
         <div className="bg-white rounded-xl shadow p-6">
+          {isEditPage && employee.status === "PROBATION" && (
+            <div className="mb-6 pb-4 border-b border-gray-200">
+              <StatusBadge status={employee.status} />
+            </div>
+          )}
           <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-3 gap-6">
               <div className="col-span-2 space-y-4">
@@ -334,6 +352,22 @@ export default function EmployeeForm() {
           </form>
         </div>
       </div>
+
+      <ProbationEvaluationModal
+        isOpen={showEvaluationModal}
+        onClose={() => setShowEvaluationModal(false)}
+        employeeId={parseInt(id)}
+        employeeName={employee.name || ""}
+        onSubmit={(data) => {
+          evaluateProbation.mutate(data, {
+            onSuccess: () => {
+              toast.success(t("employeeEvaluation.probationEvaluation.submitSuccess"));
+              setShowEvaluationModal(false);
+            },
+          });
+        }}
+        isSubmitting={evaluateProbation.isPending}
+      />
     </div>
   );
 }

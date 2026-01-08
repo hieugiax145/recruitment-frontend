@@ -8,6 +8,9 @@ export const candidateKeys = {
   all: ["candidates"],
   list: (params) => ["candidates", "list", params],
   detail: (id) => ["candidates", "detail", id],
+  reviews: (id) => ["candidates", "reviews", id],
+  comments: (id) => ["candidates", "comments", id],
+  interviewed: (params) => ["candidates", "interviewed", params],
 };
 
 // Custom hook to fetch candidates with optional filters
@@ -108,18 +111,15 @@ export const useAddCandidateComment = () => {
   const { t } = useTranslation();
 
   return useMutation({
-    mutationFn: async ({ applicationId, content }) => {
-      const payload = { applicationId, content };
-      const response = await candidateServices.commentCandidate(
-        applicationId,
-        payload
-      );
+    mutationFn: async ({ candidateId, content }) => {
+      const payload = { candidateId, content };
+      const response = await candidateServices.commentCandidate(payload);
       return response.data;
     },
     onSuccess: (_data, variables) => {
-      // Refresh the specific candidate detail
+      // Refresh the comments list only
       queryClient.invalidateQueries({
-        queryKey: candidateKeys.detail(variables.applicationId),
+        queryKey: candidateKeys.comments(variables.candidateId),
       });
     },
     onError: (error) => {
@@ -148,5 +148,83 @@ export const useChangeStageCandidate = () => {
         error.response?.data?.message || t("candidates.updateStatusError");
       toast.error(errorMessage);
     },
+  });
+};
+
+// Custom hook to evaluate a candidate
+export const useEvaluateCandidate = () => {
+  const queryClient = useQueryClient();
+  const { t } = useTranslation();
+
+  return useMutation({
+    mutationFn: async (data) => {
+      const response = await candidateServices.evaluateCandidate(data);
+      return response.data;
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: candidateKeys.detail(variables.candidateId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: candidateKeys.reviews(variables.candidateId),
+      });
+      queryClient.invalidateQueries({ queryKey: candidateKeys.all });
+    },
+    onError: (error) => {
+      const errorMessage =
+        error.response?.data?.message || t("candidates.evaluation.submitError");
+      toast.error(errorMessage);
+    },
+  });
+};
+
+// Custom hook to fetch candidate reviews
+export const useCandidateReviews = (candidateId) => {
+  return useQuery({
+    queryKey: candidateKeys.reviews(candidateId),
+    queryFn: async () => {
+      const response = await candidateServices.getCandidateReviews(candidateId);
+      return response.data;
+    },
+    enabled: !!candidateId,
+    staleTime: 5 * 60 * 1000,
+  });
+};
+
+// Custom hook to fetch candidate comments
+export const useCandidateComments = (candidateId) => {
+  return useQuery({
+    queryKey: candidateKeys.comments(candidateId),
+    queryFn: async () => {
+      const response = await candidateServices.getCandidateComments(candidateId);
+      return response.data;
+    },
+    enabled: !!candidateId,
+    staleTime: 5 * 60 * 1000,
+  });
+};
+
+// Custom hook to convert candidate to employee
+export const useConvertToEmployee = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (candidateId) => candidateServices.convertToEmployee(candidateId),
+    onSuccess: (response, candidateId) => {
+      queryClient.invalidateQueries({ queryKey: candidateKeys.detail(candidateId) });
+      queryClient.invalidateQueries({ queryKey: candidateKeys.all });
+    },
+  });
+};
+
+// Custom hook to fetch candidates that the user has interviewed
+export const useInterviewedCandidates = (params = {}) => {
+  return useQuery({
+    queryKey: candidateKeys.interviewed(params),
+    queryFn: async () => {
+      const response = await candidateServices.getInterviewedCandidates(params);
+      return response.data;
+    },
+    staleTime: 5 * 60 * 1000,
   });
 };

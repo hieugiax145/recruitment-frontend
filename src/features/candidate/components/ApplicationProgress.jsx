@@ -36,7 +36,7 @@ export default function ApplicationProgress({ status, isHR, onStatusChange, isUp
       label: t("applicationSteps.interview"),
       icon: MessageSquare,
     },
-    // { key: "OFFER", label: t("applicationSteps.offer"), icon: FileText },
+    { key: "OFFER", label: t("applicationSteps.offer"), icon: FileText },
     { key: "HIRED", label: t("applicationSteps.hired"), icon: CheckCircle2 },
   ];
 
@@ -44,7 +44,8 @@ export default function ApplicationProgress({ status, isHR, onStatusChange, isUp
     SUBMITTED: 0,
     REVIEWING: 1,
     INTERVIEW: 2,
-    HIRED: 3,
+    OFFER: 3,
+    HIRED: 4,
     REJECTED: -1,
     ARCHIVED: -2,
   };

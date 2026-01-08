@@ -61,10 +61,31 @@ export const useCreateOffer = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: offerKeys.all });
+      toast.success("Tạo offer thành công");
     },
     onError: (error) => {
       const errorMessage =
         error.response?.data?.message || "Không thể tạo offer";
+      toast.error(errorMessage);
+    },
+  });
+};
+
+export const useUpdateOffer = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, data }) => {
+      const response = await offerServices.updateOffer(id, data);
+      return response.data;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: offerKeys.all });
+      queryClient.invalidateQueries({ queryKey: offerKeys.detail(variables.id) });
+    },
+    onError: (error) => {
+      const errorMessage =
+        error.response?.data?.message || "Không thể cập nhật offer";
       toast.error(errorMessage);
     },
   });
@@ -75,7 +96,7 @@ export const useApproveOffer = () => {
 
   return useMutation({
     mutationFn: async ({ id, action }) => {
-      const response = await offerServices.approveOffer(id, action);
+      const response = await offerServices.approveOffer(action, id);
       return response.data;
     },
     onSuccess: () => {
@@ -93,16 +114,102 @@ export const useRejectOffer = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, notes }) => {
-      const response = await offerServices.rejectOffer(id, notes);
+    mutationFn: async ({ id, data }) => {
+      const response = await offerServices.rejectOffer(data, id);
       return response.data;
     },
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: offerKeys.all });
+      queryClient.invalidateQueries({ queryKey: offerKeys.detail(variables.id) });
+      toast.success("Đã từ chối offer");
     },
     onError: (error) => {
       const errorMessage =
         error.response?.data?.message || "Không thể từ chối offer";
+      toast.error(errorMessage);
+    },
+  });
+};
+
+export const useSubmitOffer = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, data }) => {
+      const response = await offerServices.submitOffer(id);
+      return response.data;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: offerKeys.all });
+      queryClient.invalidateQueries({ queryKey: offerKeys.detail(variables.id) });
+      toast.success("Đã nộp offer");
+    },
+    onError: (error) => {
+      const errorMessage =
+        error.response?.data?.message || "Không thể nộp offer";
+      toast.error(errorMessage);
+    },
+  });
+};
+
+export const useReturnOffer = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, data }) => {
+      const response = await offerServices.returnOffer(data, id);
+      return response.data;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: offerKeys.all });
+      queryClient.invalidateQueries({ queryKey: offerKeys.detail(variables.id) });
+      toast.success("Đã trả về offer");
+    },
+    onError: (error) => {
+      const errorMessage =
+        error.response?.data?.message || "Không thể trả về offer";
+      toast.error(errorMessage);
+    },
+  });
+};
+
+export const useCancelOffer = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, data }) => {
+      const response = await offerServices.cancelOffer(data, id);
+      return response.data;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: offerKeys.all });
+      queryClient.invalidateQueries({ queryKey: offerKeys.detail(variables.id) });
+      toast.success("Đã hủy offer");
+    },
+    onError: (error) => {
+      const errorMessage =
+        error.response?.data?.message || "Không thể hủy offer";
+      toast.error(errorMessage);
+    },
+  });
+};
+
+export const useWithdrawOffer = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, data }) => {
+      const response = await offerServices.withdrawOffer(data, id);
+      return response.data;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: offerKeys.all });
+      queryClient.invalidateQueries({ queryKey: offerKeys.detail(variables.id) });
+      toast.success("Đã thu hồi offer");
+    },
+    onError: (error) => {
+      const errorMessage =
+        error.response?.data?.message || "Không thể thu hồi offer";
       toast.error(errorMessage);
     },
   });

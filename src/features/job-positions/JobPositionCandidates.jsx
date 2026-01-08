@@ -60,12 +60,12 @@ export default function JobPositionCandidates() {
       color: "#F59E0B",
       bgColor: "#FEF3C7",
     },
-    // {
-    //   id: "OFFER",
-    //   label: t("statuses.offer"),
-    //   color: "#8B5CF6",
-    //   bgColor: "#F5F3FF",
-    // },
+    {
+      id: "OFFER",
+      label: t("statuses.offer"),
+      color: "#8B5CF6",
+      bgColor: "#F5F3FF",
+    },
     {
       id: "HIRED",
       label: t("statuses.hired"),
@@ -136,8 +136,8 @@ export default function JobPositionCandidates() {
       SUBMITTED: 0,
       REVIEWING: 1,
       INTERVIEW: 2,
-      // OFFER: 3,
-      HIRED: 3,
+      OFFER: 3,
+      HIRED: 4,
       REJECTED: -1,
       ARCHIVED: -1,
     };

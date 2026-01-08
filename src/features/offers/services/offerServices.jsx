@@ -6,22 +6,42 @@ export const offerServices = {
   },
 
   getOfferById: async (id) => {
-    return api.get(`/compensation-service/offers/${id}`);
-  },
-
-  updateOfferStatus: async (id, status) => {
-    return api.patch(`/compensation-service/offers/${id}/status`, { status });
+    return api.get(`/job-service/offers/${id}`);
   },
 
   createOffer: async (offerData) => {
-    return api.post("/compensation-service/offers", offerData);
+    return api.post("/job-service/offers", offerData);
   },
 
-  approveOffer: async (id, action) => {
-    return api.post(`/compensation-service/offers/${id}/approve`, { action });
+  updateOffer: async (id, offerData) => {
+    return api.put(`/job-service/offers/${id}`, offerData);
   },
 
-  rejectOffer: async (id, notes) => {
-    return api.post(`/compensation-service/offers/${id}/reject`, { notes });
+  updateOfferStatus: async (id, status) => {
+    return api.patch(`/job-service/offers/${id}/status`, { status });
+  },
+
+  submitOffer: async (id) => {
+    return api.post(`/job-service/offers/submit/${id}`);
+  },
+
+  approveOffer: async (action, id) => {
+    return api.post(`/job-service/offers/approve/${id}`, { action });
+  },
+
+  rejectOffer: async (data, id) => {
+    return api.post(`/job-service/offers/reject/${id}`, data);
+  },
+
+  returnOffer: async (data, id) => {
+    return api.post(`/job-service/offers/return/${id}`, data);
+  },
+
+  cancelOffer: async (data, id) => {
+    return api.post(`/job-service/offers/cancel/${id}`, data);
+  },
+
+  withdrawOffer: async (data, id) => {
+    return api.post(`/job-service/offers/withdraw/${id}`, data);
   },
 };

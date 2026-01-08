@@ -21,11 +21,31 @@ export const candidateServices = {
     return api.delete(`/candidate-service/candidates/${id}`);
   },
 
-  commentCandidate: async (id, data) => {
+  commentCandidate: async (data) => {
     return api.post(`/candidate-service/comments`, data);
+  },
+
+  getCandidateComments: async (candidateId) => {
+    return api.get(`/candidate-service/comments`, { params: { candidateId } });
   },
 
   changeStageCandidate: async (id, stage) => {
     return api.put(`/candidate-service/candidates/status/${id}?status=${stage}`);
+  },
+
+  evaluateCandidate: async (data) => {
+    return api.post("/candidate-service/reviews", data);
+  },
+
+  getCandidateReviews: async (candidateId) => {
+    return api.get(`/candidate-service/candidates/${candidateId}/reviews`);
+  },
+
+  convertToEmployee: async (candidateId) => {
+    return api.post(`/candidate-service/candidates/convert/${candidateId}`);
+  },
+
+  getInterviewedCandidates: async (params = {}) => {
+    return api.get("/candidate-service/candidates/interviewed", { params });
   },
 };

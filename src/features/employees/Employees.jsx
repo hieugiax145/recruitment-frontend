@@ -13,9 +13,11 @@ import { useAllDepartments, useDepartments } from "../../hooks/useDepartments";
 import { usePositions } from "../../hooks/usePositions";
 import SelectDropdown from "../../components/ui/SelectDropdown";
 import EmptyState from "../../components/ui/EmptyState";
+import { useAuth } from "../../context/AuthContext";
 
 export default function Employees() {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedDepartmentId, setSelectedDepartmentId] = useState(null);
   const [selectedPositionId, setSelectedPositionId] = useState(null);
@@ -23,10 +25,25 @@ export default function Employees() {
   const itemsPerPage = 10;
   const navigate = useNavigate();
 
+  // Check user role and department
+  const isManager = user?.role?.name === "MANAGER";
+  const isHR = user?.department?.id === 2;
+  const isCEO = user?.role?.name === "CEO";
+  const isAdmin = user?.role?.name === "ADMIN";
+  const userDepartmentId = user?.department?.id;
+
+  // Only MANAGER (who is not HR/CEO/ADMIN) should be restricted to their department
+  const shouldFilterByDepartment = isManager && !isHR && !isCEO && !isAdmin;
+  
+  // For MANAGER: filter by their department, unless they select another department explicitly
+  const effectiveDepartmentId = shouldFilterByDepartment && !selectedDepartmentId 
+    ? userDepartmentId 
+    : selectedDepartmentId;
+
   const { data, isLoading, isError, error } = useEmployees({
     page: currentPage,
     size: itemsPerPage,
-    departmentId: selectedDepartmentId,
+    departmentId: effectiveDepartmentId,
     positionId: selectedPositionId,
     keyword: keyword || undefined,
   });

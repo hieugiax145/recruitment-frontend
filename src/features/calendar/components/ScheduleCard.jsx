@@ -15,16 +15,23 @@ export default function ScheduleCard({ schedule, onClick }) {
     }
   };
 
+  const isDone = schedule.status === "DONE";
+  const bgColor = isDone ? "bg-gray-50" : "bg-red-50";
+  const borderColor = isDone ? "border-gray-200" : "border-red-200";
+  const hoverBgColor = isDone ? "hover:bg-gray-100" : "hover:bg-red-100";
+  const titleColor = isDone ? "text-gray-700" : "text-red-700";
+  const timeColor = isDone ? "text-gray-600" : "text-red-600";
+
   return (
     <div
-      className="bg-red-50 border border-red-200 rounded-md p-1.5 mb-1 cursor-pointer hover:bg-red-100 transition-colors"
+      className={`${bgColor} border ${borderColor} rounded-md p-1.5 mb-1 cursor-pointer ${hoverBgColor} transition-colors`}
       title={schedule.title || schedule.description}
       onClick={onClick}
     >
-      <div className="text-xs font-medium text-red-700 truncate">
+      <div className={`text-xs font-medium ${titleColor} truncate`}>
         {schedule.title || t("common.noTitle")}
       </div>
-      <div className="text-xs text-red-600">
+      <div className={`text-xs ${timeColor}`}>
         {formatTime(schedule.startTime)}
         {schedule.endTime && ` - ${formatTime(schedule.endTime)}`}
       </div>

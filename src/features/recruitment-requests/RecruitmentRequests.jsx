@@ -193,7 +193,7 @@ export default function RecruitmentRequests() {
         <div className="flex-1 flex flex-col bg-white rounded-xl shadow overflow-hidden">
           <div className="flex-1 overflow-auto">
             <table className="w-full min-w-[800px]">
-              <thead className="bg-red-50 sticky top-0 z-10">
+              <thead className="bg-gray-50 border-b border-gray-200 sticky top-0 z-10">
                 <tr>
                   {tableHeaders(t("id"))}
                   {tableHeaders(t("staffCreated"))}
@@ -204,7 +204,7 @@ export default function RecruitmentRequests() {
                   {tableHeaders(t("status"))}
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-gray-200">
                 {currentRequests.length === 0 ? (
                   <tr>
                     <td colSpan="7" className="p-8">
@@ -218,38 +218,32 @@ export default function RecruitmentRequests() {
                   currentRequests.map((request, index) => (
                     <tr
                       key={request.id}
-                      className="border-b last:border-b-0 border-gray-200 hover:bg-gray-50 cursor-pointer"
+                      className="hover:bg-gray-50 transition-colors cursor-pointer"
                       onClick={() =>
                         navigate(`/recruitment-requests/${request.id}`)
                       }
                     >
-                      <td
-                        className="p-4 text-sm whitespace-nowrap"
-                        onClick={(e) => e.stopPropagation()}
-                      >
+                      <td className="p-4 text-sm text-gray-900">
                         {startIndex + index + 1}
                       </td>
-                      <td className="p-4 text-sm whitespace-nowrap max-w-[150px] truncate">
+                      <td className="p-4 text-sm text-gray-900 font-medium">
                         {request.requester?.name || t("common.notAvailable")}
                       </td>
-                      <td
-                        className="p-4 text-sm whitespace-nowrap max-w-[200px] truncate"
-                        title={request.title}
-                      >
+                      <td className="p-4 text-sm text-gray-900">
                         {request.title || t("common.notAvailable")}
                       </td>
-                      <td className="p-4 text-sm whitespace-nowrap text-center">
+                      <td className="p-4 text-sm text-gray-900 text-center">
                         {request.quantity || 0}
                       </td>
-                      <td className="p-4 text-sm whitespace-nowrap max-w-[150px] truncate">
+                      <td className="p-4 text-sm text-gray-600">
                         {request.department?.name || t("common.notAvailable")}
                       </td>
-                      <td className="p-4 text-sm whitespace-nowrap">
+                      <td className="p-4 text-sm text-gray-600">
                         {request.createdAt
                           ? formatDateTime(request.createdAt)
                           : t("common.notAvailable")}
                       </td>
-                      <td className="p-4 whitespace-nowrap">
+                      <td className="p-4">
                         <StatusBadge status={request.status} />
                       </td>
                     </tr>

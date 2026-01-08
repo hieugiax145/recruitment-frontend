@@ -105,6 +105,14 @@ export const STATUS_CONFIG = {
     borderColor: "border-green-300",
   },
 
+  // Employee Statuses
+  PROBATION: {
+    label: () => i18n.t("statuses.probation"),
+    bgColor: "bg-orange-100",
+    textColor: "text-orange-800",
+    borderColor: "border-orange-300",
+  },
+
   // Approval Statuses (uses PENDING, APPROVED, REJECTED, CANCELLED, RETURNED from above)
 };
 
