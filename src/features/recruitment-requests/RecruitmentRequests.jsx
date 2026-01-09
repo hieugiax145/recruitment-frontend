@@ -57,7 +57,14 @@ export default function RecruitmentRequests() {
   const { data: departmentsData } = useAllDepartments();
   const departments = Array.isArray(departmentsData) ? departmentsData : [];
 
-  const currentRequests = Array.isArray(data?.data?.result) ? data.data.result : [];
+  const allRequests = Array.isArray(data?.data?.result) ? data.data.result : [];
+  // Filter out DRAFT requests that are not created by current user
+  const currentRequests = allRequests.filter(request => {
+    if (request.status !== "DRAFT") return true;
+    // Check if current user is the creator of this draft request
+    const creatorId = request.user?.userId || request.requester?.id || request.requesterId;
+    return creatorId === user?.userId;
+  });
   const meta = data?.data?.meta;
   const totalPages = meta?.pages || 1;
 

@@ -571,7 +571,9 @@
     "approved": "Approved",
     "cancelled": "Cancelled",
     "completed": "Completed",
-    "probation": "Probation"
+    "probation": "Probation",
+    "active": "Active",
+    "inactive": "Inactive"
   },
 
   "buttons": {
@@ -581,7 +583,8 @@
     "processing": "Processing...",
     "withdraw": "Withdraw",
     "return": "Return",
-    "markAsDone": "Mark as Done"
+    "markAsDone": "Mark as Done",
+    "edit": "Edit"
   },
 
   "common": {
@@ -629,7 +632,8 @@
     "markAllAsRead": "Mark all as read",
     "viewAllNotifications": "View all notifications",
     "notifications": "Notifications",
-    "confirmDeleteRequest": "Are you sure you want to delete this request?"
+    "confirmDeleteRequest": "Are you sure you want to delete this request?",
+    "update": "Update"
   },
 
   "toasts": {
@@ -760,8 +764,8 @@
     "pdfMaxSize": "PDF • Max 5MB",
     "adding": "Adding...",
     "addEventTitle": "Add Event",
-    "addEventSubtitle": "Create a new event in the work calendar",
-    "createEvent": "Create Event",
+    "addEventSubtitle": "Create a new event in the work calendar",    "editEvent": "Edit Event",
+    "editEventSubtitle": "Update event information",    "createEvent": "Create Event",
     "title": "Title",
     "titlePlaceholder": "Enter event title",
     "descriptionPlaceholder": "Describe the event in detail",

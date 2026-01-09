@@ -1,11 +1,11 @@
 import { useEffect } from "react";
 import { createPortal } from "react-dom";
-import { X, Calendar, Clock, MapPin, Users, Video, Monitor, CheckCircle, User } from "lucide-react";
+import { X, Calendar, Clock, MapPin, Users, Video, Monitor, CheckCircle, User, Edit } from "lucide-react";
 import Button from "../../../components/ui/Button";
 import { useTranslation } from "react-i18next";
 import { useUpdateScheduleStatus } from "../hooks/useCalendar";
 
-export default function ScheduleDetailModal({ schedule, isOpen, onClose }) {
+export default function ScheduleDetailModal({ schedule, isOpen, onClose, onEdit }) {
   const { t } = useTranslation();
   const updateStatusMutation = useUpdateScheduleStatus();
 
@@ -278,6 +278,20 @@ export default function ScheduleDetailModal({ schedule, isOpen, onClose }) {
 
         {/* Footer */}
         <div className="px-6 pb-6 flex justify-end gap-3">
+          {onEdit && schedule.status !== "DONE" && (
+            <Button
+              variant="outline"
+              onClick={() => {
+                onEdit(schedule);
+                onClose();
+              }}
+              disabled={updateStatusMutation.isPending}
+              className="px-6"
+            >
+              <Edit className="h-4 w-4 mr-2" />
+              {t("buttons.edit")}
+            </Button>
+          )}
           {(schedule.status === "SCHEDULED" || schedule.status === "IN_PROGRESS") && (
             <Button
               onClick={handleMarkAsDone}

@@ -596,7 +596,9 @@
     "approved": "Đã phê duyệt",
     "cancelled": "Đã hủy",
     "completed": "Hoàn thành",
-    "probation": "Thử việc"
+    "probation": "Thử việc",
+    "active": "Đang làm việc",
+    "inactive": "Nghỉ việc"
   },
 
   "buttons": {
@@ -606,7 +608,8 @@
     "processing": "Đang xử lý...",
     "withdraw": "Thu hồi",
     "return": "Trả về",
-    "markAsDone": "Đã hoàn thành"
+    "markAsDone": "Đã hoàn thành",
+    "edit": "Sửa"
   },
 
   "common": {
@@ -654,7 +657,8 @@
     "markAllAsRead": "Đánh dấu tất cả đã đọc",
     "viewAllNotifications": "Xem tất cả thông báo",
     "notifications": "Thông báo",
-    "confirmDeleteRequest": "Bạn có chắc chắn muốn xóa yêu cầu này?"
+    "confirmDeleteRequest": "Bạn có chắc chắn muốn xóa yêu cầu này?",
+    "update": "Cập nhật"
   },
 
   "toasts": {
@@ -795,6 +799,8 @@
     "addCandidate": "Thêm ứng viên",
     "addEventTitle": "Thêm sự kiện",
     "addEventSubtitle": "Tạo sự kiện mới trong lịch làm việc",
+    "editEvent": "Sửa sự kiện",
+    "editEventSubtitle": "Cập nhật thông tin sự kiện",
     "createEvent": "Tạo sự kiện",
     "title": "Tiêu đề",
     "titlePlaceholder": "Nhập tiêu đề sự kiện",

@@ -7,7 +7,7 @@ import SelectDropdown from "../../../components/ui/SelectDropdown";
 import MultiSelectDropdown from "../../../components/ui/MultiSelectDropdown";
 import LoadingOverlay from "../../../components/ui/LoadingOverlay";
 import { toast } from "react-toastify";
-import { useCreateSchedule } from "../hooks/useCalendar";
+import { useCreateSchedule, useUpdateSchedule } from "../hooks/useCalendar";
 import { useCandidates } from "../../candidate/hooks/useCandidates";
 import { useUsers } from "../../../hooks/useUsers";
 import { useTranslation } from "react-i18next";
@@ -45,9 +45,11 @@ const getMeetingTypeOptions = (t) => [
   // { id: "OTHER", name: t("calendarSchedule.meetingTypes.other") },
 ];
 
-export default function CreateEventModal({ isOpen, onClose, defaultDate, defaultCandidate }) {
+export default function CreateEventModal({ isOpen, onClose, defaultDate, defaultCandidate, editingSchedule }) {
   const { t } = useTranslation();
   const createSchedule = useCreateSchedule();
+  const updateSchedule = useUpdateSchedule();
+  const isEditMode = !!editingSchedule;
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -66,6 +68,47 @@ export default function CreateEventModal({ isOpen, onClose, defaultDate, default
 
   const [availableParticipants, setAvailableParticipants] = useState([]);
   const [isLoadingAvailableParticipants, setIsLoadingAvailableParticipants] = useState(false);
+
+  // Populate form when editing
+  useEffect(() => {
+    if (editingSchedule && isOpen) {
+      const startDateTime = new Date(editingSchedule.startTime);
+      const endDateTime = new Date(editingSchedule.endTime);
+      
+      setFormData({
+        title: editingSchedule.title || "",
+        description: editingSchedule.description || "",
+        format: editingSchedule.format || "OFFLINE",
+        meetingType: editingSchedule.meetingType || "INTERVIEW",
+        status: editingSchedule.status || "SCHEDULED",
+        location: editingSchedule.location || "",
+        date: formatDate(startDateTime),
+        startTime: startDateTime.toTimeString().slice(0, 5),
+        endTime: endDateTime.toTimeString().slice(0, 5),
+        reminderTime: editingSchedule.reminderTime || 15,
+        createdById: editingSchedule.createdById || 1,
+        participants: editingSchedule.participants?.filter(p => p.participantType === "USER").map(p => p.participantId) || [],
+        candidate: editingSchedule.participants?.find(p => p.participantType === "CANDIDATE")?.participantId || null,
+      });
+    } else if (!editingSchedule && isOpen) {
+      // Reset form for create mode
+      setFormData({
+        title: "",
+        description: "",
+        format: "OFFLINE",
+        meetingType: "INTERVIEW",
+        status: "SCHEDULED",
+        location: "",
+        date: defaultDate ? formatDate(defaultDate) : formatDate(new Date()),
+        startTime: getCurrentTime(),
+        endTime: getTimeAfterOneHour(),
+        reminderTime: 15,
+        createdById: 1,
+        participants: [],
+        candidate: null,
+      });
+    }
+  }, [editingSchedule, isOpen, defaultDate]);
 
   const {
     data: candidateData,
@@ -239,11 +282,22 @@ export default function CreateEventModal({ isOpen, onClose, defaultDate, default
       userIds: formData.participants,
     };
 
-    createSchedule.mutate(payload, {
-      onSuccess: () => {
-        handleClose();
-      },
-    });
+    if (isEditMode && editingSchedule?.id) {
+      updateSchedule.mutate(
+        { id: editingSchedule.id, payload },
+        {
+          onSuccess: () => {
+            handleClose();
+          },
+        }
+      );
+    } else {
+      createSchedule.mutate(payload, {
+        onSuccess: () => {
+          handleClose();
+        },
+      });
+    }
   };
 
   const handleClose = () => {
@@ -288,10 +342,10 @@ export default function CreateEventModal({ isOpen, onClose, defaultDate, default
             </div>
             <div className="flex-1">
               <h2 className="text-xl font-semibold text-gray-900">
-                {t("modals.addEventTitle")}
+                {isEditMode ? t("modals.editEvent") : t("modals.addEventTitle")}
               </h2>
               <p className="text-sm text-gray-500 mt-0.5">
-                {t("modals.addEventSubtitle")}
+                {isEditMode ? t("modals.editEventSubtitle") : t("modals.addEventSubtitle")}
               </p>
             </div>
           </div>
@@ -438,7 +492,7 @@ export default function CreateEventModal({ isOpen, onClose, defaultDate, default
               {t("common.cancel")}
             </Button>
             <Button type="submit" onClick={handleSubmit}>
-              {t("modals.createEvent")}
+              {isEditMode ? t("common.update") : t("modals.createEvent")}
             </Button>
           </div>
         </form>

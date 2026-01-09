@@ -23,6 +23,7 @@ export default function Calendar() {
   const [selectedDate, setSelectedDate] = useState(null);
   const [showCreateEventModal, setShowCreateEventModal] = useState(false);
   const [selectedSchedule, setSelectedSchedule] = useState(null);
+  const [editingSchedule, setEditingSchedule] = useState(null);
   const [showScheduleDetailModal, setShowScheduleDetailModal] = useState(false);
 
   const toYMD = (date) => {
@@ -227,6 +228,12 @@ export default function Calendar() {
   };
 
   const handleCreateEvent = () => {
+    setEditingSchedule(null);
+    setShowCreateEventModal(true);
+  };
+
+  const handleEditSchedule = (schedule) => {
+    setEditingSchedule(schedule);
     setShowCreateEventModal(true);
   };
 
@@ -531,8 +538,12 @@ export default function Calendar() {
       {/* Create Event Modal */}
       <CreateEventModal
         isOpen={showCreateEventModal}
-        onClose={() => setShowCreateEventModal(false)}
+        onClose={() => {
+          setShowCreateEventModal(false);
+          setEditingSchedule(null);
+        }}
         defaultDate={selectedDate || currentDate}
+        editingSchedule={editingSchedule}
       />
 
       {/* Schedule Detail Modal */}
@@ -540,6 +551,7 @@ export default function Calendar() {
         schedule={selectedSchedule}
         isOpen={showScheduleDetailModal}
         onClose={handleCloseScheduleDetail}
+        onEdit={handleEditSchedule}
       />
     </div>
   );

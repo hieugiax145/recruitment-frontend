@@ -59,3 +59,24 @@ export const useUpdateScheduleStatus = () => {
     },
   });
 };
+
+export const useUpdateSchedule = () => {
+  const queryClient = useQueryClient();
+  const { t } = useTranslation();
+
+  return useMutation({
+    mutationFn: async ({ id, payload }) => {
+      const data = await calendarServices.updateSchedule(id, payload);
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["events"] });
+      queryClient.invalidateQueries({ queryKey: ["calendar"] });
+      toast.success(t("toasts.updateEventSuccess"));
+    },
+    onError: (error) => {
+      const message = error?.response?.data?.message || "Không thể cập nhật sự kiện";
+      toast.error(message);
+    },
+  });
+};

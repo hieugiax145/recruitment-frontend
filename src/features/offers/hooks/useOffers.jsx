@@ -61,7 +61,6 @@ export const useCreateOffer = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: offerKeys.all });
-      toast.success("Tạo offer thành công");
     },
     onError: (error) => {
       const errorMessage =
@@ -121,7 +120,6 @@ export const useRejectOffer = () => {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: offerKeys.all });
       queryClient.invalidateQueries({ queryKey: offerKeys.detail(variables.id) });
-      toast.success("Đã từ chối offer");
     },
     onError: (error) => {
       const errorMessage =
@@ -142,7 +140,6 @@ export const useSubmitOffer = () => {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: offerKeys.all });
       queryClient.invalidateQueries({ queryKey: offerKeys.detail(variables.id) });
-      toast.success("Đã nộp offer");
     },
     onError: (error) => {
       const errorMessage =
@@ -163,7 +160,6 @@ export const useReturnOffer = () => {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: offerKeys.all });
       queryClient.invalidateQueries({ queryKey: offerKeys.detail(variables.id) });
-      toast.success("Đã trả về offer");
     },
     onError: (error) => {
       const errorMessage =
@@ -184,7 +180,6 @@ export const useCancelOffer = () => {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: offerKeys.all });
       queryClient.invalidateQueries({ queryKey: offerKeys.detail(variables.id) });
-      toast.success("Đã hủy offer");
     },
     onError: (error) => {
       const errorMessage =
@@ -205,7 +200,6 @@ export const useWithdrawOffer = () => {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: offerKeys.all });
       queryClient.invalidateQueries({ queryKey: offerKeys.detail(variables.id) });
-      toast.success("Đã thu hồi offer");
     },
     onError: (error) => {
       const errorMessage =

@@ -112,6 +112,18 @@ export const STATUS_CONFIG = {
     textColor: "text-orange-800",
     borderColor: "border-orange-300",
   },
+  ACTIVE: {
+    label: () => i18n.t("statuses.active"),
+    bgColor: "bg-green-100",
+    textColor: "text-green-800",
+    borderColor: "border-green-300",
+  },
+  INACTIVE: {
+    label: () => i18n.t("statuses.inactive"),
+    bgColor: "bg-gray-100",
+    textColor: "text-gray-800",
+    borderColor: "border-gray-300",
+  },
 
   // Approval Statuses (uses PENDING, APPROVED, REJECTED, CANCELLED, RETURNED from above)
 };

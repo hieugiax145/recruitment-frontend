@@ -13,6 +13,7 @@ import { useAllDepartments, useDepartments } from "../../hooks/useDepartments";
 import { usePositions } from "../../hooks/usePositions";
 import SelectDropdown from "../../components/ui/SelectDropdown";
 import EmptyState from "../../components/ui/EmptyState";
+import StatusBadge from "../../components/ui/StatusBadge";
 import { useAuth } from "../../context/AuthContext";
 
 export default function Employees() {
@@ -21,6 +22,7 @@ export default function Employees() {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedDepartmentId, setSelectedDepartmentId] = useState(null);
   const [selectedPositionId, setSelectedPositionId] = useState(null);
+  const [selectedStatus, setSelectedStatus] = useState(null);
   const [keyword, setKeyword] = useState("");
   const itemsPerPage = 10;
   const navigate = useNavigate();
@@ -45,6 +47,7 @@ export default function Employees() {
     size: itemsPerPage,
     departmentId: effectiveDepartmentId,
     positionId: selectedPositionId,
+    status: selectedStatus,
     keyword: keyword || undefined,
   });
   const employees = Array.isArray(data?.data?.result) ? data.data.result : [];
@@ -150,6 +153,20 @@ export default function Employees() {
               compact
               className="min-w-[200px]"
             />
+            <SelectDropdown
+              value={selectedStatus}
+              onChange={setSelectedStatus}
+              options={[
+                { id: null, name: t("common.allStatuses") },
+                { id: "ACTIVE", name: t("statuses.active") },
+                { id: "INACTIVE", name: t("statuses.inactive") },
+                { id: "PROBATION", name: t("statuses.probation") },
+              ]}
+              placeholder={t("common.allStatuses")}
+              hideLabel
+              compact
+              className="min-w-[200px]"
+            />
             <Button onClick={() => navigate("/employees/new")}>
               <Plus className="h-4 w-4 mr-2" /> {t("addEmployee")}
             </Button>
@@ -219,8 +236,8 @@ export default function Employees() {
                           {e.position?.name || "-"}
                         </td>
                         {/* removed position level cell */}
-                        <td className="p-4 text-sm text-gray-600">
-                          {isActive ? t("active") : t("inactive")}
+                        <td className="p-4">
+                          <StatusBadge status={e.status} />
                         </td>
                       </tr>
                     );
