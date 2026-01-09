@@ -23,7 +23,7 @@ export const calendarServices = {
 
   updateScheduleStatus: async (id, status) => {
     const response = await api.put(
-      `/schedule-service/schedules/${id}`,
+      `/schedule-service/schedules/status/${id}`,
       null,
       {
         params: { status }

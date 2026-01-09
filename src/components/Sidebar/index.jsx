@@ -22,6 +22,7 @@ const Sidebar = ({ isVisible, toggleSidebar, sidebarWidth }) => {
   const isManager = user?.role?.name === "MANAGER";
   const isHRDepartment = user?.department?.id === 2;
   const canAccessEmployees = isAdmin || isCEO || isManager || isHRDepartment;
+  const canAccessOffers = isCEO || isHRDepartment;
 
   // Admin: only management; Non-admin: business functions + employees
   const adminMenus = [
@@ -36,7 +37,7 @@ const Sidebar = ({ isVisible, toggleSidebar, sidebarWidth }) => {
     { text: t("recruitmentRequestsPage"), link: "/recruitment-requests", icon: <ClipboardList /> },
     { text: t("jobPositionsPage"), link: "/job-positions", icon: <Briefcase /> },
     { text: t("candidatesPage"), link: "/candidates", icon: <UsersRound /> },
-    { text: t("offersPage"), link: "/offers", icon: <HandshakeIcon /> },
+    ...(canAccessOffers ? [{ text: t("offersPage"), link: "/offers", icon: <HandshakeIcon /> }] : []),
     { text: t("calendar"), link: "/calendar", icon: <CalendarDays /> },
     { text: t("emailPage"), link: "/email", icon: <Mail /> },
   ];

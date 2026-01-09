@@ -6,7 +6,7 @@ import TextInput from "../../components/ui/TextInput";
 import SelectDropdown from "../../components/ui/SelectDropdown";
 import Button from "../../components/ui/Button";
 import { toast } from "react-toastify";
-import { useCreateEmployee, useUpdateEmployee, useEmployee, useDeleteEmployee, useEvaluateProbation, useEmployeeProbationEvaluations } from "../../hooks/useEmployees";
+import { useCreateEmployee, useUpdateEmployee, useEmployee, useDeleteEmployee, useEvaluateProbation, useEmployeeReviews } from "../../hooks/useEmployees";
 import ProbationEvaluationModal from "./components/ProbationEvaluationModal";
 import { Star } from "lucide-react";
 import { useAllDepartments } from "../../hooks/useDepartments";
@@ -28,7 +28,7 @@ export default function EmployeeForm() {
   const updateEmployee = useUpdateEmployee();
   const deleteEmployee = useDeleteEmployee();
   const { data: employeeData, isLoading: isLoadingEmployee } = useEmployee(id, { enabled: isEditPage });
-  const { data: evaluationsData } = useEmployeeProbationEvaluations(isEditPage ? id : null);
+  const { data: evaluationsData } = useEmployeeReviews(isEditPage ? id : null);
   const formRef = useRef(null);
 
   const [isEditMode, setIsEditMode] = useState(!isEditPage);
@@ -371,19 +371,19 @@ export default function EmployeeForm() {
       />
 
       {/* Probation Evaluations Section */}
-      {isEditPage && evaluationsData && (Array.isArray(evaluationsData?.data) ? evaluationsData.data : []).length > 0 && (
+      {isEditPage && evaluationsData && (Array.isArray(evaluationsData?.data?.result) ? evaluationsData.data.result : []).length > 0 && (
         <div className="flex-1 mt-4">
           <div className="bg-white rounded-xl shadow p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              {t("employeeEvaluation.probationEvaluation.title")} ({(Array.isArray(evaluationsData?.data) ? evaluationsData.data : []).length})
+              {t("employeeEvaluation.probationEvaluation.title")} ({(Array.isArray(evaluationsData?.data?.result) ? evaluationsData.data.result : []).length})
             </h3>
             <div className="space-y-4">
-              {(Array.isArray(evaluationsData?.data) ? evaluationsData.data : []).map((evaluation, index) => (
+              {(Array.isArray(evaluationsData?.data?.result) ? evaluationsData.data.result : []).map((evaluation, index) => (
                 <div key={index} className="p-4 border border-gray-200 rounded-lg">
                   <div className="flex items-center justify-between mb-3">
                     <div>
-                      <p className="font-medium text-gray-900">{evaluation.evaluatedBy}</p>
-                      <p className="text-sm text-gray-500">{new Date(evaluation.evaluatedAt).toLocaleDateString()}</p>
+                      <p className="font-medium text-gray-900">{evaluation.reviewerName}</p>
+                      <p className="text-sm text-gray-500">{new Date(evaluation.createdAt).toLocaleDateString()}</p>
                     </div>
                     <span className={`px-3 py-1 rounded-full text-sm font-medium ${
                       evaluation.probationResult ? 
@@ -394,14 +394,14 @@ export default function EmployeeForm() {
                     </span>
                   </div>
                   <div className="grid grid-cols-2 gap-3 text-sm mb-3">
-                    <div><span className="text-gray-600">{t("employeeEvaluation.probationEvaluation.onTimeCompletion")}:</span> <span className="font-medium">{evaluation.onTimeCompletionScore}/5</span></div>
-                    <div><span className="text-gray-600">{t("employeeEvaluation.probationEvaluation.workEfficiency")}:</span> <span className="font-medium">{evaluation.workEfficiencyScore}/5</span></div>
-                    <div><span className="text-gray-600">{t("employeeEvaluation.probationEvaluation.professionalSkill")}:</span> <span className="font-medium">{evaluation.professionalSkillScoreProbation}/5</span></div>
-                    <div><span className="text-gray-600">{t("employeeEvaluation.probationEvaluation.selfLearning")}:</span> <span className="font-medium">{evaluation.selfLearningScore}/5</span></div>
-                    <div><span className="text-gray-600">{t("employeeEvaluation.probationEvaluation.workAttitude")}:</span> <span className="font-medium">{evaluation.workAttitudeScore}/5</span></div>
-                    <div><span className="text-gray-600">{t("employeeEvaluation.probationEvaluation.communicationSkill")}:</span> <span className="font-medium">{evaluation.communicationSkillScoreProbation}/5</span></div>
-                    <div><span className="text-gray-600">{t("employeeEvaluation.probationEvaluation.honestyResponsibility")}:</span> <span className="font-medium">{evaluation.honestyResponsibilityScore}/5</span></div>
-                    <div><span className="text-gray-600">{t("employeeEvaluation.probationEvaluation.teamIntegration")}:</span> <span className="font-medium">{evaluation.teamIntegrationScore}/5</span></div>
+                    <div><span className="text-gray-600">{t("employeeEvaluation.probationEvaluation.onTimeCompletion")}:</span> <span className="font-medium">{evaluation.onTimeCompletionScore ?? 'N/A'}/5</span></div>
+                    <div><span className="text-gray-600">{t("employeeEvaluation.probationEvaluation.workEfficiency")}:</span> <span className="font-medium">{evaluation.workEfficiencyScore ?? 'N/A'}/5</span></div>
+                    <div><span className="text-gray-600">{t("employeeEvaluation.probationEvaluation.professionalSkill")}:</span> <span className="font-medium">{evaluation.professionalSkillScore ?? 'N/A'}/5</span></div>
+                    <div><span className="text-gray-600">{t("employeeEvaluation.probationEvaluation.selfLearning")}:</span> <span className="font-medium">{evaluation.selfLearningScore ?? 'N/A'}/5</span></div>
+                    <div><span className="text-gray-600">{t("employeeEvaluation.probationEvaluation.workAttitude")}:</span> <span className="font-medium">{evaluation.workAttitudeScore ?? 'N/A'}/5</span></div>
+                    <div><span className="text-gray-600">{t("employeeEvaluation.probationEvaluation.communicationSkill")}:</span> <span className="font-medium">{evaluation.communicationSkillScore ?? 'N/A'}/5</span></div>
+                    <div><span className="text-gray-600">{t("employeeEvaluation.probationEvaluation.honestyResponsibility")}:</span> <span className="font-medium">{evaluation.honestyResponsibilityScore ?? 'N/A'}/5</span></div>
+                    <div><span className="text-gray-600">{t("employeeEvaluation.probationEvaluation.teamIntegration")}:</span> <span className="font-medium">{evaluation.teamIntegrationScore ?? 'N/A'}/5</span></div>
                   </div>
                   {evaluation.additionalComments && (
                     <div className="text-sm">

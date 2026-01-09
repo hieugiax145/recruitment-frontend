@@ -18,6 +18,7 @@ export default function Offers() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const isHR = user?.department?.id === 2;
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedJobPositionId, setSelectedJobPositionId] = useState(null);
   const [selectedStatus, setSelectedStatus] = useState(null);
@@ -126,9 +127,11 @@ export default function Offers() {
               compact
               className="min-w-[200px]"
             />
-            <Button onClick={() => navigate("/offers/new")}>
-              <Plus className="h-4 w-4 mr-2" /> {t("offers.newOfferButton")}
-            </Button>
+            {isHR && (
+              <Button onClick={() => navigate("/offers/new")}>
+                <Plus className="h-4 w-4 mr-2" /> {t("offers.newOfferButton")}
+              </Button>
+            )}
           </>
         }
         />
@@ -173,9 +176,11 @@ export default function Offers() {
               compact
               className="min-w-[200px]"
             />
-            <Button onClick={() => navigate("/offers/new")}>
-              <Plus className="h-4 w-4 mr-2" /> {t("offers.newOfferButton")}
-            </Button>
+            {isHR && (
+              <Button onClick={() => navigate("/offers/new")}>
+                <Plus className="h-4 w-4 mr-2" /> {t("offers.newOfferButton")}
+              </Button>
+            )}
           </>
         }
       />

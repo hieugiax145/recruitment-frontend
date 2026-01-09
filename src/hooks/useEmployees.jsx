@@ -116,3 +116,14 @@ export const useEmployeeProbationEvaluations = (employeeId) => {
     enabled: !!employeeId,
   });
 };
+
+export const useEmployeeReviews = (employeeId, params = {}) => {
+  return useQuery({
+    queryKey: [...employeeKeys.evaluations(employeeId), 'reviews', params],
+    queryFn: async () => {
+      const res = await employeeServices.getEmployeeReviews(employeeId, params);
+      return res.data;
+    },
+    enabled: !!employeeId,
+  });
+};

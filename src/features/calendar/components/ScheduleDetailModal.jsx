@@ -278,7 +278,7 @@ export default function ScheduleDetailModal({ schedule, isOpen, onClose }) {
 
         {/* Footer */}
         <div className="px-6 pb-6 flex justify-end gap-3">
-          {schedule.status === "SCHEDULED" && (
+          {(schedule.status === "SCHEDULED" || schedule.status === "IN_PROGRESS") && (
             <Button
               onClick={handleMarkAsDone}
               disabled={updateStatusMutation.isPending}
