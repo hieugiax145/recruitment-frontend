@@ -11,6 +11,39 @@ import { useCreateSchedule } from "../hooks/useCalendar";
 import { useCandidates } from "../../candidate/hooks/useCandidates";
 import { useUsers } from "../../../hooks/useUsers";
 import { useTranslation } from "react-i18next";
+import { calendarServices } from "../services/calendarServices";
+
+// Helper function to get current time in HH:MM format
+function getCurrentTime() {
+  const now = new Date();
+  const hours = String(now.getHours()).padStart(2, "0");
+  const minutes = String(now.getMinutes()).padStart(2, "0");
+  return `${hours}:${minutes}`;
+}
+
+// Helper function to get time + 1 hour in HH:MM format
+function getTimeAfterOneHour() {
+  const now = new Date();
+  now.setHours(now.getHours() + 1);
+  const hours = String(now.getHours()).padStart(2, "0");
+  const minutes = String(now.getMinutes()).padStart(2, "0");
+  return `${hours}:${minutes}`;
+}
+
+// Helper function to format date to YYYY-MM-DD
+function formatDate(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+const getMeetingTypeOptions = (t) => [
+  { id: "INTERVIEW", name: t("calendarSchedule.meetingTypes.interview") },
+  // { id: "MEETING", name: t("calendarSchedule.meetingTypes.meeting") },
+  // { id: "TRAINING", name: t("calendarSchedule.meetingTypes.training") },
+  // { id: "OTHER", name: t("calendarSchedule.meetingTypes.other") },
+];
 
 export default function CreateEventModal({ isOpen, onClose, defaultDate, defaultCandidate }) {
   const { t } = useTranslation();
@@ -22,9 +55,9 @@ export default function CreateEventModal({ isOpen, onClose, defaultDate, default
     meetingType: "INTERVIEW",
     status: "SCHEDULED",
     location: "",
-    date: defaultDate ? formatDate(defaultDate) : "",
-    startTime: "14:00",
-    endTime: "15:00",
+    date: defaultDate ? formatDate(defaultDate) : formatDate(new Date()),
+    startTime: getCurrentTime(),
+    endTime: getTimeAfterOneHour(),
     reminderTime: 15,
     createdById: 1,
     participants: [],
@@ -32,6 +65,7 @@ export default function CreateEventModal({ isOpen, onClose, defaultDate, default
   });
 
   const [availableParticipants, setAvailableParticipants] = useState([]);
+  const [isLoadingAvailableParticipants, setIsLoadingAvailableParticipants] = useState(false);
 
   const {
     data: candidateData,
@@ -60,24 +94,12 @@ export default function CreateEventModal({ isOpen, onClose, defaultDate, default
     }
   }, [isCandidatesError, candidatesError]);
 
-  const meetingTypeOptions = [
-    { id: "INTERVIEW", name: t("calendarSchedule.meetingTypes.interview") },
-    { id: "MEETING", name: t("calendarSchedule.meetingTypes.meeting") },
-    { id: "TRAINING", name: t("calendarSchedule.meetingTypes.training") },
-    { id: "OTHER", name: t("calendarSchedule.meetingTypes.other") },
-  ];
+  const meetingTypeOptions = useMemo(() => getMeetingTypeOptions(t), [t]);
 
   const formatOptions = [
     // { id: "ONLINE", name: "Online" },
     { id: "OFFLINE", name: "Offline" },
   ];
-
-  function formatDate(date) {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
-  }
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -94,59 +116,48 @@ export default function CreateEventModal({ isOpen, onClose, defaultDate, default
     }));
   };
 
-  const {
-    data: usersData,
-    isLoading: isLoadingParticipants,
-    isError: isUsersError,
-    error: usersError,
-    refetch: refetchUsers,
-  } = useUsers({}, { enabled: isOpen });
-
+  // Fetch available participants based on selected time
   useEffect(() => {
-    if (isOpen) {
-      refetchUsers();
-    }
-  }, [isOpen, refetchUsers]);
+    const fetchAvailableParticipants = async () => {
+      if (!isOpen || !formData.date || !formData.startTime || !formData.endTime) {
+        setAvailableParticipants([]);
+        return;
+      }
 
-  useEffect(() => {
-    if (!isOpen) {
-      return;
-    }
+      setIsLoadingAvailableParticipants(true);
+      try {
+        const startTime = `${formData.date}T${formData.startTime}:00`;
+        const endTime = `${formData.date}T${formData.endTime}:00`;
+        
+        const response = await calendarServices.getAvailableParticipants(startTime, endTime);
+        
+        if (Array.isArray(response?.data)) {
+          setAvailableParticipants(
+            response.data.map((participant) => ({
+              id: participant.id,
+              name: participant.departmentName 
+                ? `${participant.name} - ${participant.departmentName}`
+                : participant.name,
+              role: "",
+            }))
+          );
+        } else {
+          setAvailableParticipants([]);
+        }
+      } catch (error) {
+        console.error("Error fetching available participants:", error);
+        const message =
+          error?.response?.data?.message ||
+          "Không thể tải danh sách người tham dự có sẵn";
+        toast.error(message);
+        setAvailableParticipants([]);
+      } finally {
+        setIsLoadingAvailableParticipants(false);
+      }
+    };
 
-    if (isUsersError) {
-      const message =
-        usersError?.response?.data?.message ||
-        "Không thể tải danh sách người tham dự";
-      toast.error(message);
-      setAvailableParticipants([]);
-      return;
-    }
-    const list = Array.isArray(usersData?.data)
-      ? usersData.data
-      : Array.isArray(usersData)
-      ? usersData
-      : Array.isArray(usersData?.data?.result)
-      ? usersData.data.result
-      : Array.isArray(usersData?.result)
-      ? usersData.result
-      : undefined;
-
-    if (Array.isArray(list)) {
-      setAvailableParticipants(
-        list.map((u) => {
-          const userName = (u.employee && (u.employee.name || u.employee.fullName)) || u.name || "";
-          const departmentName = u.department?.name || u.employee?.department?.name || "";
-          const displayName = departmentName ? `${userName} - ${departmentName}` : userName;
-          
-          return {
-            id: u.id,
-            name: displayName,
-            role: "",
-          };
-        })
-      );
-    }
-  }, [usersData, isUsersError, usersError, isOpen]);
+    fetchAvailableParticipants();
+  }, [isOpen, formData.date, formData.startTime, formData.endTime]);
 
   useEffect(() => {
     if (defaultCandidate?.id) {
@@ -156,6 +167,31 @@ export default function CreateEventModal({ isOpen, onClose, defaultDate, default
       }));
     }
   }, [defaultCandidate]);
+
+  // Auto-generate title based on meeting type and candidate
+  useEffect(() => {
+    const meetingTypeName = meetingTypeOptions.find(opt => opt.id === formData.meetingType)?.name || "";
+    
+    let candidateName = "";
+    if (defaultCandidate) {
+      candidateName = defaultCandidate.name;
+    } else if (formData.candidate) {
+      const selectedCandidate = availableCandidates.find(c => c.id === formData.candidate);
+      candidateName = selectedCandidate?.name || "";
+    }
+
+    if (meetingTypeName && candidateName) {
+      setFormData((prev) => ({
+        ...prev,
+        title: `${meetingTypeName} - ${candidateName}`,
+      }));
+    } else if (meetingTypeName) {
+      setFormData((prev) => ({
+        ...prev,
+        title: meetingTypeName,
+      }));
+    }
+  }, [formData.meetingType, formData.candidate, defaultCandidate, availableCandidates]);
 
   const handleMultiSelectChange = (name) => (values) => {
     setFormData((prev) => ({
@@ -218,9 +254,9 @@ export default function CreateEventModal({ isOpen, onClose, defaultDate, default
       meetingType: "INTERVIEW",
       status: "SCHEDULED",
       location: "",
-      date: defaultDate ? formatDate(defaultDate) : "",
-      startTime: "14:00",
-      endTime: "15:00",
+      date: defaultDate ? formatDate(defaultDate) : formatDate(new Date()),
+      startTime: getCurrentTime(),
+      endTime: getTimeAfterOneHour(),
       reminderTime: 15,
       createdById: 1,
       participants: [],
@@ -264,7 +300,7 @@ export default function CreateEventModal({ isOpen, onClose, defaultDate, default
         {/* Body */}
         <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
           <div className="relative flex-1 overflow-y-auto px-6 py-5">
-            <LoadingOverlay show={isLoadingParticipants} />
+            <LoadingOverlay show={isLoadingAvailableParticipants} />
             <div className="grid grid-cols-2 gap-x-6 gap-y-4">
               {/* Left Column */}
               <div className="space-y-4">
@@ -324,13 +360,13 @@ export default function CreateEventModal({ isOpen, onClose, defaultDate, default
                   selectedValues={formData.participants}
                   onChange={handleMultiSelectChange("participants")}
                   placeholder={
-                    isLoadingParticipants
+                    isLoadingAvailableParticipants
                       ? t("loading")
                       : availableParticipants.length === 0
-                      ? t("common.noParticipants")
+                      ? "Không có người tham dự khả dụng"
                       : t("common.selectParticipants")
                   }
-                  disabled={isLoadingParticipants}
+                  disabled={isLoadingAvailableParticipants}
                 />
               </div>
 

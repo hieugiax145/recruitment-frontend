@@ -47,7 +47,6 @@ export default function ProbationEvaluationModal({ isOpen, onClose, employeeId, 
     }
 
     const payload = {
-      type: "PROBATION",
       employeeId,
       onTimeCompletionScore: parseInt(formData.onTimeCompletionScore),
       workEfficiencyScore: parseInt(formData.workEfficiencyScore),
@@ -57,7 +56,7 @@ export default function ProbationEvaluationModal({ isOpen, onClose, employeeId, 
       communicationSkillScoreProbation: parseInt(formData.communicationSkillScoreProbation),
       honestyResponsibilityScore: parseInt(formData.honestyResponsibilityScore),
       teamIntegrationScore: parseInt(formData.teamIntegrationScore),
-      probationResult: formData.probationResult,
+      probationResult: formData.probationResult === "ELIGIBLE",
       additionalComments: formData.additionalComments,
     };
 

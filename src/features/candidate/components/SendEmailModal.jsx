@@ -1,20 +1,36 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Modal from "../../../components/ui/Modal";
 import Button from "../../../components/ui/Button";
 import TextInput from "../../../components/ui/TextInput";
 import TextArea from "../../../components/ui/TextArea";
+import SelectDropdown from "../../../components/ui/SelectDropdown";
 import LoadingOverlay from "../../../components/ui/LoadingOverlay";
 import { useSendEmail } from "../../../hooks/useEmail";
 import { Mail } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
+import { EMAIL_TEMPLATES } from "../../../constants/emailTemplates";
 
 export default function SendEmailModal({ isOpen, onClose, recipientEmail, recipientName }) {
   const { t } = useTranslation();
   const defaultSubject = t("modals.emailSubjectTemplate", { name: recipientName });
   const [subject, setSubject] = useState(defaultSubject);
   const [message, setMessage] = useState("");
+  const [selectedTemplate, setSelectedTemplate] = useState(null);
   const sendEmail = useSendEmail();
+
+  const templateOptions = [
+    { id: null, name: "Không sử dụng mẫu" },
+    ...Object.values(EMAIL_TEMPLATES)
+  ];
+
+  useEffect(() => {
+    if (selectedTemplate && EMAIL_TEMPLATES[selectedTemplate]) {
+      const template = EMAIL_TEMPLATES[selectedTemplate];
+      setSubject(template.subject(recipientName));
+      setMessage(template.content(recipientName));
+    }
+  }, [selectedTemplate, recipientName]);
 
   const handleSend = async () => {
     if (!subject.trim() || !message.trim()) {
@@ -43,6 +59,7 @@ export default function SendEmailModal({ isOpen, onClose, recipientEmail, recipi
   const handleClose = () => {
     setSubject(defaultSubject);
     setMessage("");
+    setSelectedTemplate(null);
     onClose();
   };
 
@@ -66,6 +83,14 @@ export default function SendEmailModal({ isOpen, onClose, recipientEmail, recipi
 
         {/* Body */}
         <div className="px-6 py-6 space-y-4">
+          <SelectDropdown
+            label="Chọn mẫu email"
+            options={templateOptions}
+            value={selectedTemplate}
+            onChange={setSelectedTemplate}
+            placeholder="Chọn mẫu có sẵn hoặc soạn thảo mới"
+          />
+
           <TextInput
             label={t("modals.emailSubject")}
             value={subject}

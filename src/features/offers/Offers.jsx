@@ -12,7 +12,7 @@ import SelectDropdown from "../../components/ui/SelectDropdown";
 import { useJobPositions } from "../job-positions/hooks/useJobPositions";
 import EmptyState from "../../components/ui/EmptyState";
 import { useAuth } from "../../context/AuthContext";
-import { Plus } from "lucide-react";
+import { HandshakeIcon, icons, Plus } from "lucide-react";
 
 export default function Offers() {
   const { t } = useTranslation();
@@ -202,6 +202,7 @@ export default function Offers() {
                     <td colSpan="7" className="p-8">
                       <EmptyState
                         title={t("offers.noOffersFound")}
+                        icon={HandshakeIcon}
                       />
                     </td>
                   </tr>

@@ -2,10 +2,12 @@ import api from "../config/axios";
 
 export const statisticsServices = {
   getSummary: async (period = "WEEKLY", dateRange = null) => {
-    const params = { period };
-    if (dateRange && period === "CUSTOM") {
-      params.from = dateRange.from;
-      params.to = dateRange.to;
+    const params = {};
+    if (dateRange && dateRange.from && dateRange.to) {
+      params.startDate = dateRange.from;
+      params.endDate = dateRange.to;
+    } else {
+      params.period = period;
     }
     return api.get("/statistics-service/statistics/summary", { params });
   },

@@ -69,7 +69,7 @@ export default function OfferForm() {
 
     const selectedCandidateId = watch("candidateId");
 
-    const { data: candidatesData, isLoading: isLoadingCandidates } = useCandidates({ status: "INTERVIEW" });
+    const { data: candidatesData, isLoading: isLoadingCandidates } = useCandidates({ status: "OFFER" });
     const candidates = Array.isArray(candidatesData?.data?.result) ? candidatesData.data.result : [];
 
     const { data: selectedCandidateData, isLoading: isLoadingSelectedCandidate } = useCandidate(selectedCandidateId, {

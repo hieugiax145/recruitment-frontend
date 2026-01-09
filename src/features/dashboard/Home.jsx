@@ -14,14 +14,30 @@ import { useTranslation } from "react-i18next";
 import { Briefcase, Calendar } from "lucide-react";
 import LoadingOverlay from "../../components/ui/LoadingOverlay";
 import LoadingContent from "../../components/ui/LoadingContent";
+import { useAuth } from "../../context/AuthContext";
 
 export default function Home() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [customDateRange, setCustomDateRange] = useState({ from: "", to: "" });
+  const { user } = useAuth();
+  const isAdmin = user?.role?.name === "ADMIN";
+  
+  // Set default date range: from 1 month ago to today
+  const getDefaultDateRange = () => {
+    const today = new Date();
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(today.getMonth() - 1);
+    
+    return {
+      from: oneMonthAgo.toISOString().split('T')[0],
+      to: today.toISOString().split('T')[0]
+    };
+  };
+  
+  const [customDateRange, setCustomDateRange] = useState(getDefaultDateRange());
 
   const { data: summaryData, isLoading: isLoadingSummary } =
-    useSummaryStatistics();
+    useSummaryStatistics("CUSTOM", customDateRange);
   const { data: schedulesData, isLoading: isLoadingSchedules } =
     useUpcomingSchedules();
   const { data: jobOpeningsData, isLoading: isLoadingJobOpenings } =
@@ -78,29 +94,29 @@ export default function Home() {
     : [];
 
   const stats = {
-    applications: summaryData?.data?.applications || {
-      value: 0,
+    applications: {
+      value: summaryData?.data?.applications || 0,
       changePercent: 0,
       isIncrease: null,
-      changeText: "So với tuần trước",
+      changeText: "",
     },
-    hired: summaryData?.data?.hired || {
-      value: 0,
+    hired: {
+      value: summaryData?.data?.hired || 0,
       changePercent: 0,
       isIncrease: null,
-      changeText: "So với tuần trước",
+      changeText: "",
     },
-    interviews: summaryData?.data?.interviews || {
-      value: 0,
+    interviews: {
+      value: summaryData?.data?.interviews || 0,
       changePercent: 0,
       isIncrease: null,
-      changeText: "So với tuần trước",
+      changeText: "",
     },
-    rejected: summaryData?.data?.rejected || {
-      value: 0,
+    rejected: {
+      value: summaryData?.data?.rejected || 0,
       changePercent: 0,
       isIncrease: null,
-      changeText: "So với tuần trước",
+      changeText: "",
     },
   };
 
@@ -298,125 +314,131 @@ export default function Home() {
 
   return (
     <div className="flex flex-col h-full">
-      {/* Period Selector */}
-      <div className="mb-4 bg-white rounded-xl shadow p-4">
-        <div className="flex items-center justify-between gap-4 flex-wrap">
-          <h2 className="text-lg font-semibold text-gray-900">
-            {t("overviewStatistics")}
-          </h2>
-          <div className="flex items-center gap-3">
-            <label className="text-sm text-gray-600">{t("fromDate")}:</label>
-            <input
-              type="date"
-              value={customDateRange.from}
-              onChange={(e) =>
-                setCustomDateRange((prev) => ({
-                  ...prev,
-                  from: e.target.value,
-                }))
-              }
-              className="text-sm border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-            <label className="text-sm text-gray-600">{t("toDate")}:</label>
-            <input
-              type="date"
-              value={customDateRange.to}
-              onChange={(e) =>
-                setCustomDateRange((prev) => ({ ...prev, to: e.target.value }))
-              }
-              className="text-sm border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-        <StatCard
-          label={t("applicationsLabel")}
-          value={stats.applications.value}
-          iconBg="#3B82F6"
-          iconType="users"
-          change={stats.applications.changePercent}
-          isIncrease={stats.applications.isIncrease}
-          subtitle={stats.applications.changeText}
-        />
-        <StatCard
-          label={t("hiredLabel")}
-          value={stats.hired.value}
-          iconBg="#10B981"
-          iconType="briefcase"
-          change={stats.hired.changePercent}
-          isIncrease={stats.hired.isIncrease}
-          subtitle={stats.hired.changeText}
-        />
-        <StatCard
-          label={t("interviewsLabel")}
-          value={stats.interviews.value}
-          iconBg="#8B5CF6"
-          iconType="star"
-          change={stats.interviews.changePercent}
-          isIncrease={stats.interviews.isIncrease}
-          subtitle={stats.interviews.changeText}
-        />
-        <StatCard
-          label={t("rejectedLabel")}
-          value={stats.rejected.value}
-          iconBg="#EF4444"
-          iconType="x"
-          change={stats.rejected.changePercent}
-          isIncrease={stats.rejected.isIncrease}
-          subtitle={stats.rejected.changeText}
-        />
-      </div>
-
-      {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* Left Column - Schedules and Applications */}
-        <div className="lg:col-span-2 space-y-4">
-          {/* Upcoming Events */}
-          <div className="bg-white rounded-xl shadow p-4">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-gray-900">
-                {t("upcomingSchedule")}
-              </h2>
-              <TextButton onClick={() => navigate("/calendar")}>{t("viewAll")}</TextButton>
-            </div>
-            <div className="space-y-2">
-              {upcomingEvents.length > 0 ? (
-                upcomingEvents.map((event, index) => (
-                  <EventCard key={index} event={event} />
-                ))
-              ) : (
-                <EmptyState title={t("noUpcomingSchedules")} icon={Calendar} />
-              )}
+      {/* Period Selector - Only show for non-admin */}
+      {!isAdmin && (
+        <div className="mb-4 bg-white rounded-xl shadow p-4">
+          <div className="flex items-center justify-between gap-4 flex-wrap">
+            <h2 className="text-lg font-semibold text-gray-900">
+              {t("overviewStatistics")}
+            </h2>
+            <div className="flex items-center gap-3">
+              <label className="text-sm text-gray-600">{t("fromDate")}:</label>
+              <input
+                type="date"
+                value={customDateRange.from}
+                onChange={(e) =>
+                  setCustomDateRange((prev) => ({
+                    ...prev,
+                    from: e.target.value,
+                  }))
+                }
+                className="text-sm border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+              <label className="text-sm text-gray-600">{t("toDate")}:</label>
+              <input
+                type="date"
+                value={customDateRange.to}
+                onChange={(e) =>
+                  setCustomDateRange((prev) => ({ ...prev, to: e.target.value }))
+                }
+                className="text-sm border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
             </div>
           </div>
         </div>
+      )}
 
-        {/* Right Column - Job Positions */}
-        <div className="lg:col-span-1">
-          <div className="bg-white rounded-xl shadow p-4">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-gray-900">
-                {t("recruitmentPositions")} ({jobPositions.length})
-              </h2>
-              <TextButton onClick={() => navigate("/job-positions")}>
-                {t("viewAll")}
-              </TextButton>
+      {/* Stats Cards - Only show for non-admin */}
+      {!isAdmin && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+          <StatCard
+            label={t("applicationsLabel")}
+            value={stats.applications.value}
+            iconBg="#3B82F6"
+            iconType="users"
+            change={stats.applications.changePercent}
+            isIncrease={stats.applications.isIncrease}
+            subtitle={stats.applications.changeText}
+          />
+          <StatCard
+            label={t("hiredLabel")}
+            value={stats.hired.value}
+            iconBg="#10B981"
+            iconType="briefcase"
+            change={stats.hired.changePercent}
+            isIncrease={stats.hired.isIncrease}
+            subtitle={stats.hired.changeText}
+          />
+          <StatCard
+            label={t("interviewsLabel")}
+            value={stats.interviews.value}
+            iconBg="#8B5CF6"
+            iconType="star"
+            change={stats.interviews.changePercent}
+            isIncrease={stats.interviews.isIncrease}
+            subtitle={stats.interviews.changeText}
+          />
+          <StatCard
+            label={t("rejectedLabel")}
+            value={stats.rejected.value}
+            iconBg="#EF4444"
+            iconType="x"
+            change={stats.rejected.changePercent}
+            isIncrease={stats.rejected.isIncrease}
+            subtitle={stats.rejected.changeText}
+          />
+        </div>
+      )}
+
+      {/* Main Content Grid - Only show for non-admin */}
+      {!isAdmin && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          {/* Left Column - Schedules and Applications */}
+          <div className="lg:col-span-2 space-y-4">
+            {/* Upcoming Events */}
+            <div className="bg-white rounded-xl shadow p-4">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold text-gray-900">
+                  {t("upcomingSchedule")}
+                </h2>
+                <TextButton onClick={() => navigate("/calendar")}>{t("viewAll")}</TextButton>
+              </div>
+              <div className="space-y-2">
+                {upcomingEvents.length > 0 ? (
+                  upcomingEvents.map((event, index) => (
+                    <EventCard key={index} event={event} />
+                  ))
+                ) : (
+                  <EmptyState title={t("noUpcomingSchedules")} icon={Calendar} />
+                )}
+              </div>
             </div>
-            <div className="space-y-2">
-              {jobPositions.length > 0 ? (
-                jobPositions.map((position) => (
-                  <JobPositionCard key={position.id} position={position} />
-                ))
-              ) : (
-                <EmptyState title={t("noPositionsFound")} icon={Briefcase} />
-              )}
+          </div>
+
+          {/* Right Column - Job Positions */}
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-xl shadow p-4">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold text-gray-900">
+                  {t("recruitmentPositions")} ({jobPositions.length})
+                </h2>
+                <TextButton onClick={() => navigate("/job-positions")}>
+                  {t("viewAll")}
+                </TextButton>
+              </div>
+              <div className="space-y-2">
+                {jobPositions.length > 0 ? (
+                  jobPositions.map((position) => (
+                    <JobPositionCard key={position.id} position={position} />
+                  ))
+                ) : (
+                  <EmptyState title={t("noPositionsFound")} icon={Briefcase} />
+                )}
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
       {/* </div> */}
     </div>
   );

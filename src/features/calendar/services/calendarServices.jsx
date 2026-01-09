@@ -31,4 +31,14 @@ export const calendarServices = {
     );
     return response.data;
   },
+
+  getAvailableParticipants: async (startTime, endTime) => {
+    const response = await api.get(
+      "/schedule-service/schedules/available-participants",
+      {
+        params: { startTime, endTime }
+      }
+    );
+    return response.data;
+  },
 };

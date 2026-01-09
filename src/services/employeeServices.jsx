@@ -9,4 +9,6 @@ export const employeeServices = {
   updateEmployee: (id, data) => api.put(`${base}/${id}`, data),
   deleteEmployee: (id) => api.delete(`${base}/${id}`),
   evaluateProbation: (data) => api.post("/user-service/reviews", data),
+  getEmployeeProbationEvaluations: (employeeId) => api.get(`${base}/${employeeId}/probation-evaluations`),
+  getEmployeeReviews: (employeeId, params = {}) => api.get("/user-service/reviews", { params: { employeeId, ...params } }),
 };

@@ -224,7 +224,7 @@ export default function RecruitmentRequests() {
                       }
                     >
                       <td className="p-4 text-sm text-gray-900">
-                        {startIndex + index + 1}
+                        {request.id}
                       </td>
                       <td className="p-4 text-sm text-gray-900 font-medium">
                         {request.requester?.name || t("common.notAvailable")}

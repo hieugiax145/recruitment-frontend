@@ -7,6 +7,7 @@ export const employeeKeys = {
   all: ["employees"],
   list: (params) => ["employees", "list", params],
   detail: (id) => ["employees", "detail", id],
+  evaluations: (id) => ["employees", "evaluations", id],
 };
 
 export const useEmployees = (params = {}, options = {}) => {
@@ -95,11 +96,23 @@ export const useEvaluateProbation = () => {
     },
     onSuccess: (_data, variables) => {
       qc.invalidateQueries({ queryKey: employeeKeys.detail(variables.employeeId) });
+      qc.invalidateQueries({ queryKey: employeeKeys.evaluations(variables.employeeId) });
       qc.invalidateQueries({ queryKey: employeeKeys.all });
     },
     onError: (err) => {
       const msg = err.response?.data?.message || t("employeeEvaluation.probationEvaluation.submitError");
       toast.error(msg);
     },
+  });
+};
+
+export const useEmployeeProbationEvaluations = (employeeId) => {
+  return useQuery({
+    queryKey: employeeKeys.evaluations(employeeId),
+    queryFn: async () => {
+      const res = await employeeServices.getEmployeeProbationEvaluations(employeeId);
+      return res.data;
+    },
+    enabled: !!employeeId,
   });
 };
